@@ -43,7 +43,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             {/* Main Content */}
             <div className={cn(
                 "flex-1 transition-all duration-300 ease-in-out",
-                isSidebarOpen ? "md:ml-64" : "ml-0"
+                isSidebarOpen ? "md:ml-72" : "ml-0"
             )}>
                 {/* Header */}
                 <Header
