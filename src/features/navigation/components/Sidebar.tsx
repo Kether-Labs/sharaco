@@ -2,12 +2,12 @@
 
 import { cn } from "@/lib/utils"
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { navItems } from '@/data/navItemsData'
+import { navItems } from '../data/navItemsData'
 import { NavItem } from './NavItem'
 import { Button } from '@/components/ui/button'
 import { X, LogOut, Settings } from 'lucide-react'
 import Link from "next/link"
-import Logo from "@/components/logo"
+import Logo from "@/components/ui/logo"
 import { motion, AnimatePresence } from "framer-motion"
 
 export default function Sidebar({ setIsSidebarOpen, isSidebarOpen }: { setIsSidebarOpen: (open: boolean) => void, isSidebarOpen: boolean }) {

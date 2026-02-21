@@ -7,9 +7,10 @@ import Link from 'next/link'
 
 import { Sparkles, BarChart3, Users, CheckCircle, ArrowRight, Menu, X, Rocket, Zap, Globe, ShieldCheck, Mail } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import Logo from '@/components/logo'
+
 import { SwitchTheme } from '@/components/ui/switch-theme'
 import Image from 'next/image'
+import Logo from '@/components/ui/logo'
 
 // Types
 interface NavItem {

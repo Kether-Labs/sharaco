@@ -1,8 +1,9 @@
-import logo from '../../assets/img/logo.png'
+
+import Image from 'next/image';
 const Logo = ({ width, height }: { width: number, height: number }) => {
     return (
         <div>
-            <img src={logo} alt="logo" className={`w-${width} object-contain h-${height}`} />
+            <Image src={'/img/logo.png'} alt="logo" width={width} height={height} className={`object-contain`} />
         </div>
     )
 }

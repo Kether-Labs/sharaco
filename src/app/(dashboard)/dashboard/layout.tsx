@@ -1,8 +1,8 @@
 "use client"
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import Header from "@/components/auth/Header"
-import Sidebar from "@/components/auth/sidebar/Sidebar"
+import Header from "@/features/navigation/components/Header"
+import Sidebar from "@/features/navigation/components/Sidebar"
 import { Toaster } from "@/components/ui/toaster"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
 

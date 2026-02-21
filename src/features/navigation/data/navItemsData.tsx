@@ -1,4 +1,4 @@
-import { NavItemInterface } from "@/interfaces/NavItemsInterface";
+import { NavItemInterface } from "../types/NavItemsInterface";
 import {
   ChevronRight,
   Home,

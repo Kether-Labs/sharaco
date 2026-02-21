@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
 
-import { SwitchTheme } from "../ui/switch-theme"
+import { SwitchTheme } from "@/components/ui/switch-theme"
 
 export default function Header({
   setIsSidebarOpen,

@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { NavItemInterface } from "@/interfaces/NavItemsInterface"
+import { NavItemInterface } from "../types/NavItemsInterface"
 import { cn } from "@/lib/utils"
 import { ChevronRight } from "lucide-react"
 import React from "react"

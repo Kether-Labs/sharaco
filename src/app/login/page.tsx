@@ -5,7 +5,7 @@ import Image from "next/image"
 import { Github, Mail, Apple, ShieldCheck, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import Logo from "@/components/logo"
+import Logo from "@/components/ui/logo"
 
 export default function LoginPage() {
     return (
