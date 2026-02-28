@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+
 import { Trash2, GripVertical } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -22,11 +22,7 @@ export function LineItem({ item, index, onChange, onRemove }: LineItemProps) {
     const lineTotal = item.quantity * item.unitPrice;
 
     return (
-        <motion.div
-            layout
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+        <div
             className="group relative flex items-start gap-3 p-4 bg-white/40 dark:bg-slate-900/40 rounded-2xl border border-white/50 dark:border-white/5 shadow-sm backdrop-blur-md hover:bg-white/60 dark:hover:bg-slate-900/60 transition-all duration-300"
         >
             <div className="mt-2 text-slate-400 cursor-grab active:cursor-grabbing hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
@@ -102,6 +98,6 @@ export function LineItem({ item, index, onChange, onRemove }: LineItemProps) {
             >
                 <Trash2 className="h-4 w-4" />
             </Button>
-        </motion.div>
+        </div>
     );
 }

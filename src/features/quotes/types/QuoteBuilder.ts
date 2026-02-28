@@ -8,12 +8,15 @@ export interface QuoteLineItem {
 
 export interface QuoteDraft {
     clientName: string;
+    clientEmail: string;
     clientAddress: string;
     reference: string;
     date: string;
     validityDays: number;
     hasVat: boolean;
-    discountRate: number;      // e.g., 10 for 10% global discount
+    isTaxExempt: boolean;
+    discountRate: number;
     items: QuoteLineItem[];
     notes?: string;
+    internalNotes?: string;
 }

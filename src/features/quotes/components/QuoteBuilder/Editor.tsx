@@ -9,11 +9,13 @@ import { LivePreview } from "./LivePreview";
 export function Editor() {
     const [draft, setDraft] = useState<QuoteDraft>({
         clientName: "",
+        clientEmail: "",
         clientAddress: "",
         reference: `DEV-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000)}`,
         date: new Date().toISOString().split('T')[0],
         validityDays: 30,
         hasVat: true,
+        isTaxExempt: false,
         discountRate: 0,
         items: [
             {
@@ -24,7 +26,8 @@ export function Editor() {
                 taxRate: 20
             }
         ],
-        notes: "Merci pour votre confiance. Conditions de paiement : 30% d'acompte à la signature, solde à la livraison."
+        notes: "Merci pour votre confiance. Conditions de paiement : 30% d'acompte à la signature, solde à la livraison.",
+        internalNotes: ""
     });
 
     const handleDraftChange = (field: keyof QuoteDraft, value: any) => {
@@ -65,18 +68,20 @@ export function Editor() {
     };
 
     return (
-        <div className="flex h-screen w-screen overflow-hidden bg-white dark:bg-slate-950">
-            {/* Left Side: Controls Panel */}
-            <EditorPanel
-                draft={draft}
-                onChange={handleDraftChange}
-                onItemChange={handleItemChange}
-                onAddItem={addItem}
-                onRemoveItem={removeItem}
-            />
+        <div className="flex h-screen w-screen overflow-hidden bg-slate-900">
+            {/* Left Side: Controls Panel (40%) */}
+            <div className="w-[40%] min-w-[500px] h-full">
+                <EditorPanel
+                    draft={draft}
+                    onChange={handleDraftChange}
+                    onItemChange={handleItemChange}
+                    onAddItem={addItem}
+                    onRemoveItem={removeItem}
+                />
+            </div>
 
-            {/* Right Side: Live A4 Preview */}
-            <div className="flex-1 relative overflow-hidden bg-slate-100/50 dark:bg-slate-900/50">
+            {/* Right Side: Live A4 Preview (60%) */}
+            <div className="w-[60%] relative overflow-hidden bg-slate-100 dark:bg-slate-950/20">
                 {/* Background Grid Pattern */}
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
 
