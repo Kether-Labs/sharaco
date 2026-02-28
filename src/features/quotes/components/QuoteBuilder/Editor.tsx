@@ -27,7 +27,9 @@ export function Editor() {
             }
         ],
         notes: "Merci pour votre confiance. Conditions de paiement : 30% d'acompte à la signature, solde à la livraison.",
-        internalNotes: ""
+        internalNotes: "",
+        logoUrl: null,
+        brandColor: "#6366f1"
     });
 
     const handleDraftChange = (field: keyof QuoteDraft, value: any) => {

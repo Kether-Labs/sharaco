@@ -26,10 +26,19 @@ export function LivePreview({ draft }: LivePreviewProps) {
                 layout
                 className="w-full max-w-[800px] bg-white min-h-[1131px] shadow-[0_40px_80px_rgba(0,0,0,0.1)] rounded-sm overflow-hidden flex flex-col relative text-slate-800"
             >
-                {/* Modern Header Shape */}
-                <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-indigo-50/50 rounded-bl-[400px] -z-10" />
-                <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-sky-50/50 rounded-bl-[300px] -z-10" />
-                <div className="h-4 w-full bg-slate-900"></div>
+                {/* Modern Header Shape - Dynamic Brand Color */}
+                <div
+                    className="absolute top-0 right-0 w-[400px] h-[400px] rounded-bl-[400px] -z-10 opacity-10 transition-colors duration-500"
+                    style={{ backgroundColor: draft.brandColor || "#6366f1" }}
+                />
+                <div
+                    className="absolute top-0 right-0 w-[300px] h-[300px] rounded-bl-[300px] -z-10 opacity-20 transition-colors duration-500"
+                    style={{ backgroundColor: draft.brandColor || "#6366f1" }}
+                />
+                <div
+                    className="h-4 w-full transition-colors duration-500"
+                    style={{ backgroundColor: draft.brandColor || "#1e293b" }}
+                ></div>
 
                 <div className="p-14 flex-1 flex flex-col z-10">
 
@@ -37,10 +46,20 @@ export function LivePreview({ draft }: LivePreviewProps) {
                     <div className="flex justify-between items-start mb-20">
                         <div>
                             <div className="flex items-center gap-3 mb-4">
-                                <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center shadow-lg">
-                                    <span className="text-white font-black text-xl">S</span>
-                                </div>
-                                <h2 className="text-2xl font-black text-slate-900 tracking-tight">SHARACO</h2>
+                                {draft.logoUrl ? (
+                                    // eslint-disable-next-line @next/next/no-img-element
+                                    <img src={draft.logoUrl} alt="Company Logo" className="max-w-[160px] max-h-[60px] object-contain drop-shadow-sm" />
+                                ) : (
+                                    <>
+                                        <div
+                                            className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg transition-colors duration-500"
+                                            style={{ backgroundColor: draft.brandColor || "#1e293b" }}
+                                        >
+                                            <span className="text-white font-black text-xl">S</span>
+                                        </div>
+                                        <h2 className="text-2xl font-black text-slate-900 tracking-tight">SHARACO</h2>
+                                    </>
+                                )}
                             </div>
                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Freelance / Studio</p>
                             <p className="text-sm text-slate-500 max-w-[200px] leading-relaxed">123 Avenue de la Création<br />75001 Paris, France<br />contact@sharaco.com</p>

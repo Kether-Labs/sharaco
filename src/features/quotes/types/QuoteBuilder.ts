@@ -19,4 +19,6 @@ export interface QuoteDraft {
     items: QuoteLineItem[];
     notes?: string;
     internalNotes?: string;
+    logoUrl?: string | null;
+    brandColor?: string;
 }

@@ -18,6 +18,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TabDetails } from "./tabs/TabDetails";
 import { TabClient } from "./tabs/TabClient";
 import { TabItems } from "./tabs/TabItems";
+import { TabDesign } from "./tabs/TabDesign";
+import { Paintbrush } from "lucide-react";
 
 interface EditorPanelProps {
     draft: QuoteDraft;
@@ -61,40 +63,46 @@ export function EditorPanel({ draft, onChange, onItemChange, onAddItem, onRemove
 
             {/* Elementor Tabs System */}
             <Tabs defaultValue="details" className="flex-1 flex flex-col overflow-hidden">
-                <div className="px-24 py-4 bg-slate-900 border-b border-slate-800/50">
-                    <TabsList className="w-full h-12 bg-slate-950 border border-slate-800 p-2 rounded-2xl">
+                <div className="px-6 py-4 bg-slate-900 border-b border-slate-800/50">
+                    <TabsList className="w-full h-12 bg-slate-950 border border-slate-800 p-2 rounded-2xl flex">
                         <TabsTrigger
                             value="details"
-                            className="flex-1 rounded-xl data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-slate-400 font-bold text-xs uppercase tracking-widest transition-all"
+                            className="flex-1 min-w-0 px-2 rounded-xl data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-slate-400 font-bold text-[10px] 2xl:text-xs uppercase tracking-widest transition-all whitespace-nowrap overflow-hidden text-ellipsis"
                         >
-                            <Calendar className="w-3.5 h-3.5 mr-2" /> Détails
+                            <Calendar className="w-3.5 h-3.5 mr-1 2xl:mr-2 shrink-0 hidden xl:inline-block" /> Détails
                         </TabsTrigger>
                         <TabsTrigger
                             value="client"
-                            className="flex-1 rounded-xl data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-slate-400 font-bold text-xs uppercase tracking-widest transition-all"
+                            className="flex-1 min-w-0 px-2 rounded-xl data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-slate-400 font-bold text-[10px] 2xl:text-xs uppercase tracking-widest transition-all whitespace-nowrap overflow-hidden text-ellipsis"
                         >
-                            <User className="w-3.5 h-3.5 mr-2" /> Client
+                            <User className="w-3.5 h-3.5 mr-1 2xl:mr-2 shrink-0 hidden xl:inline-block" /> Client
                         </TabsTrigger>
                         <TabsTrigger
                             value="items"
-                            className="flex-1 rounded-xl data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-slate-400 font-bold text-xs uppercase tracking-widest transition-all"
+                            className="flex-1 min-w-0 px-2 rounded-xl data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-slate-400 font-bold text-[10px] 2xl:text-xs uppercase tracking-widest transition-all whitespace-nowrap overflow-hidden text-ellipsis"
                         >
-                            <FileText className="w-3.5 h-3.5 mr-2" /> Prestations
+                            <FileText className="w-3.5 h-3.5 mr-1 2xl:mr-2 shrink-0 hidden xl:inline-block" /> Prestations
+                        </TabsTrigger>
+                        <TabsTrigger
+                            value="design"
+                            className="flex-1 min-w-0 px-2 rounded-xl data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-slate-400 font-bold text-[10px] 2xl:text-xs uppercase tracking-widest transition-all whitespace-nowrap overflow-hidden text-ellipsis"
+                        >
+                            <Paintbrush className="w-3.5 h-3.5 mr-1 2xl:mr-2 shrink-0 hidden xl:inline-block" /> Thème
                         </TabsTrigger>
                     </TabsList>
                 </div>
 
                 <ScrollArea className="flex-1">
                     <div className="px-6 py-8">
-                        <TabsContent value="details" className="mt-0 outline-none">
+                        <TabsContent value="details" className="mt-0 outline-none w-full">
                             <TabDetails draft={draft} onChange={handleDraftChange} />
                         </TabsContent>
 
-                        <TabsContent value="client" className="mt-0 outline-none">
+                        <TabsContent value="client" className="mt-0 outline-none w-full">
                             <TabClient draft={draft} onChange={handleDraftChange} />
                         </TabsContent>
 
-                        <TabsContent value="items" className="mt-0 outline-none">
+                        <TabsContent value="items" className="mt-0 outline-none w-full">
                             <TabItems
                                 draft={draft}
                                 onItemChange={handleItemChange}
@@ -102,6 +110,10 @@ export function EditorPanel({ draft, onChange, onItemChange, onAddItem, onRemove
                                 onRemoveItem={onRemoveItem}
                                 onDraftChange={handleDraftChange}
                             />
+                        </TabsContent>
+
+                        <TabsContent value="design" className="mt-0 outline-none w-full">
+                            <TabDesign draft={draft} onChange={handleDraftChange} />
                         </TabsContent>
                     </div>
                 </ScrollArea>

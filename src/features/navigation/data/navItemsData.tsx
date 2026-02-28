@@ -26,5 +26,5 @@ export const navItems: NavItemInterface[] = [
   { title: "Clients", icon: <Users className="h-4 w-4" />, href: "/dashboard/clients" },
   { title: "Billing", icon: <CreditCard className="h-4 w-4" />, href: "/dashboard/billing" },
   { title: "System", isHeader: true, icon: null },
-  { title: "Settings", icon: <Key className="h-4 w-4" />, href: "/dashboard/settings" },
+  { title: "Paramètres", icon: <Key className="h-4 w-4" />, href: "/dashboard/settings" },
 ];
