@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { BrandIdentity, SettingsTab } from "../../types";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Paintbrush, CreditCard, Bell, User } from "lucide-react";
 import { TabIdentity } from "./tabs/TabIdentity";
 import { TabBilling } from "./tabs/TabBilling";
 import { TabNotifications } from "./tabs/TabNotifications";
 import { TabAccount } from "./tabs/TabAccount";
+import { BrandIdentity } from "../types";
 
 // Default identity state
 const defaultIdentity: BrandIdentity = {

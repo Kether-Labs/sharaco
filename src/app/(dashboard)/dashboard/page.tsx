@@ -26,7 +26,7 @@ export default function DashboardPage() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-                        Welcome back, John 👋
+                        Welcome back, Level 👋
                     </h2>
                     <p className="text-muted-foreground mt-1 text-sm md:text-base">
                         Here's what's happening with your business today.
@@ -35,7 +35,7 @@ export default function DashboardPage() {
                 <div className="flex items-center gap-2">
                     <Button variant="outline" className="hidden md:flex bg-white dark:bg-slate-950 border-gray-200 dark:border-slate-800">
                         <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
-                        <span>Feb 12, 2024 - Feb 19, 2024</span>
+                        <span>Mar 22, 2026 - Apr 22, 2026</span>
                     </Button>
                     <Button variant="outline" size="icon" className="bg-white dark:bg-slate-950 border-gray-200 dark:border-slate-800">
                         <Download className="h-4 w-4" />

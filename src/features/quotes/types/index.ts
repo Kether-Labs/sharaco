@@ -1,0 +1,51 @@
+export type DocumentType = 'DEVIS' | 'FACTURE';
+export type DocumentStatus = 'DRAFT' | 'SENT' | 'VIEWED' | 'PAID' | 'CANCELLED';
+
+export interface DocumentItem {
+    id: string;
+    description: string;
+    quantity: number;
+    unit_price_cents: number;
+    tax_rate: number;
+    document_id: string;
+}
+
+export interface Document {
+    id: string;
+    type: DocumentType;
+    status: DocumentStatus;
+    number?: string;
+    created_at: string;
+    due_date?: string;
+    sent_at?: string;
+    viewed_at?: string;
+    user_id: string;
+    client_id: string;
+    template_id?: string;
+    items?: DocumentItem[];
+    subtotal_cents?: number;
+    tax_total_cents?: number;
+    total_cents?: number;
+    client?: {
+        id: string;
+        name: string;
+        email?: string;
+    };
+}
+
+export interface DocumentCreate {
+    type: DocumentType;
+    client_id: string;
+    template_id?: string;
+    due_date?: string;
+    items: {
+        description: string;
+        quantity: number;
+        unit_price_cents: number;
+        tax_rate: number;
+    }[];
+}
+
+export interface DocumentStatusUpdate {
+    status: DocumentStatus;
+}

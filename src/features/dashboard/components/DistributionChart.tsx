@@ -54,7 +54,7 @@ export function DistributionChart() {
                     </ResponsiveContainer>
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                         <div className="text-center">
-                            <span className="text-3xl font-bold">1200</span>
+                            <span className="text-3xl font-bold">12</span>
                             <div className="text-xs text-muted-foreground uppercase tracking-wider">Clients</div>
                         </div>
                     </div>

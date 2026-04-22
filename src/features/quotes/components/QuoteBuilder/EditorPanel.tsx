@@ -63,29 +63,29 @@ export function EditorPanel({ draft, onChange, onItemChange, onAddItem, onRemove
 
             {/* Elementor Tabs System */}
             <Tabs defaultValue="details" className="flex-1 flex flex-col overflow-hidden">
-                <div className="px-6 py-4 bg-slate-900 border-b border-slate-800/50">
-                    <TabsList className="w-full h-12 bg-slate-950 border border-slate-800 p-2 rounded-2xl flex">
+                <div className="px-24 py-4 bg-slate-900 border-b border-slate-800/50">
+                    <TabsList className="w-full  h-12 bg-slate-950 border border-slate-800 px-2 rounded-2xl flex">
                         <TabsTrigger
                             value="details"
-                            className="flex-1 min-w-0 px-2 rounded-xl data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-slate-400 font-bold text-[10px] 2xl:text-xs uppercase tracking-widest transition-all whitespace-nowrap overflow-hidden text-ellipsis"
+                            className="flex-1 min-w-0 px-2 rounded-xl data-[state=active]:bg-sky-500 data-[state=active]:text-white text-slate-400 font-bold text-[10px] 2xl:text-xs uppercase tracking-widest transition-all whitespace-nowrap overflow-hidden text-ellipsis"
                         >
                             <Calendar className="w-3.5 h-3.5 mr-1 2xl:mr-2 shrink-0 hidden xl:inline-block" /> Détails
                         </TabsTrigger>
                         <TabsTrigger
                             value="client"
-                            className="flex-1 min-w-0 px-2 rounded-xl data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-slate-400 font-bold text-[10px] 2xl:text-xs uppercase tracking-widest transition-all whitespace-nowrap overflow-hidden text-ellipsis"
+                            className="flex-1 min-w-0 px-2 rounded-xl data-[state=active]:bg-sky-500 data-[state=active]:text-white text-slate-400 font-bold text-[10px] 2xl:text-xs uppercase tracking-widest transition-all whitespace-nowrap overflow-hidden text-ellipsis"
                         >
                             <User className="w-3.5 h-3.5 mr-1 2xl:mr-2 shrink-0 hidden xl:inline-block" /> Client
                         </TabsTrigger>
                         <TabsTrigger
                             value="items"
-                            className="flex-1 min-w-0 px-2 rounded-xl data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-slate-400 font-bold text-[10px] 2xl:text-xs uppercase tracking-widest transition-all whitespace-nowrap overflow-hidden text-ellipsis"
+                            className="flex-1 min-w-0 px-2 rounded-xl data-[state=active]:bg-sky-500 data-[state=active]:text-white text-slate-400 font-bold text-[10px] 2xl:text-xs uppercase tracking-widest transition-all whitespace-nowrap overflow-hidden text-ellipsis"
                         >
                             <FileText className="w-3.5 h-3.5 mr-1 2xl:mr-2 shrink-0 hidden xl:inline-block" /> Prestations
                         </TabsTrigger>
                         <TabsTrigger
                             value="design"
-                            className="flex-1 min-w-0 px-2 rounded-xl data-[state=active]:bg-indigo-600 data-[state=active]:text-white text-slate-400 font-bold text-[10px] 2xl:text-xs uppercase tracking-widest transition-all whitespace-nowrap overflow-hidden text-ellipsis"
+                            className="flex-1 min-w-0 px-2 rounded-xl data-[state=active]:bg-sky-500 data-[state=active]:text-white text-slate-400 font-bold text-[10px] 2xl:text-xs uppercase tracking-widest transition-all whitespace-nowrap overflow-hidden text-ellipsis"
                         >
                             <Paintbrush className="w-3.5 h-3.5 mr-1 2xl:mr-2 shrink-0 hidden xl:inline-block" /> Thème
                         </TabsTrigger>
@@ -120,11 +120,11 @@ export function EditorPanel({ draft, onChange, onItemChange, onAddItem, onRemove
             </Tabs>
 
             {/* Bottom Global Actions */}
-            <div className="p-6 bg-slate-900/50 border-t border-slate-800 backdrop-blur-md shrink-0 grid grid-cols-2 gap-4">
+            <div className="p-6 px-44 bg-slate-900/50 border-t border-slate-800 backdrop-blur-md shrink-0 grid grid-cols-2 gap-4">
                 <Button variant="outline" className="h-12 rounded-2xl border-slate-800 bg-slate-950 text-slate-400 hover:bg-slate-900 hover:text-white font-bold text-xs uppercase tracking-widest transition-all">
                     <Save className="mr-2 h-4 w-4" /> Brouillon
                 </Button>
-                <Button className="h-12 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-xl shadow-indigo-600/20 border-0 font-bold text-xs uppercase tracking-widest transition-all">
+                <Button className="h-12  rounded-2xl dark:bg-sky-500 hover:bg-sky-600  shadow-xl  border-0 font-bold text-xs uppercase tracking-widest transition-all">
                     <Send className="mr-2 h-4 w-4" /> Finaliser
                 </Button>
             </div>
