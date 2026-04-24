@@ -6,28 +6,23 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Loader2 } from 'lucide-react';
+import { Apple, Github, Loader2, ShieldCheck, ChevronLeft } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
 import {
     Form,
     FormControl,
     FormField,
     FormItem,
-    FormLabel,
+
     FormMessage,
 } from '@/components/ui/form';
 
-import { useLogin } from '../hooks/useAuth';
+import Logo from '@/components/ui/logo';
+import { useLogin, useVerifyIfEmailExist } from '../hooks/useAuth';
+import { Label } from '@/components/ui/label';
 
 const loginSchema = z.object({
     email: z.string().min(1, "L'email est requis").email("Format d'email invalide"),
@@ -39,7 +34,12 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 export function LoginForm() {
     const router = useRouter();
     const loginMutation = useLogin();
+    const verifyIfEmailExistMutation = useVerifyIfEmailExist();
+
+    const [email, setEmail] = useState('');
+    const [step, setStep] = useState<'email' | 'password'>('email');
     const [showPassword, setShowPassword] = useState(false);
+    const [error, setError] = useState('');
 
     const form = useForm<LoginFormValues>({
         resolver: zodResolver(loginSchema),
@@ -49,111 +49,220 @@ export function LoginForm() {
         },
     });
 
-    const onSubmit = (data: LoginFormValues) => {
-        loginMutation.mutate({
+    const onStepNext = async () => {
+        setError('');
+        if (!email || !z.string().email().safeParse(email).success) {
+            setError("Veuillez entrer un email valide");
+            return;
+        }
+
+        try {
+            const exists = await verifyIfEmailExistMutation.mutateAsync(email);
+            if (exists) {
+                form.setValue('email', email);
+                setStep('password');
+            } else {
+                setError('Email non trouvé ou non autorisé.');
+            }
+        } catch (err) {
+            setError("Une erreur est survenue lors de la vérification.");
+        }
+    };
+
+    const onSubmit = async (data: LoginFormValues) => {
+        const response = await loginMutation.mutateAsync({
             username: data.email,
             password: data.password,
         });
+        if (response) {
+            router.push('/dashboard');
+        } else {
+            setError("Une erreur est survenue lors de la connexion.");
+        }
     };
 
     return (
-        <Card className="w-full max-w-md border-border/50 bg-card/80 backdrop-blur-sm">
-            <CardHeader className="space-y-1 text-center">
-                <CardTitle className="text-2xl font-bold tracking-tight">
-                    Connexion
-                </CardTitle>
-                <CardDescription>
-                    Entrez vos identifiants pour accéder à votre compte
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                        {loginMutation.isError && (
-                            <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
-                                {loginMutation.error instanceof Error
-                                    ? loginMutation.error.message
-                                    : 'Identifiants incorrects. Veuillez réessayer.'}
+        <div className="w-full max-w-[400px] space-y-8 text-center overflow-hidden">
+            {/* Logo & Heading */}
+            <div className="flex flex-col items-center space-y-6">
+                <div className="p-3 bg-white/5 rounded-2xl border border-white/10 dark:border-slate-800">
+                    <Logo width={80} height={80} />
+                </div>
+                <div className="space-y-2">
+                    <h1 className="text-3xl font-bold tracking-tight">Sign in to Sharaco</h1>
+                    <p className="text-zinc-500 text-sm font-medium">
+                        Identifiez-vous pour accéder à votre espace.
+                    </p>
+                </div>
+            </div>
+
+            <div className="relative">
+                <AnimatePresence mode="wait">
+                    {step === 'email' ? (
+                        <motion.div
+                            key="email-step"
+                            initial={{ x: -20, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            exit={{ x: 20, opacity: 0 }}
+                            transition={{ duration: 0.3, ease: 'easeInOut' }}
+                            className="space-y-4"
+                        >
+                            <div className="space-y-2">
+                                <Input
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    onKeyDown={(e) => e.key === 'Enter' && onStepNext()}
+                                    value={email}
+                                    type="email"
+                                    placeholder="Entrez votre email"
+                                    disabled={verifyIfEmailExistMutation.isPending}
+                                    className="h-12 bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-600 focus:ring-sky-500 focus:border-sky-500 rounded-xl"
+                                />
                             </div>
-                        )}
-
-                        <FormField
-                            control={form.control}
-                            name="email"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Email</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            type="email"
-                                            placeholder="nom@entreprise.com"
-                                            autoComplete="email"
-                                            disabled={loginMutation.isPending}
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
+                            {error && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="text-red-500 text-sm font-medium"
+                                >
+                                    {error}
+                                </motion.div>
                             )}
-                        />
+                            <Button
+                                onClick={onStepNext}
+                                disabled={verifyIfEmailExistMutation.isPending}
+                                className="w-full cursor-pointer h-12 bg-sky-700 hover:bg-sky-600 font-bold rounded-xl transition-all"
+                            >
+                                {verifyIfEmailExistMutation.isPending ? (
+                                    <Loader2 className="h-5 w-5 animate-spin" />
+                                ) : (
+                                    'Continuer avec Email'
+                                )}
+                            </Button>
+                        </motion.div>
+                    ) : (
+                        <motion.div
+                            key="password-step"
+                            initial={{ x: 20, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            exit={{ x: -20, opacity: 0 }}
+                            transition={{ duration: 0.3, ease: 'easeInOut' }}
+                        >
+                            <Form {...form}>
+                                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                                    {loginMutation.isError && (
+                                        <div className="rounded-lg border border-red-500/50 bg-red-500/10 p-3 text-sm text-red-500 text-left">
+                                            {loginMutation.error instanceof Error
+                                                ? loginMutation.error.message
+                                                : 'Identifiants incorrects. Veuillez réessayer.'}
+                                        </div>
+                                    )}
 
-                        <FormField
-                            control={form.control}
-                            name="password"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <div className="flex items-center justify-between">
-                                        <FormLabel>Mot de passe</FormLabel>
+                                    <div className="flex items-center space-x-2 text-sm text-zinc-400 mb-2">
                                         <button
                                             type="button"
-                                            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-                                            onClick={() => setShowPassword(!showPassword)}
+                                            onClick={() => setStep('email')}
+                                            className="hover:text-white transition-colors"
                                         >
-                                            {showPassword ? 'Masquer' : 'Afficher'}
+                                            <ChevronLeft className="h-4 w-4" />
                                         </button>
+                                        <span className="font-medium truncate">{email}</span>
                                     </div>
-                                    <FormControl>
-                                        <Input
-                                            type={showPassword ? 'text' : 'password'}
-                                            placeholder="••••••••"
-                                            autoComplete="current-password"
-                                            disabled={loginMutation.isPending}
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
 
-                        <Button
-                            type="submit"
-                            className="w-full"
-                            disabled={loginMutation.isPending}
-                        >
-                            {loginMutation.isPending ? (
-                                <>
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    Connexion en cours...
-                                </>
-                            ) : (
-                                'Se connecter'
-                            )}
-                        </Button>
-                    </form>
-                </Form>
-            </CardContent>
-            <CardFooter className="flex justify-center">
-                <p className="text-sm text-muted-foreground">
-                    Pas encore de compte ?{' '}
-                    <Link
-                        href="/register"
-                        className="font-medium text-primary underline-offset-4 hover:underline"
-                    >
-                        Créer un compte
-                    </Link>
-                </p>
-            </CardFooter>
-        </Card>
+                                    <FormField
+                                        control={form.control}
+                                        name="password"
+                                        render={({ field }) => (
+                                            <FormItem className="text-left">
+                                                <div className="flex items-center mt-6 justify-between mb-5">
+                                                    <Label htmlFor="password" className="text-zinc-400  text-xs  tracking-widest font-bold">Mot de passe</Label>
+                                                    <button
+                                                        type="button"
+                                                        className="text-xs text-sky-500 cursor-pointer hover:text-sky-400 font-bold transition-colors"
+                                                        onClick={() => setShowPassword(!showPassword)}
+                                                    >
+                                                        {showPassword ? 'Masquer' : 'Afficher'}
+                                                    </button>
+                                                </div>
+                                                <FormControl>
+                                                    <Input
+                                                        type={showPassword ? 'text' : 'password'}
+                                                        placeholder="••••••••"
+                                                        className="h-12 bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-600 focus:ring-sky-500 focus:border-sky-500 rounded-xl"
+                                                        autoComplete="current-password"
+                                                        disabled={loginMutation.isPending}
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage className="text-red-500 text-xs" />
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <Button
+                                        type="submit"
+                                        className="w-full cursor-pointer h-12 bg-sky-700 hover:bg-sky-600 font-bold rounded-xl transition-all"
+                                        disabled={loginMutation.isPending}
+                                    >
+                                        {loginMutation.isPending ? (
+                                            <>
+                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                Connexion...
+                                            </>
+                                        ) : (
+                                            'Se connecter'
+                                        )}
+                                    </Button>
+                                </form>
+                            </Form>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
+
+            {/* Separator */}
+            <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t border-zinc-800" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-black px-2 text-zinc-500 font-bold tracking-widest">or</span>
+                </div>
+            </div>
+
+            {/* Social Auth */}
+            <div className="space-y-3">
+                <Button variant="outline" className="w-full h-12 bg-transparent border-zinc-800 hover:bg-white/5 text-white font-bold rounded-xl flex items-center justify-center gap-3">
+                    <svg className="w-5 h-5" viewBox="0 0 24 24">
+                        <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.1-1.93 3.3-4.77 3.3-8.09z" />
+                        <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                        <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" />
+                        <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                    </svg>
+                    Continue with Google
+                </Button>
+
+                <Button variant="outline" className="w-full h-12 bg-transparent border-zinc-800 hover:bg-white/5 text-white font-bold rounded-xl flex items-center justify-center gap-3">
+                    <Github className="w-5 h-5" />
+                    Continue with GitHub
+                </Button>
+
+                <Button variant="outline" className="w-full h-12 bg-transparent border-zinc-800 hover:bg-white/5 text-white font-bold rounded-xl flex items-center justify-center gap-3">
+                    <Apple className="w-5 h-5" />
+                    Continue with Apple
+                </Button>
+
+                <Button variant="outline" className="w-full h-12 bg-transparent border-zinc-800 hover:bg-white/5 text-white font-bold rounded-xl flex items-center justify-center gap-3">
+                    <ShieldCheck className="w-5 h-5" />
+                    Continue with SAML SSO
+                </Button>
+            </div>
+
+            <p className="text-zinc-500 text-sm font-medium pt-4">
+                Don't have an account?{" "}
+                <Link href="/signup" className="text-sky-500 hover:text-sky-400 font-bold underline-offset-4 hover:underline">
+                    Sign Up
+                </Link>
+            </p>
+        </div>
     );
 }

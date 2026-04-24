@@ -10,6 +10,11 @@ export const authApi = {
         return api.postForm<AuthResponse>('/api/v1/auth/login', formData);
     },
 
+    verifyIfEmailExist: async (email: string): Promise<boolean> => {
+
+        return api.post<boolean>(`/api/v1/auth/verify-email?email=${email}`);
+    },
+
     register: async (data: RegisterRequest): Promise<User> => {
         return api.post<User>('/api/v1/auth/register', data);
     },
