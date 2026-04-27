@@ -3,55 +3,66 @@
 import { TrendingUp } from "lucide-react"
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { MonthlyRevenue } from "@/features/dashboard/types"
+import { formatCurrency } from "@/features/quotes/lib/formatCurrency"
 
-const revenueData = [
-    { name: "Jan", total: 2400 },
-    { name: "Feb", total: 1398 },
-    { name: "Mar", total: 9800 },
-    { name: "Apr", total: 3908 },
-    { name: "May", total: 4800 },
-    { name: "Jun", total: 3800 },
-    { name: "Jul", total: 4300 },
-]
+interface RevenueChartProps {
+    data: MonthlyRevenue[]
+}
 
-export function RevenueChart() {
+const formatMonth = (monthString: string) => {
+    if (!monthString) return "";
+    const date = new Date(monthString + "-01");
+    // Format to short french month, e.g., "Jan", "Fév"
+    return new Intl.DateTimeFormat('fr-FR', { month: 'short' }).format(date);
+}
+
+export function RevenueChart({ data }: RevenueChartProps) {
+    // If no data or array is empty, provide a fallback to avoid empty chart
+    const chartData = data && data.length > 0 ? data : [];
+    console.log(data)
+    console.log("level")
     return (
-        <Card className="col-span-1 lg:col-span-5 bg-white dark:bg-slate-950 border-border/50 shadow-sm">
+        <Card className="col-span-1 lg:col-span-2 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 shadow-sm rounded-xl hover:shadow-md transition-shadow">
             <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                    <TrendingUp className="h-5 w-5 text-sky-500" />
-                    Revenue Overview
+                <CardTitle className="text-base font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5 text-emerald-500" />
+                    Revenus mensuels
                 </CardTitle>
-                <CardDescription>
-                    Comparing current revenue against last year's performance.
+                <CardDescription className="text-xs">
+                    Évolution des revenus encaissés sur les 12 derniers mois.
                 </CardDescription>
             </CardHeader>
             <CardContent className="pl-0">
-                <div className="h-[350px] w-full">
+                <div className="h-[300px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart data={revenueData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                        <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 10, bottom: 0 }}>
                             <defs>
-                                <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#0ea5e9" stopOpacity={0.3} />
-                                    <stop offset="95%" stopColor="#0ea5e9" stopOpacity={0} />
+                                <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                                 </linearGradient>
                             </defs>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.4} />
                             <XAxis
-                                dataKey="name"
+                                dataKey="month"
                                 stroke="#888888"
                                 fontSize={12}
                                 tickLine={false}
                                 axisLine={false}
+                                tickFormatter={formatMonth}
                             />
                             <YAxis
                                 stroke="#888888"
                                 fontSize={12}
                                 tickLine={false}
                                 axisLine={false}
-                                tickFormatter={(value) => `$${value}`}
+                                // Auto scale or format compactly to avoid overlapping text
+                                tickFormatter={(value) => value >= 1000 ? `${(value / 1000).toFixed(0)}k` : value}
                             />
                             <Tooltip
+                                formatter={(value: number) => [formatCurrency(value), "Revenus"]}
+                                labelFormatter={(label) => formatMonth(label as string)}
                                 contentStyle={{
                                     backgroundColor: "hsl(var(--background))",
                                     borderColor: "hsl(var(--border))",
@@ -63,11 +74,11 @@ export function RevenueChart() {
                             />
                             <Area
                                 type="monotone"
-                                dataKey="total"
-                                stroke="#0ea5e9"
+                                dataKey="revenue_cents"
+                                stroke="#10b981"
                                 strokeWidth={3}
                                 fillOpacity={1}
-                                fill="url(#colorTotal)"
+                                fill="url(#colorRevenue)"
                             />
                         </AreaChart>
                     </ResponsiveContainer>

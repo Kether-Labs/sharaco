@@ -6,100 +6,165 @@ import {
     DollarSign,
     Plus,
     FileText,
-    Briefcase,
-    Calendar,
+    Users,
+    Clock,
+    TrendingUp,
+    FileSpreadsheet,
+    FileEdit,
+    AlertTriangle,
     Download,
+    Calendar
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { KPICard } from "@/features/dashboard/components/KPICard"
 import { RevenueChart } from "@/features/dashboard/components/RevenueChart"
 import { DistributionChart } from "@/features/dashboard/components/DistributionChart"
-import { QuotesHistory } from "@/features/dashboard/components/QuotesHistory"
-import { ActivityFeed } from "@/features/dashboard/components/ActivityFeed"
-import { sparklineData1, sparklineData2, sparklineData3, sparklineData4 } from "@/features/dashboard/data/SparklineData"
+import { RecentDocuments } from "@/features/dashboard/components/RecentDocuments"
+import { RecentActivity } from "@/features/dashboard/components/RecentActivity"
+import { useDashboardStats, useDashboardRevenue } from "@/features/dashboard/hooks/useDashboard"
+import { formatCurrency } from "@/features/quotes/lib/formatCurrency"
+import { Skeleton } from "@/components/ui/skeleton"
 
 export default function DashboardPage() {
+    const { data: stats, isLoading: isStatsLoading, error: statsError, refetch: refetchStats } = useDashboardStats();
+    const { data: revenueData, isLoading: isRevenueLoading } = useDashboardRevenue(12);
+
+
+    if (statsError) {
+        return (
+            <div className="flex-1 flex flex-col items-center justify-center p-8 space-y-4">
+                <p className="text-red-500 font-medium">Une erreur est survenue lors du chargement des statistiques.</p>
+                <Button onClick={() => refetchStats()} variant="outline">Réessayer</Button>
+            </div>
+        )
+    }
+
     return (
-        <div className="flex-1 space-y-6 lg:space-y-8 p-4 md:p-8 pt-6 max-w-[1600px] mx-auto">
-            {/* Enterprise Header */}
+        <div className="flex-1 space-y-6 p-4 md:p-8 pt-6 max-w-[1600px] mx-auto">
+            {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-                        Welcome back, Level 👋
+                        Tableau de bord
                     </h2>
                     <p className="text-muted-foreground mt-1 text-sm md:text-base">
-                        Here's what's happening with your business today.
+                        Vue d'ensemble de votre activité.
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Button variant="outline" className="hidden md:flex bg-white dark:bg-slate-950 border-gray-200 dark:border-slate-800">
-                        <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
-                        <span>Mar 22, 2026 - Apr 22, 2026</span>
-                    </Button>
-                    <Button variant="outline" size="icon" className="bg-white dark:bg-slate-950 border-gray-200 dark:border-slate-800">
-                        <Download className="h-4 w-4" />
-                    </Button>
-                    <Button className="bg-sky-600 hover:bg-sky-700 text-white shadow-lg shadow-sky-500/20 transition-all active:scale-95">
-                        <Plus className="mr-2 h-4 w-4" /> New Quote
+                    <Button className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-500/20 transition-all active:scale-95">
+                        <Plus className="mr-2 h-4 w-4" /> Nouveau Devis
                     </Button>
                 </div>
             </div>
 
-            {/* KPI Cards with Sparklines */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <KPICard
-                    title="Total Revenue"
-                    value="$45,231.89"
-                    change="+20.1%"
-                    trend="up"
-                    icon={DollarSign}
-                    iconColor="text-emerald-500"
-                    data={sparklineData1}
-                    strokeColor="#10b981"
-                />
-                <KPICard
-                    title="Active Quotes"
-                    value="2,350"
-                    change="+180.1%"
-                    trend="up"
-                    icon={FileText}
-                    iconColor="text-sky-500"
-                    data={sparklineData2}
-                    strokeColor="#0ea5e9"
-                />
-                <KPICard
-                    title="Acceptance Rate"
-                    value="42.5%"
-                    change="-4.5%"
-                    trend="down"
-                    icon={Activity}
-                    iconColor="text-amber-500"
-                    data={sparklineData3}
-                    strokeColor="#f59e0b"
-                />
-                <KPICard
-                    title="Avg. Deal Size"
-                    value="$3,250"
-                    change="+8%"
-                    trend="up"
-                    icon={Briefcase}
-                    iconColor="text-indigo-500"
-                    data={sparklineData4}
-                    strokeColor="#6366f1"
-                />
+            {/* ROW 1 — 4 KPI Cards */}
+            <div className="grid gap-4 md:gap-6 grid-cols-2 md:grid-cols-4">
+                {isStatsLoading ? (
+                    [...Array(4)].map((_, i) => <Skeleton key={i} className="h-[120px] rounded-xl" />)
+                ) : (
+                    <>
+                        <KPICard
+                            title="Revenu encaissé"
+                            value={formatCurrency(stats?.montant_paye_cents || 0)}
+                            description={`Ce mois : ${formatCurrency(stats?.montant_paye_ce_mois_cents || 0)}`}
+                            icon={DollarSign}
+                            iconColorClass="text-emerald-500"
+                            iconBgClass="bg-emerald-500/10"
+                        />
+                        <KPICard
+                            title="En attente"
+                            value={formatCurrency(stats?.montant_en_attente_cents || 0)}
+                            description="Devis envoyés & consultés"
+                            icon={Clock}
+                            iconColorClass="text-amber-500"
+                            iconBgClass="bg-amber-500/10"
+                        />
+                        <KPICard
+                            title="Taux de conversion"
+                            value={`${stats?.taux_conversion || 0}%`}
+                            description="Devis → Payé"
+                            icon={TrendingUp}
+                            trend={(stats?.taux_conversion || 0) > 50 ? 'up' : 'down'}
+                            iconColorClass={(stats?.taux_conversion || 0) > 50 ? "text-emerald-500" : "text-rose-500"}
+                            iconBgClass={(stats?.taux_conversion || 0) > 50 ? "bg-emerald-500/10" : "bg-rose-500/10"}
+                        />
+                        <KPICard
+                            title="Clients"
+                            value={stats?.total_clients || 0}
+                            description="Total contacts"
+                            icon={Users}
+                            iconColorClass="text-sky-500"
+                            iconBgClass="bg-sky-500/10"
+                        />
+                    </>
+                )}
             </div>
 
-            {/* Charts Section */}
-            <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-7">
-                <RevenueChart />
-                <DistributionChart />
-            </div>
+            {/* ROW 2 — Charts */}
+            {revenueData && revenueData?.length > 0 && <div className="grid gap-4 md:gap-6 grid-cols-1 lg:grid-cols-3">
+                {isRevenueLoading ? (
+                    <Skeleton className="col-span-1 lg:col-span-2 h-[350px] rounded-xl" />
+                ) : (
+                    <RevenueChart data={revenueData || []} />
+                )}
+                {isStatsLoading ? (
+                    <Skeleton className="col-span-1 h-[350px] rounded-xl" />
+                ) : (
+                    <DistributionChart
+                        draft={stats?.devis_draft || 0}
+                        sent={stats?.devis_sent || 0}
+                        viewed={stats?.devis_viewed || 0}
+                        paid={stats?.devis_paid || 0}
+                    />
+                )}
+            </div>}
 
-            <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-3">
-                <QuotesHistory />
-                <ActivityFeed />
-            </div>
+
+            {/* ROW 3 — Recent Documents & Activity */}
+
+            <RecentDocuments />
+            {/* ROW 4 — Mini Stats */}
+
+            {revenueData && revenueData?.length > 0 && <div className="grid gap-4 md:gap-6 grid-cols-2 lg:grid-cols-4">
+                {isStatsLoading ? (
+                    [...Array(4)].map((_, i) => <Skeleton key={i} className="h-[120px] rounded-xl" />)
+                ) : (
+                    <>
+                        <KPICard
+                            title="Devis ce mois"
+                            value={stats?.devis_ce_mois || 0}
+                            icon={FileText}
+                            iconColorClass="text-indigo-500"
+                            iconBgClass="bg-indigo-500/10"
+                        />
+                        <KPICard
+                            title="Factures ce mois"
+                            value={stats?.factures_ce_mois || 0}
+                            icon={FileSpreadsheet}
+                            iconColorClass="text-cyan-500"
+                            iconBgClass="bg-cyan-500/10"
+                        />
+                        <KPICard
+                            title="Devis brouillon"
+                            value={stats?.devis_draft || 0}
+                            icon={FileEdit}
+                            iconColorClass="text-slate-500"
+                            iconBgClass="bg-slate-500/10"
+                        />
+                        <KPICard
+                            title="Relances échouées"
+                            value={stats?.relances_echouees || 0}
+                            icon={AlertTriangle}
+                            iconColorClass={(stats?.relances_echouees || 0) > 0 ? "text-white" : "text-slate-500"}
+                            iconBgClass={(stats?.relances_echouees || 0) > 0 ? "bg-rose-500" : "bg-slate-500/10"}
+                            valueColorClass={(stats?.relances_echouees || 0) > 0 ? "text-rose-500" : undefined}
+                        />
+                    </>
+                )}
+            </div>}
+
         </div>
     )
 }

@@ -27,7 +27,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }, [])
 
     return (
-        <div className="flex bg-background dark:bg-slate-900 h-[100%]">
+        <div className="flex bg-background dark:bg-slate-900 h-screen">
             {/* Desktop Sidebar */}
             <div className="hidden md:block">
                 <Sidebar setIsSidebarOpen={setIsSidebarOpen} isSidebarOpen={isSidebarOpen} />
