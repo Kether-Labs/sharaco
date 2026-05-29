@@ -18,72 +18,97 @@ const formatMonth = (monthString: string) => {
 }
 
 export function RevenueChart({ data }: RevenueChartProps) {
-    // If no data or array is empty, provide a fallback to avoid empty chart
     const chartData = data && data.length > 0 ? data : [];
-    console.log(data)
-    console.log("level")
+    
     return (
-        <Card className="col-span-1 lg:col-span-2 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 shadow-sm rounded-xl hover:shadow-md transition-shadow">
-            <CardHeader>
-                <CardTitle className="text-base font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-                    <TrendingUp className="h-5 w-5 text-emerald-500" />
-                    Revenus mensuels
-                </CardTitle>
-                <CardDescription className="text-xs">
-                    Évolution des revenus encaissés sur les 12 derniers mois.
-                </CardDescription>
-            </CardHeader>
-            <CardContent className="pl-0">
-                <div className="h-[300px] w-full">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 10, bottom: 0 }}>
-                            <defs>
-                                <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                                </linearGradient>
-                            </defs>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.4} />
-                            <XAxis
-                                dataKey="month"
-                                stroke="#888888"
-                                fontSize={12}
-                                tickLine={false}
-                                axisLine={false}
-                                tickFormatter={formatMonth}
-                            />
-                            <YAxis
-                                stroke="#888888"
-                                fontSize={12}
-                                tickLine={false}
-                                axisLine={false}
-                                // Auto scale or format compactly to avoid overlapping text
-                                tickFormatter={(value) => value >= 1000 ? `${(value / 1000).toFixed(0)}k` : value}
-                            />
-                            <Tooltip
-                                formatter={(value: number) => [formatCurrency(value), "Revenus"]}
-                                labelFormatter={(label) => formatMonth(label as string)}
-                                contentStyle={{
-                                    backgroundColor: "hsl(var(--background))",
-                                    borderColor: "hsl(var(--border))",
-                                    borderRadius: "var(--radius)",
-                                    fontSize: "12px",
-                                    boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)"
-                                }}
-                                itemStyle={{ color: "hsl(var(--foreground))" }}
-                            />
-                            <Area
-                                type="monotone"
-                                dataKey="revenue_cents"
-                                stroke="#10b981"
-                                strokeWidth={3}
-                                fillOpacity={1}
-                                fill="url(#colorRevenue)"
-                            />
-                        </AreaChart>
-                    </ResponsiveContainer>
-                </div>
-            </CardContent>
-        </Card>
+        <motion.div
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+        >
+            <Card className="relative overflow-hidden border-slate-200/50 dark:border-white/5 bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] dark:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] rounded-[2.5rem] group transition-all duration-500">
+                <CardHeader className="p-8 pb-2">
+                    <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                            <CardTitle className="text-xl font-black tracking-tighter text-slate-900 dark:text-white flex items-center gap-2">
+                                <div className="p-2 rounded-xl bg-emerald-500/10">
+                                    <TrendingUp className="h-5 w-5 text-emerald-500" />
+                                </div>
+                                Monthly Revenue
+                            </CardTitle>
+                            <CardDescription className="text-xs font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest">
+                                Cash flow analytics — 12 Months
+                            </CardDescription>
+                        </div>
+                        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100/50 dark:bg-white/5 border border-slate-200/50 dark:border-white/5">
+                            <div className="h-2 w-2 rounded-full bg-emerald-500" />
+                            <span className="text-[10px] font-black uppercase tracking-tight text-slate-600 dark:text-slate-400">Live Status</span>
+                        </div>
+                    </div>
+                </CardHeader>
+                <CardContent className="p-8 pt-6">
+                    <div className="h-[320px] w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                <defs>
+                                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.2} />
+                                        <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="currentColor" className="text-slate-200 dark:text-white/5" />
+                                <XAxis
+                                    dataKey="month"
+                                    stroke="currentColor"
+                                    className="text-slate-400 dark:text-slate-600"
+                                    fontSize={10}
+                                    fontWeight={700}
+                                    tickLine={false}
+                                    axisLine={false}
+                                    tickFormatter={formatMonth}
+                                    dy={10}
+                                />
+                                <YAxis
+                                    stroke="currentColor"
+                                    className="text-slate-400 dark:text-slate-600"
+                                    fontSize={10}
+                                    fontWeight={700}
+                                    tickLine={false}
+                                    axisLine={false}
+                                    tickFormatter={(value) => value >= 1000 ? `${(value / 1000).toFixed(0)}k` : value}
+                                />
+                                <Tooltip
+                                    cursor={{ stroke: '#10b981', strokeWidth: 2, strokeDasharray: '5 5' }}
+                                    content={({ active, payload, label }) => {
+                                        if (active && payload && payload.length) {
+                                            return (
+                                                <div className="rounded-2xl border border-slate-200/50 dark:border-white/10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl p-4 shadow-2xl">
+                                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-1">
+                                                        {formatMonth(label)}
+                                                    </p>
+                                                    <p className="text-lg font-black tracking-tighter text-slate-900 dark:text-white">
+                                                        {formatCurrency(payload[0].value as number)}
+                                                    </p>
+                                                </div>
+                                            );
+                                        }
+                                        return null;
+                                    }}
+                                />
+                                <Area
+                                    type="monotone"
+                                    dataKey="revenue_cents"
+                                    stroke="#10b981"
+                                    strokeWidth={4}
+                                    fillOpacity={1}
+                                    fill="url(#colorRevenue)"
+                                    animationDuration={2000}
+                                />
+                            </AreaChart>
+                        </ResponsiveContainer>
+                    </div>
+                </CardContent>
+            </Card>
+        </motion.div>
     )
 }

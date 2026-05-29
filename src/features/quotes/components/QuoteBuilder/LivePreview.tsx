@@ -1,180 +1,208 @@
 "use client";
 
-import { QuoteDraft, QuoteLineItem } from "../../types/QuoteBuilder";
-import { LineItem } from "./LineItem";
+import { QuoteDraft } from "../../types/QuoteBuilder";
 import { useQuoteTotal } from "../../hooks/useQuoteTotal";
-
 import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { cn } from "@/lib/utils";
 
 interface LivePreviewProps {
     draft: QuoteDraft;
 }
 
 export function LivePreview({ draft }: LivePreviewProps) {
-    const { subTotal, discountAmount, subTotalAfterDiscount, totalTax, grandTotal } = useQuoteTotal(draft.items, draft.hasVat, draft.discountRate, draft.isTaxExempt);
+    const { subTotal, discountAmount, totalTax, grandTotal } = useQuoteTotal(
+        draft.items, 
+        draft.hasVat, 
+        draft.discountRate, 
+        draft.isTaxExempt
+    );
 
     const formatCurrency = (amount: number) =>
-        new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount);
+        new Intl.NumberFormat('fr-FR', { 
+            style: 'currency', 
+            currency: 'EUR',
+            minimumFractionDigits: 2 
+        }).format(amount);
 
     return (
-        <div className="w-full h-full flex items-center justify-center p-8 bg-slate-50 dark:bg-slate-900/50 overflow-y-auto">
-
+        <div className="w-full flex justify-center py-10">
             {/* The A4 Paper Simulator */}
             <motion.div
                 layout
-                className="w-full max-w-[800px] bg-white min-h-[1131px] shadow-[0_40px_80px_rgba(0,0,0,0.1)] rounded-sm overflow-hidden flex flex-col relative text-slate-800"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="w-full max-w-[800px] bg-white min-h-[1131px] shadow-[0_0_1px_rgba(0,0,0,0.1),0_20px_40px_-10px_rgba(0,0,0,0.05),0_40px_80px_-20px_rgba(0,0,0,0.05)] rounded-sm overflow-hidden flex flex-col relative text-zinc-900 font-sans"
             >
-                {/* Modern Header Shape - Dynamic Brand Color */}
-                <div
-                    className="absolute top-0 right-0 w-[400px] h-[400px] rounded-bl-[400px] -z-10 opacity-10 transition-colors duration-500"
-                    style={{ backgroundColor: draft.brandColor || "#6366f1" }}
+                {/* Brand Accent Bar */}
+                <div 
+                    className="h-1.5 w-full transition-colors duration-500"
+                    style={{ backgroundColor: draft.brandColor || "#0ea5e9" }}
                 />
-                <div
-                    className="absolute top-0 right-0 w-[300px] h-[300px] rounded-bl-[300px] -z-10 opacity-20 transition-colors duration-500"
-                    style={{ backgroundColor: draft.brandColor || "#6366f1" }}
-                />
-                <div
-                    className="h-4 w-full transition-colors duration-500"
-                    style={{ backgroundColor: draft.brandColor || "#1e293b" }}
-                ></div>
 
-                <div className="p-14 flex-1 flex flex-col z-10">
-
-                    {/* Header: Company & Quote Info */}
+                <div className="p-16 flex-1 flex flex-col">
+                    {/* Top Section: Branding & Reference */}
                     <div className="flex justify-between items-start mb-20">
-                        <div>
-                            <div className="flex items-center gap-3 mb-4">
-                                {draft.logoUrl ? (
-                                    // eslint-disable-next-line @next/next/no-img-element
-                                    <img src={draft.logoUrl} alt="Company Logo" className="max-w-[160px] max-h-[60px] object-contain drop-shadow-sm" />
-                                ) : (
-                                    <>
-                                        <div
-                                            className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg transition-colors duration-500"
-                                            style={{ backgroundColor: draft.brandColor || "#1e293b" }}
-                                        >
-                                            <span className="text-white font-black text-xl">S</span>
-                                        </div>
-                                        <h2 className="text-2xl font-black text-slate-900 tracking-tight">SHARACO</h2>
-                                    </>
-                                )}
+                        <div className="space-y-6">
+                            {draft.logoUrl ? (
+                                <div className="h-12 flex items-center">
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img src={draft.logoUrl} alt="Logo" className="max-h-full max-w-[180px] object-contain" />
+                                </div>
+                            ) : (
+                                <div className="flex items-center gap-3">
+                                    <div 
+                                        className="w-10 h-10 rounded-lg flex items-center justify-center transition-colors duration-500 shadow-sm"
+                                        style={{ backgroundColor: draft.brandColor || "#0ea5e9" }}
+                                    >
+                                        <span className="text-white font-black text-xl tracking-tighter">S</span>
+                                    </div>
+                                    <span className="text-xl font-black tracking-tighter text-zinc-900 uppercase">Sharaco</span>
+                                </div>
+                            )}
+                            
+                            <div className="space-y-1">
+                                <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Provider</p>
+                                <p className="text-xs font-semibold text-zinc-800 leading-relaxed">
+                                    Sharaco Studio SAS<br />
+                                    123 Avenue de la Création<br />
+                                    75001 Paris, France
+                                </p>
                             </div>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Freelance / Studio</p>
-                            <p className="text-sm text-slate-500 max-w-[200px] leading-relaxed">123 Avenue de la Création<br />75001 Paris, France<br />contact@sharaco.com</p>
                         </div>
-                        <div className="text-right">
-                            <h1 className="text-5xl font-black text-slate-900 tracking-tighter mb-2">DEVIS</h1>
-                            <p className="text-sm text-slate-500 font-mono tracking-widest bg-slate-100 inline-block px-3 py-1 rounded-md border border-slate-200">
-                                {draft.reference || "RÉF-XXXX"}
-                            </p>
-                        </div>
-                    </div>
 
-                    {/* Client & Dates Grid */}
-                    <div className="grid grid-cols-2 gap-12 mb-16">
-                        <div className="space-y-4">
-                            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 border-b border-slate-200 pb-2 inline-block">Client</h3>
-                            <div>
-                                <p className="font-bold text-slate-900 text-xl leading-none mb-1">{draft.clientName || "Désignation client"}</p>
-                                {draft.clientEmail && <p className="text-indigo-600 text-sm font-medium mb-2">{draft.clientEmail}</p>}
-                                <p className="text-slate-500 whitespace-pre-wrap text-sm leading-relaxed">{draft.clientAddress || "Adresse du client"}</p>
+                        <div className="text-right flex flex-col items-end gap-6">
+                            <div className="space-y-1">
+                                <h1 className="text-4xl font-black tracking-tighter text-zinc-900 uppercase">Quotation</h1>
+                                <p className="text-xs font-mono font-bold text-zinc-400">REF: {draft.reference || "2024-000"}</p>
                             </div>
-                        </div>
-                        <div className="space-y-6 text-right flex flex-col items-end justify-end">
-                            <div className="bg-slate-50/80 backdrop-blur-sm p-5 rounded-2xl border border-slate-100 inline-block text-left min-w-[220px] shadow-sm">
-                                <div className="mb-4">
-                                    <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Émis le</h3>
-                                    <p className="font-bold text-slate-900 text-sm">
-                                        {draft.date ? format(new Date(draft.date), 'dd MMMM yyyy', { locale: fr }) : "Date"}
+
+                            <div className="grid grid-cols-2 gap-x-8 gap-y-2 text-right">
+                                <div>
+                                    <p className="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Date</p>
+                                    <p className="text-xs font-bold text-zinc-900">
+                                        {draft.date ? format(new Date(draft.date), 'dd MMM yyyy', { locale: fr }) : "-"}
                                     </p>
                                 </div>
                                 <div>
-                                    <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Échéance</h3>
-                                    <p className="font-bold text-indigo-600 text-sm">
-                                        {draft.date ? format(new Date(new Date(draft.date).getTime() + draft.validityDays * 24 * 60 * 60 * 1000), 'dd MMMM yyyy', { locale: fr }) : "Date"}
-                                    </p>
+                                    <p className="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Validity</p>
+                                    <p className="text-xs font-bold text-zinc-900">{draft.validityDays} days</p>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Middle Section: Client Info */}
+                    <div className="mb-20">
+                        <div className="max-w-[300px] space-y-2">
+                            <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Bill To</p>
+                            <div className="space-y-1">
+                                <p className="text-lg font-black text-zinc-900 tracking-tight">
+                                    {draft.clientName || "Client Name"}
+                                </p>
+                                {draft.clientEmail && (
+                                    <p className="text-xs font-semibold text-zinc-500">{draft.clientEmail}</p>
+                                )}
+                                <p className="text-xs font-semibold text-zinc-500 leading-relaxed whitespace-pre-wrap">
+                                    {draft.clientAddress || "Billing Address"}
+                                </p>
                             </div>
                         </div>
                     </div>
 
                     {/* Items Table */}
-                    <div className="mb-12 flex-1">
-                        <table className="w-full text-left border-collapse">
+                    <div className="flex-1">
+                        <table className="w-full text-left">
                             <thead>
-                                <tr className="border-b-2 border-slate-900">
-                                    <th className="py-4 text-[10px] font-black text-slate-900 uppercase tracking-widest w-[50%]">Prestation / Désignation</th>
-                                    <th className="py-4 text-[10px] font-black text-slate-900 uppercase tracking-widest text-center">Qté</th>
-                                    <th className="py-4 text-[10px] font-black text-slate-900 uppercase tracking-widest text-right">Unit. HT</th>
-                                    {!draft.isTaxExempt && draft.hasVat && (
-                                        <th className="py-4 text-[10px] font-black text-slate-900 uppercase tracking-widest text-right">TVA</th>
-                                    )}
-                                    <th className="py-4 text-[10px] font-black text-slate-900 uppercase tracking-widest text-right">Total HT</th>
+                                <tr className="border-b border-zinc-100">
+                                    <th className="py-4 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] w-[60%]">Description</th>
+                                    <th className="py-4 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] text-center px-4">Qty</th>
+                                    <th className="py-4 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] text-right">Unit Price</th>
+                                    <th className="py-4 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] text-right">Amount</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100">
+                            <tbody className="divide-y divide-zinc-50">
                                 {draft.items.map((item) => (
-                                    <tr key={item.id} className="group hover:bg-slate-50/50 transition-colors">
-                                        <td className="py-6 pr-4">
-                                            <p className="font-bold text-slate-900">{item.description || "Désignation de la prestation"}</p>
+                                    <tr key={item.id} className="group">
+                                        <td className="py-6 pr-8">
+                                            <p className="text-sm font-bold text-zinc-900 leading-snug">
+                                                {item.description || "Project Milestone / Service Name"}
+                                            </p>
                                         </td>
-                                        <td className="py-6 text-center text-slate-500 font-bold">{item.quantity}</td>
-                                        <td className="py-6 text-right text-slate-500 font-bold">{formatCurrency(item.unitPrice)}</td>
-                                        {!draft.isTaxExempt && draft.hasVat && (
-                                            <td className="py-6 text-right text-slate-400 text-xs font-bold">{item.taxRate}%</td>
-                                        )}
-                                        <td className="py-6 text-right font-black text-slate-900">{formatCurrency(item.quantity * item.unitPrice)}</td>
+                                        <td className="py-6 text-center">
+                                            <span className="text-xs font-mono font-bold text-zinc-500">{item.quantity}</span>
+                                        </td>
+                                        <td className="py-6 text-right">
+                                            <span className="text-xs font-mono font-bold text-zinc-500">{formatCurrency(item.unitPrice)}</span>
+                                        </td>
+                                        <td className="py-6 text-right">
+                                            <span className="text-sm font-mono font-black text-zinc-900">{formatCurrency(item.quantity * item.unitPrice)}</span>
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
                     </div>
 
-                    {/* Totals Section */}
-                    <div className="flex justify-between items-end mb-12">
-                        <div className="w-1/2 pr-16">
-                            <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Informations de paiement</h3>
-                            <p className="text-[11px] text-slate-500 leading-relaxed font-medium">Virement bancaire uniquement. IBAN: FR76 1234 5678 9012 3456 7890 123.<br />Paiement à réception. Pénalités de retard : 15% par an.</p>
-                            {draft.isTaxExempt && (
-                                <p className="text-[10px] font-bold text-slate-400 italic mt-4 italic">Exonération de TVA, article 293 B du CGI.</p>
-                            )}
+                    {/* Bottom Section: Summary & Totals */}
+                    <div className="mt-20 pt-10 border-t border-zinc-100 grid grid-cols-2 gap-20">
+                        <div className="space-y-8">
+                            <div className="space-y-3">
+                                <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Notes & Terms</p>
+                                <p className="text-[11px] font-semibold text-zinc-500 leading-relaxed">
+                                    {draft.notes || "Standard terms apply. Payment is due within the agreed timeframe."}
+                                </p>
+                            </div>
+                            
+                            <div className="space-y-2">
+                                <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Payment Details</p>
+                                <p className="text-[10px] font-mono font-bold text-zinc-400 leading-relaxed uppercase">
+                                    IBAN: FR76 1234 5678 9012 3456 7890 123<br />
+                                    SWIFT: SHARFR2X
+                                </p>
+                            </div>
                         </div>
-                        <div className="w-1/2 space-y-4 bg-slate-900 p-8 rounded-[32px] shadow-2xl shadow-indigo-500/10">
 
-                            <div className="flex justify-between text-slate-400 text-xs font-bold uppercase tracking-widest">
-                                <span>Sous-total HT</span>
-                                <span className="text-white">{formatCurrency(subTotal)}</span>
+                        <div className="bg-zinc-50/50 rounded-3xl p-8 space-y-4">
+                            <div className="flex justify-between items-center">
+                                <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Subtotal</span>
+                                <span className="text-sm font-mono font-bold text-zinc-600">{formatCurrency(subTotal)}</span>
                             </div>
 
                             {draft.discountRate > 0 && (
-                                <div className="flex justify-between text-emerald-400 text-xs font-bold uppercase tracking-widest">
-                                    <span>Remise ({draft.discountRate}%)</span>
-                                    <span>-{formatCurrency(discountAmount)}</span>
+                                <div className="flex justify-between items-center text-emerald-600">
+                                    <span className="text-[10px] font-black uppercase tracking-widest">Discount ({draft.discountRate}%)</span>
+                                    <span className="text-sm font-mono font-bold">-{formatCurrency(discountAmount)}</span>
                                 </div>
                             )}
 
                             {!draft.isTaxExempt && draft.hasVat && (
-                                <div className="flex justify-between text-slate-400 text-xs font-bold uppercase tracking-widest border-t border-white/10 pt-4">
-                                    <span>TVA Totale</span>
-                                    <span className="text-white">{formatCurrency(totalTax)}</span>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">VAT Total</span>
+                                    <span className="text-sm font-mono font-bold text-zinc-600">{formatCurrency(totalTax)}</span>
                                 </div>
                             )}
 
-                            <div className="flex justify-between items-end pt-2 mt-4">
-                                <span className="font-black text-slate-500 uppercase tracking-tighter text-xs">Total à payer</span>
-                                <span className="font-black text-3xl text-white tracking-tighter">{formatCurrency(grandTotal)}</span>
+                            <div className="pt-4 border-t border-zinc-200 flex justify-between items-end">
+                                <span className="text-xs font-black text-zinc-900 uppercase tracking-tighter">Grand Total</span>
+                                <span className="text-3xl font-black text-zinc-900 tracking-tighter">
+                                    {formatCurrency(grandTotal)}
+                                </span>
                             </div>
+                            
+                            {draft.isTaxExempt && (
+                                <p className="text-[9px] font-bold text-zinc-400 italic text-right pt-2">
+                                    Exonération de TVA, article 293 B du CGI.
+                                </p>
+                            )}
                         </div>
                     </div>
 
-                    {/* Notes & Footer */}
-                    <div className="mt-auto pt-8 border-t border-slate-200">
-                        <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Conditions & Notes</h3>
-                        <p className="text-sm text-slate-600 whitespace-pre-wrap">{draft.notes || "Aucune note additionnelle."}</p>
+                    {/* Footer Branding */}
+                    <div className="mt-20 flex justify-center">
+                        <p className="text-[9px] font-black text-zinc-300 uppercase tracking-[0.3em]">Powered by Sharaco Operating System</p>
                     </div>
-
                 </div>
             </motion.div>
         </div>

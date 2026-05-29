@@ -20,24 +20,25 @@ const COLORS = {
 
 export function DistributionChart({ draft, sent, viewed, paid }: DistributionChartProps) {
     const distributionData = [
-        { name: "Brouillon", value: draft, color: COLORS.Brouillon },
-        { name: "Envoyé", value: sent, color: COLORS.Envoyé },
-        { name: "Consulté", value: viewed, color: COLORS.Consulté },
-        { name: "Payé", value: paid, color: COLORS.Payé },
-    ].filter(item => item.value >= 0); // Keep all even if 0 to show legend
+        { name: "Draft", value: draft, color: COLORS.Brouillon },
+        { name: "Sent", value: sent, color: COLORS.Envoyé },
+        { name: "Viewed", value: viewed, color: COLORS.Consulté },
+        { name: "Paid", value: paid, color: COLORS.Payé },
+    ].filter(item => item.value >= 0);
 
     const total = draft + sent + viewed + paid;
 
-    // Custom legend to include counts
     const renderLegend = (props: any) => {
         const { payload } = props;
         return (
-            <ul className="flex flex-wrap justify-center gap-x-4 gap-y-2 mt-4">
+            <ul className="grid grid-cols-2 gap-x-4 gap-y-3 mt-8">
                 {payload.map((entry: any, index: number) => (
-                    <li key={`item-${index}`} className="flex items-center text-xs">
-                        <span className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: entry.color }} />
-                        <span className="text-slate-600 dark:text-slate-400 font-medium mr-1">{entry.value}</span>
-                        <span className="text-slate-900 dark:text-white font-bold">{entry.payload.value}</span>
+                    <li key={`item-${index}`} className="flex items-center group cursor-default">
+                        <div className="w-2.5 h-2.5 rounded-full mr-2.5 shadow-sm transition-transform group-hover:scale-125" style={{ backgroundColor: entry.color }} />
+                        <div className="flex flex-col">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">{entry.value}</span>
+                            <span className="text-sm font-black text-slate-900 dark:text-white tracking-tighter leading-tight">{entry.payload.value}</span>
+                        </div>
                     </li>
                 ))}
             </ul>
@@ -45,56 +46,77 @@ export function DistributionChart({ draft, sent, viewed, paid }: DistributionCha
     }
 
     return (
-        <Card className="col-span-1 border-slate-200 dark:border-slate-800 shadow-sm rounded-xl">
-            <CardHeader>
-                <CardTitle className="text-base font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-                    <PieChartIcon className="h-5 w-5 text-indigo-500" />
-                    Devis par statut
-                </CardTitle>
-                <CardDescription className="text-xs">
-                    Répartition des documents créés.
-                </CardDescription>
-            </CardHeader>
-            <CardContent className="flex justify-center flex-col items-center">
-                <div className="h-[250px] w-full relative">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                            <Pie
-                                data={distributionData}
-                                cx="50%"
-                                cy="50%"
-                                innerRadius={70}
-                                outerRadius={90}
-                                paddingAngle={2}
-                                dataKey="value"
-                                stroke="none"
-                            >
-                                {distributionData.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={entry.color} />
-                                ))}
-                            </Pie>
-                            <Tooltip
-                                contentStyle={{
-                                    backgroundColor: "hsl(var(--background))",
-                                    borderColor: "hsl(var(--border))",
-                                    borderRadius: "var(--radius)",
-                                    fontSize: "12px",
-                                    boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)"
-                                }}
-                                itemStyle={{ color: "hsl(var(--foreground))" }}
-                                formatter={(value: number) => [`${value} Devis`]}
-                            />
-                            <Legend content={renderLegend} verticalAlign="bottom" />
-                        </PieChart>
-                    </ResponsiveContainer>
-                    <div className="absolute inset-x-0 top-[40%] -translate-y-4 flex items-center justify-center pointer-events-none">
-                        <div className="text-center">
-                            <span className="text-3xl font-bold text-slate-900 dark:text-white">{total}</span>
-                            <div className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold mt-1">Total</div>
+        <motion.div
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="h-full"
+        >
+            <Card className="h-full relative overflow-hidden border-slate-200/50 dark:border-white/5 bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] dark:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] rounded-[2.5rem] flex flex-col">
+                <CardHeader className="p-8 pb-0">
+                    <CardTitle className="text-xl font-black tracking-tighter text-slate-900 dark:text-white flex items-center gap-2">
+                        <div className="p-2 rounded-xl bg-indigo-500/10">
+                            <PieChartIcon className="h-5 w-5 text-indigo-500" />
+                        </div>
+                        Documents
+                    </CardTitle>
+                    <CardDescription className="text-xs font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest">
+                        Status Distribution
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="p-8 pt-4 flex flex-col items-center justify-center flex-1">
+                    <div className="h-[220px] w-full relative">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                                <Pie
+                                    data={distributionData}
+                                    cx="50%"
+                                    cy="50%"
+                                    innerRadius={70}
+                                    outerRadius={95}
+                                    paddingAngle={4}
+                                    dataKey="value"
+                                    stroke="none"
+                                    animationBegin={500}
+                                    animationDuration={1500}
+                                >
+                                    {distributionData.map((entry, index) => (
+                                        <Cell 
+                                            key={`cell-${index}`} 
+                                            fill={entry.color}
+                                            className="hover:opacity-80 transition-opacity cursor-pointer outline-none"
+                                        />
+                                    ))}
+                                </Pie>
+                                <Tooltip
+                                    content={({ active, payload }) => {
+                                        if (active && payload && payload.length) {
+                                            return (
+                                                <div className="rounded-2xl border border-slate-200/50 dark:border-white/10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl p-3 shadow-2xl">
+                                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                                                        {payload[0].name}
+                                                    </p>
+                                                    <p className="text-lg font-black tracking-tighter text-slate-900 dark:text-white">
+                                                        {payload[0].value} <span className="text-sm font-medium text-slate-400 ml-1">Quotes</span>
+                                                    </p>
+                                                </div>
+                                            );
+                                        }
+                                        return null;
+                                    }}
+                                />
+                            </PieChart>
+                        </ResponsiveContainer>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                            <span className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">{total}</span>
+                            <span className="text-[10px] text-slate-400 uppercase tracking-[0.2em] font-black mt-1">Total</span>
                         </div>
                     </div>
-                </div>
-            </CardContent>
-        </Card>
+                    <div className="w-full">
+                        <Legend content={renderLegend} verticalAlign="bottom" />
+                    </div>
+                </CardContent>
+            </Card>
+        </motion.div>
     )
 }

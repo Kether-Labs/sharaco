@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import { QuoteDraft, QuoteLineItem } from "../../types/QuoteBuilder";
 import { EditorPanel } from "./EditorPanel";
 import { LivePreview } from "./LivePreview";
+import { LayoutPreview } from "@/features/templates/components/LayoutPreview";
 
 interface EditorProps {
     templateId?: string | null
@@ -24,7 +25,7 @@ export function Editor({ templateId }: EditorProps) {
         items: [
             {
                 id: uuidv4(),
-                description: "Design UI/UX",
+                description: "Design UI/UX - Mobile App",
                 quantity: 1,
                 unitPrice: 1500,
                 taxRate: 20
@@ -33,7 +34,7 @@ export function Editor({ templateId }: EditorProps) {
         notes: "Merci pour votre confiance. Conditions de paiement : 30% d'acompte à la signature, solde à la livraison.",
         internalNotes: "",
         logoUrl: null,
-        brandColor: "#6366f1"
+        brandColor: "#0ea5e9"
     });
 
     const handleDraftChange = (field: keyof QuoteDraft, value: any) => {
@@ -66,7 +67,7 @@ export function Editor({ templateId }: EditorProps) {
     };
 
     const removeItem = (id: string) => {
-        if (draft.items.length === 1) return; // Keep at least one item
+        if (draft.items.length === 1) return;
         setDraft(prev => ({
             ...prev,
             items: prev.items.filter(item => item.id !== id)
@@ -74,9 +75,12 @@ export function Editor({ templateId }: EditorProps) {
     };
 
     return (
-        <div className="flex h-screen w-screen overflow-hidden bg-slate-900">
-            {/* Left Side: Controls Panel (40%) */}
-            <div className="w-[40%] min-w-[500px] h-full">
+        <div className="flex h-[100dvh] w-screen overflow-hidden bg-zinc-950 font-sans selection:bg-sky-500/30">
+            {/* Grain Overlay */}
+            <div className="fixed inset-0 pointer-events-none z-50 opacity-[0.03] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+
+            {/* Left Side: Controls Panel (Fixed Width) */}
+            <aside className="w-[450px] xl:w-[500px] h-full shrink-0 relative overflow-hidden">
                 <EditorPanel
                     draft={draft}
                     onChange={handleDraftChange}
@@ -84,16 +88,30 @@ export function Editor({ templateId }: EditorProps) {
                     onAddItem={addItem}
                     onRemoveItem={removeItem}
                 />
-            </div>
+            </aside>
 
-            {/* Right Side: Live A4 Preview (60%) */}
-            <div className="w-[60%] relative overflow-hidden bg-slate-100 dark:bg-slate-950/20">
-                {/* Background Grid Pattern */}
-                <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+            {/* Right Side: Live A4 Preview (Flexible) */}
+            <main className="flex-1 relative overflow-hidden bg-[#fafafa] dark:bg-zinc-900/50">
+                {/* Background Workbench Pattern */}
+                <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] dark:bg-[radial-gradient(#ffffff05_1px,transparent_1px)] [background-size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)]" />
+                
+                {/* Scrollable Canvas Area */}
+                <div className="absolute inset-0 overflow-y-auto overflow-x-hidden pt-12 pb-24 px-12 custom-scrollbar">
+                    <div className="max-w-[1000px] mx-auto">
+                        <LayoutPreview 
+                                                    layoutId={templateId as any} 
+                                                    className="w-full h-[100vh] contain border-0" 
+                                                />
+                    </div>
+                </div>
 
-                {/* Scrollable Canvas */}
-                <LivePreview draft={draft} />
-            </div>
+                {/* Status Bar / Breadcrumb (Optional but Premium) */}
+                <div className="absolute top-6 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-white/80 dark:bg-zinc-800/80 backdrop-blur-md border border-black/5 dark:border-white/5 shadow-sm flex items-center gap-3 z-30">
+                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Document Canvas</span>
+                    <div className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700" />
+                    <span className="text-[10px] font-black text-zinc-900 dark:text-zinc-100 uppercase tracking-widest">A4 Layout</span>
+                </div>
+            </main>
         </div>
     );
 }
