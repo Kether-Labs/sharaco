@@ -1,6 +1,5 @@
 "use client";
 
-
 import { Trash2, GripVertical } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -19,43 +18,45 @@ export function LineItem({ item, index, onChange, onRemove }: LineItemProps) {
         onChange(item.id, field, isNaN(num) ? 0 : num);
     };
 
+    const formatCurrency = (amount: number) =>
+        new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount);
+
     const lineTotal = item.quantity * item.unitPrice;
 
     return (
-        <div
-            className="group relative flex items-start gap-3 p-4 bg-white/40 dark:bg-slate-900/40 rounded-2xl border border-white/50 dark:border-white/5 shadow-sm backdrop-blur-md hover:bg-white/60 dark:hover:bg-slate-900/60 transition-all duration-300"
-        >
-            <div className="mt-2 text-slate-400 cursor-grab active:cursor-grabbing hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
-                <GripVertical className="h-5 w-5" />
+        <div className="group relative flex items-start gap-4 p-5 bg-white/[0.02] border border-white/5 rounded-2xl hover:bg-white/[0.04] transition-all duration-300">
+            {/* Grip handle */}
+            <div className="mt-2.5 text-zinc-600 cursor-grab active:cursor-grabbing hover:text-zinc-400 transition-colors shrink-0">
+                <GripVertical className="h-4 w-4" />
             </div>
 
-            <div className="flex-1 flex flex-col gap-4">
-                {/* Row 1: Description */}
-                <div className="space-y-1 w-full">
-                    <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Description</label>
+            <div className="flex-1 flex flex-col gap-5">
+                {/* Description */}
+                <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Description</label>
                     <Input
                         value={item.description}
                         onChange={(e) => onChange(item.id, 'description', e.target.value)}
-                        placeholder="Création site web vitrine..."
-                        className="bg-white/50 dark:bg-slate-950/50 border-white/20 dark:border-white/10 focus:border-sky-500 rounded-xl w-full"
+                        placeholder="Project Milestone or Service Name..."
+                        className="h-11 bg-zinc-900/50 border-white/5 focus:border-white/10 focus:ring-1 focus:ring-white/10 rounded-xl w-full text-zinc-200 placeholder:text-zinc-700 font-medium"
                     />
                 </div>
 
-                {/* Row 2: Metrics */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 items-end">
-                    <div className="space-y-1">
-                        <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Qté</label>
+                {/* Metrics Grid */}
+                <div className="grid grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Quantity</label>
                         <Input
                             type="number"
                             min="1"
                             value={item.quantity || ''}
                             onChange={(e) => handleNumberChange('quantity', e.target.value)}
-                            className="bg-white/50 dark:bg-slate-950/50 border-white/20 dark:border-white/10 focus:border-sky-500 rounded-xl"
+                            className="h-11 bg-zinc-900/50 border-white/5 focus:border-white/10 rounded-xl text-zinc-200 font-mono"
                         />
                     </div>
 
-                    <div className="space-y-1">
-                        <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Prix Unitaire (HT)</label>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Unit Price</label>
                         <div className="relative">
                             <Input
                                 type="number"
@@ -63,41 +64,32 @@ export function LineItem({ item, index, onChange, onRemove }: LineItemProps) {
                                 step="0.01"
                                 value={item.unitPrice || ''}
                                 onChange={(e) => handleNumberChange('unitPrice', e.target.value)}
-                                className="pl-6 bg-white/50 dark:bg-slate-950/50 border-white/20 dark:border-white/10 focus:border-sky-500 rounded-xl"
+                                className="h-11 pl-7 bg-zinc-900/50 border-white/5 focus:border-white/10 rounded-xl text-zinc-200 font-mono"
                             />
-                            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 font-medium">€</span>
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600 font-medium text-xs">€</span>
                         </div>
                     </div>
 
-                    <div className="space-y-1">
-                        <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">TVA (%)</label>
-                        <Input
-                            type="number"
-                            min="0"
-                            max="100"
-                            value={item.taxRate || ''}
-                            onChange={(e) => handleNumberChange('taxRate', e.target.value)}
-                            className="bg-white/50 dark:bg-slate-950/50 border-white/20 dark:border-white/10 focus:border-sky-500 rounded-xl"
-                        />
-                    </div>
-
-                    <div className="space-y-1 flex flex-col pb-1">
-                        <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider text-right w-full">Total HT</label>
-                        <div className="font-bold text-slate-900 dark:text-white text-lg text-right">
-                            {new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(lineTotal)}
-                        </div>
+                    <div className="space-y-2 flex flex-col items-end justify-end pb-1.5">
+                        <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest text-right w-full">Line Total</label>
+                        <span className="text-sm font-black text-zinc-100 tracking-tight">
+                            {formatCurrency(lineTotal)}
+                        </span>
                     </div>
                 </div>
             </div>
 
-            <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => onRemove(item.id)}
-                className="mt-6 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-xl transition-colors opacity-0 group-hover:opacity-100"
-            >
-                <Trash2 className="h-4 w-4" />
-            </Button>
+            {/* Remove Button */}
+            <div className="absolute -right-2 -top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onRemove(item.id)}
+                    className="h-7 w-7 rounded-lg bg-zinc-900 border border-white/10 text-zinc-500 hover:text-rose-500 hover:bg-zinc-800 transition-all shadow-xl"
+                >
+                    <Trash2 className="h-3.5 w-3.5" />
+                </Button>
+            </div>
         </div>
     );
 }

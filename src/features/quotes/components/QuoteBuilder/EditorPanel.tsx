@@ -68,7 +68,7 @@ export function EditorPanel({ draft, onChange, onItemChange, onAddItem, onRemove
                             <TabsTrigger
                                 key={tab.value}
                                 value={tab.value}
-                                className="flex-1 rounded-lg text-zinc-500 data-[state=active]:bg-white/5 data-[state=active]:text-white font-bold text-[10px] uppercase tracking-widest transition-all gap-2"
+                                className="flex-1 cursor-pointer rounded-lg text-zinc-500 data-[state=active]:bg-white/5 data-[state=active]:text-white font-bold text-[10px] uppercase tracking-widest transition-all gap-2"
                             >
                                 <tab.icon className="w-3.5 h-3.5" strokeWidth={2} />
                                 <span className="hidden xl:inline">{tab.label}</span>

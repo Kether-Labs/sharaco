@@ -1,11 +1,10 @@
 "use client";
 
 import { QuoteDraft, QuoteLineItem } from "../../../types/QuoteBuilder";
-import { Plus, SlidersHorizontal, ShoppingBag } from "lucide-react";
+import { Plus, ReceiptText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LineItem } from "../LineItem";
 import { useQuoteTotal } from "../../../hooks/useQuoteTotal";
-
 
 interface TabItemsProps {
     draft: QuoteDraft;
@@ -22,9 +21,15 @@ export function TabItems({ draft, onItemChange, onAddItem, onRemoveItem, onDraft
         new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount);
 
     return (
-        <div className="space-y-8 pb-32">
-            <div className="space-y-4">
+        <div className="space-y-10 pb-32">
+            {/* Header Description */}
+            <div className="space-y-1">
+                <h3 className="text-lg font-bold text-white tracking-tight">Services & Pricing</h3>
+                <p className="text-sm text-zinc-500">Add or edit line items for this quotation. Totals are recalculated automatically.</p>
+            </div>
 
+            {/* Items List */}
+            <div className="space-y-4">
                 {draft.items.map((item: QuoteLineItem, index: number) => (
                     <LineItem
                         key={item.id}
@@ -34,48 +39,56 @@ export function TabItems({ draft, onItemChange, onAddItem, onRemoveItem, onDraft
                         onRemove={onRemoveItem}
                     />
                 ))}
-
             </div>
 
+            {/* Add Item Button */}
             <Button
                 onClick={onAddItem}
                 variant="outline"
-                className="w-full h-14 border-dashed border-2 border-slate-800 bg-slate-900/20 hover:bg-indigo-500/10 hover:border-indigo-500 text-slate-400 hover:text-indigo-400 rounded-2xl transition-all group"
+                className="w-full h-14 border-dashed border border-zinc-800 bg-white/[0.02] hover:bg-white/[0.05] hover:border-zinc-600 text-zinc-400 hover:text-zinc-100 rounded-2xl transition-all group"
             >
-                <Plus className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
-                <span className="font-semibold text-sm">Ajouter une ligne</span>
+                <Plus className="mr-2 h-4 w-4 group-hover:scale-110 transition-transform" />
+                <span className="font-bold text-xs uppercase tracking-widest">Add New Item</span>
             </Button>
 
-            {/* Sticky Totals at bottom of tab content for better UX */}
-            <div className="p-6 bg-slate-950/80 backdrop-blur-md border border-slate-800 rounded-3xl mt-12 space-y-4 shadow-xl">
-                <div className="flex items-center gap-2 mb-2">
-                    <SlidersHorizontal className="h-4 w-4 text-indigo-400" />
-                    <h4 className="text-xs font-bold text-slate-300 uppercase tracking-widest">Résumé financier</h4>
+            {/* Financial Summary */}
+            <div className="p-8 bg-zinc-900/50 border border-white/5 rounded-[2.5rem] mt-12 space-y-6 shadow-2xl relative overflow-hidden group">
+                {/* Decorative background element */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-sky-500/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-sky-500/10 transition-colors" />
+
+                <div className="flex items-center gap-3 mb-2 relative z-10">
+                    <div className="h-8 w-8 rounded-xl bg-white/5 flex items-center justify-center border border-white/5">
+                        <ReceiptText className="h-4 w-4 text-zinc-400" />
+                    </div>
+                    <h4 className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">Financial Summary</h4>
                 </div>
 
-                <div className="space-y-3 pt-2">
-                    <div className="flex justify-between text-sm text-slate-500">
-                        <span>Total Hors Taxes</span>
-                        <span className="font-medium text-slate-300">{formatCurrency(subTotal)}</span>
+                <div className="space-y-4 relative z-10">
+                    <div className="flex justify-between items-center text-xs font-bold uppercase tracking-widest text-zinc-500">
+                        <span>Subtotal (Net)</span>
+                        <span className="text-zinc-200">{formatCurrency(subTotal)}</span>
                     </div>
 
                     {draft.discountRate > 0 && (
-                        <div className="flex justify-between text-sm text-emerald-500 border-t border-slate-800/50 pt-2">
-                            <span>Remise ({draft.discountRate}%)</span>
-                            <span className="font-medium">-{formatCurrency(discountAmount)}</span>
+                        <div className="flex justify-between items-center text-xs font-bold uppercase tracking-widest text-emerald-500/80">
+                            <span>Discount ({draft.discountRate}%)</span>
+                            <span>-{formatCurrency(discountAmount)}</span>
                         </div>
                     )}
 
                     {!draft.isTaxExempt && draft.hasVat && (
-                        <div className="flex justify-between text-sm text-slate-500 border-t border-slate-800/50 pt-2">
-                            <span>TVA</span>
-                            <span className="font-medium text-slate-300">{formatCurrency(totalTax)}</span>
+                        <div className="flex justify-between items-center text-xs font-bold uppercase tracking-widest text-zinc-500">
+                            <span>Tax Amount</span>
+                            <span className="text-zinc-200">{formatCurrency(totalTax)}</span>
                         </div>
                     )}
 
-                    <div className="flex justify-between items-center pt-4 border-t border-slate-800 mt-2">
-                        <span className="text-md font-black text-slate-200 uppercase tracking-tighter">Total TTC</span>
-                        <span className="text-2xl font-black bg-gradient-to-r from-indigo-400 to-sky-400 bg-clip-text text-transparent">
+                    <div className="pt-6 border-t border-white/5 flex justify-between items-end">
+                        <div className="space-y-1">
+                            <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Total Amount</span>
+                            <p className="text-[10px] text-zinc-500 leading-none">Including all applicable taxes</p>
+                        </div>
+                        <span className="text-3xl font-black text-white tracking-tighter">
                             {formatCurrency(grandTotal)}
                         </span>
                     </div>
