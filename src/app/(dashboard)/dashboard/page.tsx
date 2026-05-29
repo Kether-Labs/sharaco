@@ -53,7 +53,7 @@ export default function DashboardPage() {
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Button className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-500/20 transition-all active:scale-95">
+                    <Button className="bg-[#0084d1] hover:bg-emerald-700 text-white shadow-lg shadow-emerald-500/20 transition-all active:scale-95">
                         <Plus className="mr-2 h-4 w-4" /> Nouveau Devis
                     </Button>
                 </div>

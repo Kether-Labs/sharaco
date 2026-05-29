@@ -6,7 +6,11 @@ import { QuoteDraft, QuoteLineItem } from "../../types/QuoteBuilder";
 import { EditorPanel } from "./EditorPanel";
 import { LivePreview } from "./LivePreview";
 
-export function Editor() {
+interface EditorProps {
+    templateId?: string | null
+}
+
+export function Editor({ templateId }: EditorProps) {
     const [draft, setDraft] = useState<QuoteDraft>({
         clientName: "",
         clientEmail: "",

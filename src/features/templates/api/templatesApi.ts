@@ -1,10 +1,12 @@
 import { api } from '@/lib/api';
-import type { DocumentTemplate, TemplateCreate, TemplateUpdate } from '../types';
+import type { DocumentTemplate, Layout, TemplateCreate, TemplateUpdate } from '../types';
 
 export const templatesApi = {
     getAll: async (): Promise<DocumentTemplate[]> => {
         return api.get<DocumentTemplate[]>('/api/v1/templates');
     },
+
+
 
     getById: async (id: string): Promise<DocumentTemplate> => {
         return api.get<DocumentTemplate>(`/api/v1/templates/${id}`);
@@ -17,7 +19,22 @@ export const templatesApi = {
     getPreview: async (id: string): Promise<string> => {
         return api.get<string>(`/api/v1/templates/${id}/preview`);
     },
-
+getLayoutPreview: async (layoutId: string): Promise<string> => {
+    const token = localStorage.getItem('sharaco_token');
+    const res = await fetch(
+        `http://localhost:8000/api/v1/templates/layouts/${layoutId}/preview`,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+    if (!res.ok) throw new Error('Erreur aperçu layout');
+    return res.text(); // ← .text() pas .json() car c'est du HTML
+},
+    getLayouts: async (): Promise<Layout[]> => {
+        return api.get<Layout[]>('/api/v1/templates/layouts');
+    },
     create: async (data: TemplateCreate): Promise<DocumentTemplate> => {
         return api.post<DocumentTemplate>('/api/v1/templates', data);
     },

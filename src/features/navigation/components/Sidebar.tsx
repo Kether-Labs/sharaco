@@ -30,7 +30,7 @@ export default function Sidebar({ setIsSidebarOpen, isSidebarOpen }: { setIsSide
           {/* Header Area */}
           <div className="relative flex h-24 items-center justify-between px-6">
             <Link href="/dashboard" className="flex items-center gap-2 group">
-              <div className="p-1 rounded-xl bg-gradient-to-br from-sky-500/20 to-indigo-500/20 dark:from-sky-500/10 dark:to-indigo-500/10 border border-white/20 dark:border-white/5 group-hover:scale-105 transition-transform duration-300">
+              <div className="p-1 rounded-xl  dark:from-sky-500/10 dark:to-indigo-500/10 border border-white/20 dark:border-white/5 group-hover:scale-105 transition-transform duration-300">
                 <Logo width={120} height={120} />
               </div>
             </Link>

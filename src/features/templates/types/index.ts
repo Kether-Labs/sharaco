@@ -19,6 +19,12 @@ export interface DocumentTemplate {
     updated_at: string;
 }
 
+export interface Layout {
+    id: 'classic' | 'modern' | 'minimal';
+    name: string;
+    description: string;
+    preview_url: string;
+}
 export interface TemplateCreate {
     name: string;
     primary_color: string;

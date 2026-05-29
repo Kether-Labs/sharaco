@@ -22,7 +22,7 @@ export function QuoteHeader() {
                 <Button variant="outline" size="icon" className="bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/10 transition-colors">
                     <Download className="h-4 w-4 text-slate-600 dark:text-slate-300" />
                 </Button>
-                <Button className="bg-gradient-to-r from-sky-500 to-indigo-500 hover:from-sky-600 hover:to-indigo-600 text-white shadow-lg shadow-sky-500/25 border-0 transition-all active:scale-95 group">
+                <Button className="bg-[#0084d1] hover:bg-[#006db3] text-white shadow-lg shadow-[#0084d1]/25 border-0 transition-all active:scale-95 group">
                     <Plus className="mr-2 h-4 w-4 group-hover:rotate-90 transition-transform duration-300" />
                     <span className="font-semibold tracking-wide">Nouveau devis</span>
                 </Button>

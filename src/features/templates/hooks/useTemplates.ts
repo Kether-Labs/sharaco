@@ -19,7 +19,12 @@ export function useTemplate(id: string) {
         enabled: !!id,
     });
 }
-
+export function useLayouts() {
+    return useQuery({
+        queryKey: ['template-layouts'],
+        queryFn: () => templatesApi.getLayouts(),
+    });
+}
 export function useDefaultTemplate() {
     return useQuery({
         queryKey: ['templates', 'default'],
