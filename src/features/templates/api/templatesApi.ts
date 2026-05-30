@@ -1,5 +1,5 @@
 import { api } from '@/lib/api';
-import type { DocumentTemplate, Layout, TemplateCreate, TemplateUpdate } from '../types';
+import type { DocumentPreviewRequest, DocumentTemplate, Layout, TemplateCreate, TemplateUpdate } from '../types';
 
 export const templatesApi = {
     getAll: async (): Promise<DocumentTemplate[]> => {
@@ -19,6 +19,24 @@ export const templatesApi = {
     getPreview: async (id: string): Promise<string> => {
         return api.get<string>(`/api/v1/templates/${id}/preview`);
     },
+
+    previewDocument: async (data: DocumentPreviewRequest): Promise<string> => {
+        const token = localStorage.getItem('sharaco_token');
+        const res = await fetch(
+            `http://localhost:8000/api/v1/documents/preview`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(data),
+            }
+        );
+        if (!res.ok) throw new Error('Erreur aperçu document');
+        return res.text(); // ← HTML, pas JSON
+    },
+
 getLayoutPreview: async (layoutId: string): Promise<string> => {
     const token = localStorage.getItem('sharaco_token');
     const res = await fetch(

@@ -19,7 +19,7 @@ export function LineItem({ item, index, onChange, onRemove }: LineItemProps) {
     };
 
     const formatCurrency = (amount: number) =>
-        new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount);
+        new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XAF' }).format(amount);
 
     const lineTotal = item.quantity * item.unitPrice;
 
@@ -66,7 +66,7 @@ export function LineItem({ item, index, onChange, onRemove }: LineItemProps) {
                                 onChange={(e) => handleNumberChange('unitPrice', e.target.value)}
                                 className="h-11 pl-7 bg-zinc-900/50 border-white/5 focus:border-white/10 rounded-xl text-zinc-200 font-mono"
                             />
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600 font-medium text-xs">€</span>
+                            
                         </div>
                     </div>
 

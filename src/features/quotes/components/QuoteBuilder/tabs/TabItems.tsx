@@ -18,7 +18,7 @@ export function TabItems({ draft, onItemChange, onAddItem, onRemoveItem, onDraft
     const { subTotal, totalTax, grandTotal, discountAmount } = useQuoteTotal(draft.items, draft.hasVat, draft.discountRate, draft.isTaxExempt);
 
     const formatCurrency = (amount: number) =>
-        new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount);
+        new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XAF' }).format(amount);
 
     return (
         <div className="space-y-10 pb-32">

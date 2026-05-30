@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils"
 import { Loader2 } from "lucide-react"
 
 interface LayoutPreviewProps {
+    
     layoutId: 'classic' | 'modern' | 'minimal';
     className?: string;
 }

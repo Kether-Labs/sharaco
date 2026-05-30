@@ -27,7 +27,7 @@ export function EditorPanel({ draft, onChange, onItemChange, onAddItem, onRemove
     const { grandTotal } = useQuoteTotal(draft.items, draft.hasVat, draft.discountRate, draft.isTaxExempt);
 
     const formatCurrency = (amount: number) => 
-        new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount);
+        new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XAF' }).format(amount);
 
     return (
         <div className="w-full h-full bg-zinc-950 flex flex-col border-r border-white/5 relative z-20">

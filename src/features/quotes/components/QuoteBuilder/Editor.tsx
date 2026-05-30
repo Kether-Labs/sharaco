@@ -106,10 +106,11 @@ export function Editor({ templateId }: EditorProps) {
                         style={{ transform: `scale(${zoom})` }}
                     >
                         <div className="w-full max-w-[1000px] px-12">
-                            <LayoutPreview
-                                                        layoutId={templateId as any} 
-                                                        className="w-full h-[120vh] cover border-0" 
-                                                    />
+                             <LivePreview
+                                draft={draft}
+                                layoutStyle={templateId || "classic"}
+                                templateId={templateId}
+                            />
                         </div>
                     </div>
                 </div>

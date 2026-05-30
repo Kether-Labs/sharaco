@@ -19,6 +19,38 @@ export interface DocumentTemplate {
     updated_at: string;
 }
 
+export interface DocumentPreviewItem {
+    description: string;
+    quantity: number;
+    unit_price_cents: number;
+    tax_rate: number;
+}
+export interface DocumentPreviewRequest {
+    type: 'DEVIS' | 'FACTURE';
+    // Client
+    client_name: string;
+    client_email: string;
+    client_address: string;
+    client_phone: string;
+    // Articles
+    items: DocumentPreviewItem[];
+    // Template
+    template_id?: string | null;
+    layout_style: string;
+    primary_color: string;
+    secondary_color: string;
+    accent_color: string;
+    text_color: string;
+    background_color: string;
+    font_family: string;
+    header_text?: string | null;
+    footer_text?: string | null;
+    show_bank_details: boolean;
+    show_tax_id: boolean;
+    // Méta
+    notes?: string | null;
+    reference?: string | null;
+}
 export interface Layout {
     id: 'classic' | 'modern' | 'minimal';
     name: string;
