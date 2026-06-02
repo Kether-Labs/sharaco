@@ -8,6 +8,8 @@ import { LivePreview } from "./LivePreview";
 import { Plus, Minus, Maximize, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LayoutPreview } from "@/features/templates/components/LayoutPreview";
+import { EditorHeader } from "./EditorHeader";
+
 
 interface EditorProps {
     templateId?: string | null
@@ -40,6 +42,7 @@ export function Editor({ templateId }: EditorProps) {
     });
 
     const [zoom, setZoom] = useState(0.85);
+    const [showActions, setShowActions] = useState(false);
 
     const handleDraftChange = (field: keyof QuoteDraft, value: any) => {
         setDraft(prev => ({ ...prev, [field]: value }));
@@ -78,8 +81,25 @@ export function Editor({ templateId }: EditorProps) {
         }));
     };
 
+    const handleSave = () => {
+        // Logic for saving (API calls etc) would go here
+        setShowActions(true);
+    };
+
     return (
         <div className="flex h-[100dvh] w-screen overflow-hidden bg-zinc-950 font-sans selection:bg-sky-500/30">
+            {/* Global Header */}
+            <EditorHeader 
+                draft={draft} 
+                zoom={zoom}
+                onZoomIn={() => setZoom(prev => Math.min(prev + 0.1, 1.5))}
+                onZoomOut={() => setZoom(prev => Math.max(prev - 0.1, 0.4))}
+                onResetZoom={() => setZoom(0.85)}
+                onSave={handleSave}
+                showActions={showActions}
+                setShowActions={setShowActions}
+            />
+
             {/* Grain Overlay */}
             <div className="fixed inset-0 pointer-events-none z-50 opacity-[0.03] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
 
@@ -95,7 +115,7 @@ export function Editor({ templateId }: EditorProps) {
             </aside>
 
             {/* Right Side: Live A4 Preview (Flexible) */}
-            <main className="flex-1 relative overflow-hidden bg-[#fafafa] dark:bg-zinc-900/50">
+            <main className="flex-1 relative overflow-hidden bg-[#fafafa] dark:bg-zinc-900/50 pt-[72px]">
                 {/* Background Workbench Pattern */}
                 <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] dark:bg-[radial-gradient(#ffffff05_1px,transparent_1px)] [background-size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)]" />
                 
@@ -112,55 +132,6 @@ export function Editor({ templateId }: EditorProps) {
                                 templateId={templateId}
                             />
                         </div>
-                    </div>
-                </div>
-
-                {/* Combined Status & Zoom Bar */}
-                <div className="absolute top-6 left-1/2 -translate-x-1/2 flex items-center gap-3 z-30">
-                    {/* Status Part */}
-                    <div className="px-4 py-2 rounded-2xl bg-white/80 dark:bg-zinc-800/80 backdrop-blur-md border border-black/5 dark:border-white/5 shadow-sm flex items-center gap-3">
-                        <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">A4 Canvas</span>
-                        <div className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700" />
-                        <span className="text-[10px] font-black text-zinc-900 dark:text-zinc-100 uppercase tracking-widest">Editing Mode</span>
-                    </div>
-
-                    {/* Zoom Part */}
-                    <div className="px-2 py-1.5 rounded-2xl bg-white/80 dark:bg-zinc-800/80 backdrop-blur-md border border-black/5 dark:border-white/5 shadow-sm flex items-center gap-1">
-                        <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="h-8 w-8 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-all"
-                            onClick={() => setZoom(prev => Math.max(prev - 0.1, 0.4))}
-                        >
-                            <Minus className="h-4 w-4" />
-                        </Button>
-                        
-                        <div className="flex items-center justify-center w-14">
-                            <span className="text-[11px] font-black text-zinc-900 dark:text-zinc-100">
-                                {Math.round(zoom * 100)}%
-                            </span>
-                        </div>
-
-                        <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="h-8 w-8 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-all"
-                            onClick={() => setZoom(prev => Math.min(prev + 0.1, 1.5))}
-                        >
-                            <Plus className="h-4 w-4" />
-                        </Button>
-
-                        <div className="w-px h-4 bg-zinc-200 dark:bg-zinc-700 mx-1" />
-
-                        <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="h-8 w-8 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-all group"
-                            onClick={() => setZoom(0.85)}
-                            title="Reset Zoom"
-                        >
-                            <Maximize className="h-4 w-4 text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors" />
-                        </Button>
                     </div>
                 </div>
 
