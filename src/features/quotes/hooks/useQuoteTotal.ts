@@ -9,18 +9,18 @@ interface QuoteTotals {
     grandTotal: number;
 }
 
-export function useQuoteTotal(items: QuoteLineItem[], hasVat: boolean = true, discountRate: number = 0, isTaxExempt: boolean = false): QuoteTotals {
+export function useQuoteTotal(items: QuoteLineItem[], hasVat: boolean = true, vatRate: number = 20, discountRate: number = 0, isTaxExempt: boolean = false): QuoteTotals {
     return useMemo(() => {
         let subTotal = 0;
         let totalTax = 0;
         const applyTax = hasVat && !isTaxExempt;
 
         items.forEach((item) => {
-            const lineSubTotal = item.quantity * item.unitPrice;
+            const lineSubTotal = (item.quantity || 0) * (item.unitPrice || 0);
             subTotal += lineSubTotal;
 
             if (applyTax) {
-                totalTax += lineSubTotal * (item.taxRate / 100);
+                totalTax += lineSubTotal * (vatRate / 100);
             }
         });
 

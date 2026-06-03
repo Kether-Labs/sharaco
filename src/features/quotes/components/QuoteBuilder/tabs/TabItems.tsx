@@ -1,10 +1,13 @@
 "use client";
 
 import { QuoteDraft, QuoteLineItem } from "../../../types/QuoteBuilder";
-import { Plus, ReceiptText } from "lucide-react";
+import { Plus, ReceiptText, Percent } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LineItem } from "../LineItem";
 import { useQuoteTotal } from "../../../hooks/useQuoteTotal";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 interface TabItemsProps {
     draft: QuoteDraft;
@@ -15,7 +18,13 @@ interface TabItemsProps {
 }
 
 export function TabItems({ draft, onItemChange, onAddItem, onRemoveItem, onDraftChange }: TabItemsProps) {
-    const { subTotal, totalTax, grandTotal, discountAmount } = useQuoteTotal(draft.items, draft.hasVat, draft.discountRate, draft.isTaxExempt);
+    const { subTotal, totalTax, grandTotal, discountAmount } = useQuoteTotal(
+        draft.items, 
+        draft.hasVat, 
+        draft.vatRate, 
+        draft.discountRate, 
+        draft.isTaxExempt
+    );
 
     const formatCurrency = (amount: number) =>
         new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XAF' }).format(amount);
@@ -26,6 +35,38 @@ export function TabItems({ draft, onItemChange, onAddItem, onRemoveItem, onDraft
             <div className="space-y-1">
                 <h3 className="text-lg font-bold text-white tracking-tight">Services & Pricing</h3>
                 <p className="text-sm text-zinc-500">Add or edit line items for this quotation. Totals are recalculated automatically.</p>
+            </div>
+
+            {/* Global VAT Settings */}
+            <div className="p-6 bg-white/[0.04]  border border-white/5 rounded-[2rem] space-y-6">
+                <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                        <Label className="text-sm font-bold text-zinc-200">Apply VAT (TVA)</Label>
+                        <p className="text-[10px] text-zinc-500 uppercase tracking-widest font-medium">Enable tax calculation for this quote</p>
+                    </div>
+                    <Switch 
+                        className="bg-slate-300"
+                        onCheckedChange={(checked) => onDraftChange("hasVat", checked)}
+                    />
+                </div>
+
+                {draft.hasVat && (
+                    <div className="space-y-3 pt-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                        <Label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+                            <Percent className="h-3 w-3" /> VAT Percentage
+                        </Label>
+                        <div className="relative max-w-[120px]">
+                            <Input
+                                type="number"
+                                value={draft.vatRate || ''}
+                                onChange={(e) => onDraftChange("vatRate", parseFloat(e.target.value) || 0)}
+                                className="h-11 pr-8 bg-zinc-900/50 border-white/5 focus:border-white/10 rounded-xl text-zinc-200 font-mono"
+                                placeholder="20"
+                            />
+                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-zinc-600">%</span>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Items List */}

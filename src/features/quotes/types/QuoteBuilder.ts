@@ -3,7 +3,7 @@ export interface QuoteLineItem {
     description: string;
     quantity: number;
     unitPrice: number;
-    taxRate: number; // e.g., 20 for 20%
+    tax_rate: number; // e.g., 20 for 20%
 }
 
 export interface QuoteDraft {
@@ -14,6 +14,7 @@ export interface QuoteDraft {
     date: string;
     validityDays: number;
     hasVat: boolean;
+    vatRate: number;
     isTaxExempt: boolean;
     discountRate: number;
     items: QuoteLineItem[];

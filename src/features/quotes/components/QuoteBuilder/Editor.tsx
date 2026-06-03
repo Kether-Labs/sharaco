@@ -24,6 +24,7 @@ export function Editor({ templateId }: EditorProps) {
         date: new Date().toISOString().split('T')[0],
         validityDays: 30,
         hasVat: true,
+        vatRate: 20,
         isTaxExempt: false,
         discountRate: 0,
         items: [
@@ -32,7 +33,7 @@ export function Editor({ templateId }: EditorProps) {
                 description: "Design UI/UX - Mobile App",
                 quantity: 1,
                 unitPrice: 1500,
-                taxRate: 20
+                tax_rate: 20
             }
         ],
         notes: "Merci pour votre confiance. Conditions de paiement : 30% d'acompte à la signature, solde à la livraison.",
@@ -67,7 +68,7 @@ export function Editor({ templateId }: EditorProps) {
                     description: "",
                     quantity: 1,
                     unitPrice: 0,
-                    taxRate: 20
+                    tax_rate: 20
                 }
             ]
         }));
@@ -96,6 +97,7 @@ export function Editor({ templateId }: EditorProps) {
                 onZoomOut={() => setZoom(prev => Math.max(prev - 0.1, 0.4))}
                 onResetZoom={() => setZoom(0.85)}
                 onSave={handleSave}
+                onColorChange={(color) => handleDraftChange('brandColor', color)}
                 showActions={showActions}
                 setShowActions={setShowActions}
             />

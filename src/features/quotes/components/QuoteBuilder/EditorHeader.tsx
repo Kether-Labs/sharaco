@@ -8,6 +8,7 @@ import { QuoteDraft } from "../../types/QuoteBuilder";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuGroup } from "@/components/ui/dropdown-menu";
 import { FileDown, Send, Copy, ExternalLink, ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
 import { useState } from "react";
+import Logo from "@/components/ui/logo";
 
 interface EditorHeaderProps {
     draft: QuoteDraft;
@@ -16,9 +17,21 @@ interface EditorHeaderProps {
     onZoomOut: () => void;
     onResetZoom: () => void;
     onSave?: () => void;
+    onColorChange?: (color: string) => void;
     showActions?: boolean;
     setShowActions?: (show: boolean) => void;
 }
+
+const BRAND_COLORS = [
+    { name: "Sky", value: "#0ea5e9" },
+    { name: "Emerald", value: "#10b981" },
+    { name: "Rose", value: "#f43f5e" },
+    { name: "Violet", value: "#8b5cf6" },
+    { name: "Amber", value: "#f59e0b" },
+    { name: "Zinc", value: "#71717a" },
+    { name: "Indigo", value: "#6366f1" },
+    { name: "Orange", value: "#f97316" },
+];
 
 export function EditorHeader({ 
     draft, 
@@ -27,6 +40,7 @@ export function EditorHeader({
     onZoomOut, 
     onResetZoom, 
     onSave,
+    onColorChange,
     showActions,
     setShowActions
 }: EditorHeaderProps) {
@@ -51,58 +65,125 @@ export function EditorHeader({
                 </Link>
                 
                 <div className="flex flex-col">
-                    <div className="flex items-center gap-2 mb-2">
-                       
-                        <h2 className="text-[10px] font-black text-zinc-500 uppercase">
-                            Sharaco Editor
-                        </h2>
-                    </div>
-                    <div className="flex items-center gap-2 group cursor-pointer">
-                        <p className="text-[15px] font-bold text-zinc-100 tracking-tight leading-none group-hover:text-sky-400 transition-colors">
-                            {draft.reference || "Untitled Quote"}
-                        </p>
-                        <Paintbrush className="w-3 h-3 text-zinc-600 opacity-0 group-hover:opacity-100 transition-all transform group-hover:translate-x-1" />
-                    </div>
+                    <Link href="/dashboard" className="flex items-center gap-3 group">
+              <div className="   shadow-sm group-hover:scale-105 group-hover:rotate-2 transition-all duration-500">
+                <Logo width={150} height={150} />
+              </div>
+              
+            </Link>
                 </div>
             </div>
 
-            {/* Central Zoom Controls - Canva Style */}
-            <div className="absolute left-1/2 -translate-x-1/2 hidden md:flex items-center gap-1 px-2 py-1.5 rounded-2xl bg-white/5 border border-white/5 backdrop-blur-md shadow-inner">
-                <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="h-8 w-8 rounded-xl hover:bg-white/10 text-zinc-400 hover:text-white transition-all"
-                    onClick={onZoomOut}
-                >
-                    <Minus className="h-3.5 w-3.5" />
-                </Button>
-                
-                <div className="flex items-center justify-center w-14">
-                    <span className="text-[11px] font-black text-zinc-100">
-                        {Math.round(zoom * 100)}%
-                    </span>
+            {/* Central Controls: View & Style */}
+            <div className="absolute left-1/2 -translate-x-1/2 hidden md:flex items-center gap-3">
+                {/* Zoom Controls */}
+                <div className="flex items-center gap-1 px-2 py-1.5 rounded-2xl bg-white/5 border border-white/5 backdrop-blur-md shadow-inner">
+                    <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8 rounded-xl hover:bg-white/10 text-zinc-400 hover:text-white transition-all"
+                        onClick={onZoomOut}
+                    >
+                        <Minus className="h-3.5 w-3.5" />
+                    </Button>
+                    
+                    <div className="flex items-center justify-center w-14">
+                        <span className="text-[11px] font-black text-zinc-100">
+                            {Math.round(zoom * 100)}%
+                        </span>
+                    </div>
+
+                    <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8 rounded-xl hover:bg-white/10 text-zinc-400 hover:text-white transition-all"
+                        onClick={onZoomIn}
+                    >
+                        <Plus className="h-3.5 w-3.5" />
+                    </Button>
+
+                    <div className="w-px h-4 bg-white/10 mx-1" />
+
+                    <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8 rounded-xl hover:bg-white/10 text-zinc-400 hover:text-white transition-all group"
+                        onClick={onResetZoom}
+                        title="Reset Zoom"
+                    >
+                        <Maximize className="h-3.5 w-3.5 transition-colors" />
+                    </Button>
                 </div>
 
-                <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="h-8 w-8 rounded-xl hover:bg-white/10 text-zinc-400 hover:text-white transition-all"
-                    onClick={onZoomIn}
-                >
-                    <Plus className="h-3.5 w-3.5" />
-                </Button>
-
-                <div className="w-px h-4 bg-white/10 mx-1" />
-
-                <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="h-8 w-8 rounded-xl hover:bg-white/10 text-zinc-400 hover:text-white transition-all group"
-                    onClick={onResetZoom}
-                    title="Reset Zoom"
-                >
-                    <Maximize className="h-3.5 w-3.5 transition-colors" />
-                </Button>
+                {/* Brand Color Selector (Wider) */}
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="flex items-center gap-3 px-3 py-1.5 rounded-2xl bg-white/5 border border-white/5 backdrop-blur-md shadow-inner group hover:bg-white/10 transition-all min-w-[110px]"
+                        >
+                            <div className="relative flex items-center justify-center">
+                                <div 
+                                    className="w-3.5 h-3.5 rounded-full shadow-sm border border-white/20 transition-all group-hover:border-white/40"
+                                    style={{ backgroundColor: draft.brandColor }}
+                                />
+                                <div 
+                                    className="absolute inset-0 rounded-full animate-ping opacity-20 pointer-events-none"
+                                    style={{ backgroundColor: draft.brandColor }}
+                                />
+                            </div>
+                            <span className="text-[10px] font-black text-zinc-300 uppercase tracking-widest font-mono">
+                                {draft.brandColor}
+                            </span>
+                        </motion.button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent 
+                        align="center" 
+                        className="w-56 bg-zinc-900 border-white/10 p-3 rounded-2xl shadow-2xl backdrop-blur-xl z-[120]"
+                    >
+                        <DropdownMenuLabel className="text-[10px] font-black text-zinc-500 uppercase tracking-widest px-1 pb-3">
+                            Brand Palette
+                        </DropdownMenuLabel>
+                        <div className="grid grid-cols-6 gap-2 mb-3">
+                            {BRAND_COLORS.map((color) => (
+                                <button
+                                    key={color.value}
+                                    onClick={() => onColorChange?.(color.value)}
+                                    className={`
+                                        w-6 h-6 rounded-[100%] border-2 transition-all hover:scale-110 active:scale-95
+                                        ${draft.brandColor === color.value ? 'border-white' : 'border-transparent hover:border-white/20'}
+                                    `}
+                                    style={{ backgroundColor: color.value }}
+                                    title={color.name}
+                                />
+                            ))}
+                        </div>
+                        <DropdownMenuSeparator className="bg-white/5" />
+                        <div className="mt-3">
+                            <div className="flex items-center gap-2 p-1.5 rounded-xl bg-white/5 border border-white/5 focus-within:border-white/10 transition-colors">
+                                <div className="relative w-8 h-8 rounded-lg overflow-hidden border border-white/10 shrink-0">
+                                    <input 
+                                        type="color" 
+                                        value={draft.brandColor}
+                                        onChange={(e) => onColorChange?.(e.target.value)}
+                                        className="absolute -inset-2 w-[150%] h-[150%] cursor-pointer bg-transparent"
+                                    />
+                                </div>
+                                <div className="flex flex-col flex-1 px-1">
+                                    <span className="text-[9px] font-black text-zinc-600 uppercase tracking-tighter">Custom Color</span>
+                                    <input 
+                                        type="text" 
+                                        value={draft.brandColor}
+                                        onChange={(e) => onColorChange?.(e.target.value)}
+                                        className="bg-transparent border-none outline-none text-[11px] font-mono text-zinc-200 w-full"
+                                        placeholder="#000000"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
 
             <div className="flex items-center gap-3 min-w-[300px] justify-end">

@@ -24,7 +24,7 @@ export function LineItem({ item, index, onChange, onRemove }: LineItemProps) {
     const lineTotal = item.quantity * item.unitPrice;
 
     return (
-        <div className="group relative flex items-start gap-4 p-5 bg-white/[0.02] border border-white/5 rounded-2xl hover:bg-white/[0.04] transition-all duration-300">
+        <div className="group relative flex items-start gap-4 p-5 bg-white/[0.04] border border-white/5 rounded-2xl hover:bg-white/[0.04] transition-all duration-300">
             {/* Grip handle */}
             <div className="mt-2.5 text-zinc-600 cursor-grab active:cursor-grabbing hover:text-zinc-400 transition-colors shrink-0">
                 <GripVertical className="h-4 w-4" />

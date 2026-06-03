@@ -34,7 +34,7 @@ function draftToPreviewRequest(
             description: item.description,
             quantity: item.quantity,
             unit_price_cents: item.unitPrice, // FCFA = pas de centimes
-            tax_rate: item.taxRate,
+            tax_rate: draft.hasVat ? draft.vatRate : 0,
         })),
         // Template
         template_id: templateId || null,

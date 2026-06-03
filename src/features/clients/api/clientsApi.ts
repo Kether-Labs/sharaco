@@ -3,8 +3,8 @@ import { Client, ClientCreate, ClientUpdate } from '../types';
 
 
 export const clientsApi = {
-    getAll: async (): Promise<Client[]> => {
-        return api.get<Client[]>('/api/v1/clients');
+    getAll: async (skip = 0, limit = 50): Promise<Client[]> => {
+        return api.get<Client[]>(`/api/v1/clients?skip=${skip}&limit=${limit}`);
     },
 
     getById: async (id: string): Promise<Client> => {
