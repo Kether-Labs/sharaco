@@ -1,5 +1,6 @@
 import { api } from '@/lib/api';
 import type { Document, DocumentCreate, DocumentStatus } from '../types';
+import { DocumentPreviewRequest } from '@/features/templates/types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -34,7 +35,27 @@ export const quotesApi = {
     },
 
     getPreview: async (id: string): Promise<string> => {
-        return api.get<string>(`/api/v1/documents/${id}/preview`);
+        const token = localStorage.getItem('sharaco_token');
+        const res = await fetch(`${API_URL}/api/v1/documents/${id}/preview`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error('Erreur aperçu document');
+        return res.text();
+    },
+
+    // 🔴 NOUVEAU — Live preview (éditeur temps réel)
+    previewDocument: async (data: DocumentPreviewRequest): Promise<string> => {
+        const token = localStorage.getItem('sharaco_token');
+        const res = await fetch(`${API_URL}/api/v1/documents/preview`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(data),
+        });
+        if (!res.ok) throw new Error('Erreur aperçu live');
+        return res.text();
     },
 
     getPdfUrl: (id: string): string => {

@@ -7,6 +7,8 @@ export interface QuoteLineItem {
 }
 
 export interface QuoteDraft {
+    id: string; 
+    clientId: string | null;
     clientName: string;
     clientEmail: string;
     clientAddress: string;
@@ -22,4 +24,7 @@ export interface QuoteDraft {
     internalNotes?: string;
     logoUrl?: string | null;
     brandColor?: string;
+    templateId: string | null;
+    layoutStyle: string;  // "classic" | "modern" | "minimal"
+    isSaved: boolean;     // ← NOUVEAU : track si le document est sauvé en DB
 }

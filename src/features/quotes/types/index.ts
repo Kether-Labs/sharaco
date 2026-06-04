@@ -10,6 +10,7 @@ export interface DocumentItem {
     document_id: string;
 }
 
+
 export interface Document {
     id: string;
     type: DocumentType;
@@ -34,6 +35,7 @@ export interface Document {
 }
 
 export interface DocumentCreate {
+    id?: string;
     type: DocumentType;
     client_id: string;
     template_id?: string;
@@ -44,6 +46,7 @@ export interface DocumentCreate {
         unit_price_cents: number;
         tax_rate: number;
     }[];
+    notes?: string | null;    // ← NOUVEAU
 }
 
 export interface DocumentStatusUpdate {

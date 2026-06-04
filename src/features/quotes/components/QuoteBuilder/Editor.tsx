@@ -12,11 +12,15 @@ import { EditorHeader } from "./EditorHeader";
 
 
 interface EditorProps {
-    templateId?: string | null
+    templateId?: string | null,
+    documentId: string 
 }
 
-export function Editor({ templateId }: EditorProps) {
+export function Editor({ templateId, documentId }: EditorProps) {
+    console.log("🚀 Editor rendered with templateId:", templateId, "and documentId:", documentId);
     const [draft, setDraft] = useState<QuoteDraft>({
+        id: documentId , // Génère un UUID dès la création du draft
+        clientId: "",
         clientName: "",
         clientEmail: "",
         clientAddress: "",
@@ -39,7 +43,10 @@ export function Editor({ templateId }: EditorProps) {
         notes: "Merci pour votre confiance. Conditions de paiement : 30% d'acompte à la signature, solde à la livraison.",
         internalNotes: "",
         logoUrl: null,
-        brandColor: "#0ea5e9"
+        brandColor: "#0ea5e9",
+        isSaved: false,
+        templateId: templateId || null,
+        layoutStyle: templateId || "classic"
     });
 
     const [zoom, setZoom] = useState(0.85);
