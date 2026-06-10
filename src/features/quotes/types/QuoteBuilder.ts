@@ -12,6 +12,7 @@ export interface QuoteDraft {
     clientName: string;
     clientEmail: string;
     clientAddress: string;
+    clientPhone: string; // NOUVEAU : champ téléphone
     reference: string;
     date: string;
     validityDays: number;

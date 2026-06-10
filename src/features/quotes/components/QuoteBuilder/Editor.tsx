@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { QuoteDraft, QuoteLineItem } from "../../types/QuoteBuilder";
 import { EditorPanel } from "./EditorPanel";
@@ -9,6 +9,8 @@ import { Plus, Minus, Maximize, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LayoutPreview } from "@/features/templates/components/LayoutPreview";
 import { EditorHeader } from "./EditorHeader";
+import { useDownloadPdf } from "@/features/templates/hooks/useDownloadPdf";
+import { DocumentPreviewRequest } from "@/features/templates/types";
 
 
 interface EditorProps {
@@ -18,11 +20,13 @@ interface EditorProps {
 
 export function Editor({ templateId, documentId }: EditorProps) {
     console.log("🚀 Editor rendered with templateId:", templateId, "and documentId:", documentId);
+   const { downloadPdf, isDownloading } = useDownloadPdf();
     const [draft, setDraft] = useState<QuoteDraft>({
         id: documentId , // Génère un UUID dès la création du draft
         clientId: "",
         clientName: "",
         clientEmail: "",
+        clientPhone: "",
         clientAddress: "",
         reference: `DEV-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000)}`,
         date: new Date().toISOString().split('T')[0],
@@ -49,6 +53,45 @@ export function Editor({ templateId, documentId }: EditorProps) {
         layoutStyle: templateId || "classic"
     });
 
+    const handleDownload = useCallback(async () => {
+    const previewRequest: DocumentPreviewRequest = {
+        type: "DEVIS",
+        client_name: draft.clientName || "Client Exemple",
+        client_email: draft.clientEmail || "",
+        client_address: draft.clientAddress || "",
+        client_phone: draft.clientPhone || "",
+        items: draft.items.map(item => ({
+            description: item.description,
+            quantity: item.quantity,
+            unit_price_cents: item.unitPrice,
+            tax_rate: item.tax_rate,
+        })),
+        template_id: null,
+        layout_style: draft.layoutStyle || "classic",
+        primary_color: draft.brandColor || "#2563EB",
+        secondary_color: "#1E40AF",
+        accent_color: "#DBEAFE",
+        text_color: "#1F2937",
+        background_color: "#FFFFFF",
+        font_family: "Inter",
+        header_text: null,
+        footer_text: null,
+        show_bank_details: true,
+        show_tax_id: true,
+        notes: draft.notes || null,
+        reference: draft.reference || null,
+    };
+
+    try {
+        await downloadPdf(
+            previewRequest,
+            draft.isSaved ? draft.id : null,  // ← si sauvegardé, utilise GET /pdf
+            `${draft.reference || 'devis'}.pdf`
+        );
+    } catch (error: any) {
+        
+    }
+}, [draft, downloadPdf]);
     const [zoom, setZoom] = useState(0.85);
     const [showActions, setShowActions] = useState(false);
 
@@ -107,6 +150,7 @@ export function Editor({ templateId, documentId }: EditorProps) {
                 onColorChange={(color) => handleDraftChange('brandColor', color)}
                 showActions={showActions}
                 setShowActions={setShowActions}
+                downloadPdf={handleDownload}
             />
 
             {/* Grain Overlay */}

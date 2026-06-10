@@ -20,6 +20,7 @@ interface EditorHeaderProps {
     onColorChange?: (color: string) => void;
     showActions?: boolean;
     setShowActions?: (show: boolean) => void;
+    downloadPdf: () => void;
 }
 
 const BRAND_COLORS = [
@@ -42,7 +43,8 @@ export function EditorHeader({
     onSave,
     onColorChange,
     showActions,
-    setShowActions
+    setShowActions,
+    downloadPdf
 }: EditorHeaderProps) {
     const [isExporting, setIsExporting] = useState(false);
 
@@ -243,7 +245,7 @@ export function EditorHeader({
                                 }}
                                 className="flex flex-col items-start gap-0.5 p-3 focus:bg-white/5 rounded-xl cursor-pointer group"
                             >
-                                <div className="flex items-center justify-between w-full">
+                                <div onClick={downloadPdf} className="flex items-center justify-between w-full">
                                     <div className="flex items-center gap-2">
                                         <div className="p-1.5 rounded-lg bg-zinc-800 text-zinc-400 group-focus:text-sky-400 transition-colors">
                                             {isExporting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileDown className="w-3.5 h-3.5" />}

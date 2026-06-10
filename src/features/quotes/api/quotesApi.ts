@@ -61,4 +61,28 @@ export const quotesApi = {
     getPdfUrl: (id: string): string => {
         return `${API_URL}/api/v1/documents/${id}/pdf`;
     },
+
+   downloadPreviewPdf: async (id: string, filename?: string): Promise<void> => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('sharaco_token') : null;
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const res = await fetch(`${API_URL}/api/v1/documents/${id}/pdf`, { headers });
+
+    if (!res.ok) {
+      throw new Error(`Erreur lors du téléchargement du PDF (${res.status})`);
+    }
+
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename || `devis-${id}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  },
 };

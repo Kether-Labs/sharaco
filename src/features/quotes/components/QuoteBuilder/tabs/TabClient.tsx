@@ -47,6 +47,7 @@ export function TabClient({ draft, onChange }: TabClientProps) {
             onChange("clientName", client.name);
             onChange("clientEmail", client.email || "");
             onChange("clientAddress", client.address || "");
+            onChange("clientPhone", client.phone || "");
         }
     };
 
@@ -56,6 +57,7 @@ export function TabClient({ draft, onChange }: TabClientProps) {
             onChange("clientName", client.name);
             onChange("clientEmail", client.email || "");
             onChange("clientAddress", client.address || "");
+            onChange("clientPhone", client.phone || "");
             setIsDialogOpen(false);
             setNewClient({ name: "", email: "", address: "",phone: "" });
         } catch (error) {
@@ -77,7 +79,7 @@ export function TabClient({ draft, onChange }: TabClientProps) {
                     <div className="relative flex-1 group">
                         <Select 
                             onValueChange={handleClientSelect}
-                            value={clients?.find(c => c.name === draft.clientName && c.email === draft.clientEmail)?.id || ""}
+                            value={clients?.find(c => c.name === draft.clientName && c.email === draft.clientEmail && c.phone === draft.clientPhone)?.id || ""}
                         >
                             <SelectTrigger className="h-12 bg-white/[0.02] border-white/5 text-zinc-200 focus:ring-1 focus:ring-white/10 rounded-2xl transition-all shadow-inner">
                                 <div className="flex items-center gap-3">
@@ -140,6 +142,8 @@ export function TabClient({ draft, onChange }: TabClientProps) {
                                         placeholder="billing@client.com"
                                     />
                                 </div>
+
+                                
                                 <div className="space-y-2">
                                     <Label htmlFor="phone" className="text-zinc-400">Phone Number</Label>
                                     <Input
@@ -204,6 +208,19 @@ export function TabClient({ draft, onChange }: TabClientProps) {
                             type="email"
                             value={draft.clientEmail}
                             onChange={(e) => onChange("clientEmail", e.target.value)}
+                            placeholder="billing@client.com"
+                            className="h-11 bg-white/[0.02] border-white/5 text-zinc-200 focus:border-white/10 rounded-xl font-medium"
+                        />
+                    </div>
+
+                    <div className="space-y-3">
+                        <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+                            <Mail className="h-3 w-3" /> Phone
+                        </label>
+                        <Input
+                            type="string"
+                            value={draft.clientPhone}
+                            onChange={(e) => onChange("clientPhone", e.target.value)}
                             placeholder="billing@client.com"
                             className="h-11 bg-white/[0.02] border-white/5 text-zinc-200 focus:border-white/10 rounded-xl font-medium"
                         />
