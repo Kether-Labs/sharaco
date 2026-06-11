@@ -1,68 +1,52 @@
 import { api } from '@/lib/api';
-import type { Document, DocumentCreate, DocumentStatus } from '../types';
-import { DocumentPreviewRequest } from '@/features/templates/types';
+import type { Document, DocumentCreate, DocumentStatus, DocumentPreviewRequest } from '../types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 export const quotesApi = {
-    getAll: async (params?: { type?: string }): Promise<Document[]> => {
-        const query = params?.type ? `?type=${params.type}` : '';
-        return api.get<Document[]>(`/api/v1/documents${query}`);
-    },
+  getAll: async (params?: { type?: string }): Promise<Document[]> => {
+    const query = params?.type ? `?type=${params.type}` : '';
+    return api.get<Document[]>(`/api/v1/documents${query}`);
+  },
 
-    getById: async (id: string): Promise<Document> => {
-        return api.get<Document>(`/api/v1/documents/${id}`);
-    },
+  getById: async (id: string): Promise<Document> => {
+    return api.get<Document>(`/api/v1/documents/${id}`);
+  },
 
-    create: async (data: DocumentCreate): Promise<Document> => {
-        return api.post<Document>('/api/v1/documents', data);
-    },
+  create: async (data: DocumentCreate): Promise<Document> => {
+    return api.post<Document>('/api/v1/documents', data);
+  },
 
-    update: async (id: string, data: unknown): Promise<Document> => {
-        return api.put<Document>(`/api/v1/documents/${id}`, data);
-    },
+  update: async (id: string, data: unknown): Promise<Document> => {
+    return api.put<Document>(`/api/v1/documents/${id}`, data);
+  },
 
-    delete: async (id: string): Promise<void> => {
-        return api.delete<void>(`/api/v1/documents/${id}`);
-    },
+  delete: async (id: string): Promise<void> => {
+    return api.delete<void>(`/api/v1/documents/${id}`);
+  },
 
-    updateStatus: async (id: string, status: DocumentStatus): Promise<Document> => {
-        return api.patch<Document>(`/api/v1/documents/${id}/status`, { status });
-    },
+  updateStatus: async (id: string, status: DocumentStatus): Promise<Document> => {
+    return api.patch<Document>(`/api/v1/documents/${id}/status`, { status });
+  },
 
-    convertToInvoice: async (id: string): Promise<Document> => {
-        return api.post<Document>(`/api/v1/documents/${id}/convert`);
-    },
+  convertToInvoice: async (id: string): Promise<Document> => {
+    return api.post<Document>(`/api/v1/documents/${id}/convert`);
+  },
 
-    getPreview: async (id: string): Promise<string> => {
-        const token = localStorage.getItem('sharaco_token');
-        const res = await fetch(`${API_URL}/api/v1/documents/${id}/preview`, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error('Erreur aperçu document');
-        return res.text();
-    },
+  getPreview: async (id: string): Promise<string> => {
+    return api.get<string>(`/api/v1/documents/${id}/preview`);
+  },
 
-    // 🔴 NOUVEAU — Live preview (éditeur temps réel)
-    previewDocument: async (data: DocumentPreviewRequest): Promise<string> => {
-        const token = localStorage.getItem('sharaco_token');
-        const res = await fetch(`${API_URL}/api/v1/documents/preview`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(data),
-        });
-        if (!res.ok) throw new Error('Erreur aperçu live');
-        return res.text();
-    },
+  getPdfUrl: (id: string): string => {
+    return `${API_URL}/api/v1/documents/${id}/pdf`;
+  },
 
-    getPdfUrl: (id: string): string => {
-        return `${API_URL}/api/v1/documents/${id}/pdf`;
-    },
-
-   downloadPreviewPdf: async (id: string, filename?: string): Promise<void> => {
+  /**
+   * Télécharge le PDF d'un document sauvegardé (GET /documents/{id}/pdf).
+   * Utilise fetch() avec le token JWT pour l'authentification.
+   * Retourne un Blob et déclenche le téléchargement dans le navigateur.
+   */
+  downloadPdf: async (id: string, filename?: string): Promise<void> => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('sharaco_token') : null;
     const headers: Record<string, string> = {};
     if (token) {
@@ -84,5 +68,37 @@ export const quotesApi = {
     link.click();
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url);
+  },
+
+  /**
+   * Génère un PDF à partir des données du formulaire SANS sauvegarder en DB.
+   * Utilise POST /documents/preview/pdf avec authentification JWT.
+   * Retourne directement un Blob (PDF binaire).
+   * Ajoute un paramètre cache-busting pour éviter les réponses obsolètes.
+   */
+  downloadPreviewPdf: async (previewData: DocumentPreviewRequest): Promise<Blob> => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('sharaco_token') : null;
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    // Cache-busting : ajoute un timestamp pour éviter le cache navigateur
+    const cacheBuster = `_t=${Date.now()}`;
+
+    const res = await fetch(`${API_URL}/api/v1/documents/preview/pdf?${cacheBuster}`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(previewData),
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text().catch(() => '');
+      throw new Error(`Erreur lors de la génération du PDF (${res.status}): ${errorText}`);
+    }
+
+    return res.blob();
   },
 };

@@ -21,6 +21,7 @@ interface EditorHeaderProps {
     showActions?: boolean;
     setShowActions?: (show: boolean) => void;
     downloadPdf: () => void;
+    isDownloading: boolean;
 }
 
 const BRAND_COLORS = [
@@ -44,7 +45,8 @@ export function EditorHeader({
     onColorChange,
     showActions,
     setShowActions,
-    downloadPdf
+    downloadPdf,
+    isDownloading
 }: EditorHeaderProps) {
     const [isExporting, setIsExporting] = useState(false);
 

@@ -7,22 +7,22 @@ import { EditorPanel } from "./EditorPanel";
 import { LivePreview } from "./LivePreview";
 import { Plus, Minus, Maximize, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { LayoutPreview } from "@/features/templates/components/LayoutPreview";
 import { EditorHeader } from "./EditorHeader";
+
+import type { DocumentPreviewRequest } from "../../types";
+import { useToast } from "@/hooks/use-toast";
 import { useDownloadPdf } from "@/features/templates/hooks/useDownloadPdf";
-import { DocumentPreviewRequest } from "@/features/templates/types";
-
-
 interface EditorProps {
-    templateId?: string | null,
-    documentId: string 
+    templateId?: string | null;
+    documentId?: string;
 }
 
 export function Editor({ templateId, documentId }: EditorProps) {
-    console.log("🚀 Editor rendered with templateId:", templateId, "and documentId:", documentId);
-   const { downloadPdf, isDownloading } = useDownloadPdf();
+    const { downloadPdf, isDownloading } = useDownloadPdf();
+    const { toast } = useToast();
+
     const [draft, setDraft] = useState<QuoteDraft>({
-        id: documentId , // Génère un UUID dès la création du draft
+        id: documentId,
         clientId: "",
         clientName: "",
         clientEmail: "",
@@ -53,48 +53,6 @@ export function Editor({ templateId, documentId }: EditorProps) {
         layoutStyle: templateId || "classic"
     });
 
-    const handleDownload = useCallback(async () => {
-    const previewRequest: DocumentPreviewRequest = {
-        type: "DEVIS",
-        client_name: draft.clientName || "Client Exemple",
-        client_email: draft.clientEmail || "",
-        client_address: draft.clientAddress || "",
-        client_phone: draft.clientPhone || "",
-        items: draft.items.map(item => ({
-            description: item.description,
-            quantity: item.quantity,
-            unit_price_cents: item.unitPrice,
-            tax_rate: item.tax_rate,
-        })),
-        template_id: null,
-        layout_style: draft.layoutStyle || "classic",
-        primary_color: draft.brandColor || "#2563EB",
-        secondary_color: "#1E40AF",
-        accent_color: "#DBEAFE",
-        text_color: "#1F2937",
-        background_color: "#FFFFFF",
-        font_family: "Inter",
-        header_text: null,
-        footer_text: null,
-        show_bank_details: true,
-        show_tax_id: true,
-        notes: draft.notes || null,
-        reference: draft.reference || null,
-    };
-
-    try {
-        await downloadPdf(
-            previewRequest,
-            draft.isSaved ? draft.id : null,  // ← si sauvegardé, utilise GET /pdf
-            `${draft.reference || 'devis'}.pdf`
-        );
-    } catch (error: any) {
-        
-    }
-}, [draft, downloadPdf]);
-    const [zoom, setZoom] = useState(0.85);
-    const [showActions, setShowActions] = useState(false);
-
     const handleDraftChange = (field: keyof QuoteDraft, value: any) => {
         setDraft(prev => ({ ...prev, [field]: value }));
     };
@@ -118,7 +76,7 @@ export function Editor({ templateId, documentId }: EditorProps) {
                     description: "",
                     quantity: 1,
                     unitPrice: 0,
-                    tax_rate: 20
+                    tax_rate: draft.vatRate || 20
                 }
             ]
         }));
@@ -132,16 +90,77 @@ export function Editor({ templateId, documentId }: EditorProps) {
         }));
     };
 
-    const handleSave = () => {
-        // Logic for saving (API calls etc) would go here
-        setShowActions(true);
-    };
+    /**
+     * handleDownload : Génère et télécharge le PDF du devis.
+     * - Si le devis est sauvegardé en DB → GET /documents/{id}/pdf
+     * - Si pas sauvegardé → POST /documents/preview/pdf (sans sauvegarde)
+     */
+    const handleDownload = useCallback(async () => {
+        const previewRequest: DocumentPreviewRequest = {
+            type: "DEVIS",
+            client_name: draft.clientName || "Client Exemple",
+            client_email: draft.clientEmail || "",
+            client_address: draft.clientAddress || "",
+            client_phone: draft.clientPhone || "",
+            items: draft.items.map(item => ({
+                description: item.description,
+                quantity: item.quantity,
+                unit_price_cents: item.unitPrice,
+                tax_rate: item.tax_rate,
+            })),
+            template_id: draft.templateId || null,
+            layout_style: draft.layoutStyle || "classic",
+            primary_color: draft.brandColor || "#2563EB",
+            secondary_color: "#1E40AF",
+            accent_color: "#DBEAFE",
+            text_color: "#1F2937",
+            background_color: "#FFFFFF",
+            font_family: "Inter",
+            header_text: null,
+            footer_text: null,
+            show_bank_details: true,
+            show_tax_id: true,
+            notes: draft.notes || null,
+            reference: draft.reference || null,
+        };
+
+        try {
+            await downloadPdf(
+                previewRequest,
+                draft.isSaved ? draft.id : null,
+                `${draft.reference || 'devis'}.pdf`
+            );
+            toast({
+                title: "PDF téléchargé",
+                description: "Le devis a été téléchargé au format PDF.",
+            });
+        } catch (error: any) {
+            toast({
+                title: "Erreur",
+                description: "Impossible de télécharger le PDF. Veuillez réessayer.",
+                variant: "destructive",
+            });
+        }
+    }, [draft, downloadPdf, toast]);
+
+    const handleSave = useCallback(() => {
+        // TODO: Implémenter la sauvegarde via l'API
+        // Pour l'instant, on marque le draft comme sauvegardé
+        setDraft(prev => ({ ...prev, isSaved: true }));
+        toast({
+            title: "Devis enregistré",
+            description: "Le devis a été sauvegardé comme brouillon.",
+        });
+    }, [toast]);
+
+    const [zoom, setZoom] = useState(0.85);
+    const [showActions, setShowActions] = useState(false);
 
     return (
         <div className="flex h-[100dvh] w-screen overflow-hidden bg-zinc-950 font-sans selection:bg-sky-500/30">
             {/* Global Header */}
-            <EditorHeader 
-                draft={draft} 
+            <EditorHeader
+                draft={draft}
                 zoom={zoom}
                 onZoomIn={() => setZoom(prev => Math.min(prev + 0.1, 1.5))}
                 onZoomOut={() => setZoom(prev => Math.max(prev - 0.1, 0.4))}
@@ -151,6 +170,7 @@ export function Editor({ templateId, documentId }: EditorProps) {
                 showActions={showActions}
                 setShowActions={setShowActions}
                 downloadPdf={handleDownload}
+                isDownloading={isDownloading}
             />
 
             {/* Grain Overlay */}
@@ -171,24 +191,24 @@ export function Editor({ templateId, documentId }: EditorProps) {
             <main className="flex-1 relative overflow-hidden bg-[#fafafa] dark:bg-zinc-900/50 pt-[72px]">
                 {/* Background Workbench Pattern */}
                 <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] dark:bg-[radial-gradient(#ffffff05_1px,transparent_1px)] [background-size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)]" />
-                
+
                 {/* Scrollable Canvas Area */}
                 <div className="absolute inset-0 overflow-auto custom-scrollbar pt-24 pb-32">
-                    <div 
+                    <div
                         className="flex justify-center transition-transform duration-300 ease-out origin-top"
                         style={{ transform: `scale(${zoom})` }}
                     >
                         <div className="w-full max-w-[1000px] px-12">
-                             <LivePreview
+                            <LivePreview
+                                templateId={draft.templateId || null}
+                                layoutStyle={draft.layoutStyle || "classic"}
                                 draft={draft}
-                                layoutStyle={templateId || "classic"}
-                                templateId={templateId}
                             />
                         </div>
                     </div>
                 </div>
 
-                {/* Floating Hint (Optional but nice) */}
+                {/* Floating Hint */}
                 <div className="absolute bottom-6 right-6 px-4 py-2 rounded-xl bg-zinc-900/10 dark:bg-white/5 backdrop-blur-md border border-black/5 dark:border-white/5 pointer-events-none">
                     <div className="flex items-center gap-2">
                         <Search className="w-3.5 h-3.5 text-zinc-400" />

@@ -3,21 +3,21 @@ export interface QuoteLineItem {
     description: string;
     quantity: number;
     unitPrice: number;
-    tax_rate: number; // e.g., 20 for 20%
+    tax_rate: number; // e.g., 20 for 20% — correspond au champ backend
 }
 
 export interface QuoteDraft {
-    id: string; 
-    clientId: string | null;
+    id?: string;              // UUID du document (si sauvegardé)
+    clientId?: string;        // ID du client en DB
     clientName: string;
     clientEmail: string;
+    clientPhone?: string;     // Téléphone du client
     clientAddress: string;
-    clientPhone: string; // NOUVEAU : champ téléphone
     reference: string;
     date: string;
     validityDays: number;
     hasVat: boolean;
-    vatRate: number;
+    vatRate?: number;         // Taux de TVA par défaut
     isTaxExempt: boolean;
     discountRate: number;
     items: QuoteLineItem[];
@@ -25,7 +25,7 @@ export interface QuoteDraft {
     internalNotes?: string;
     logoUrl?: string | null;
     brandColor?: string;
-    templateId: string | null;
-    layoutStyle: string;  // "classic" | "modern" | "minimal"
-    isSaved: boolean;     // ← NOUVEAU : track si le document est sauvé en DB
+    isSaved?: boolean;        // Indique si le draft est sauvegardé en DB
+    templateId?: string | null;  // ID du template sélectionné
+    layoutStyle?: string;     // "classic" | "modern" | "minimal"
 }
