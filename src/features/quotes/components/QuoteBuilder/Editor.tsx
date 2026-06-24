@@ -7,11 +7,13 @@ import { EditorPanel } from "./EditorPanel";
 import { LivePreview } from "./LivePreview";
 import { Plus, Minus, Maximize, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
 import { EditorHeader } from "./EditorHeader";
 
 import type { DocumentPreviewRequest } from "../../types";
 import { useToast } from "@/hooks/use-toast";
 import { useDownloadPdf } from "@/features/templates/hooks/useDownloadPdf";
+import { DownloadLoader } from "../DownloadLoader";
 interface EditorProps {
     templateId?: string | null;
     documentId?: string;
@@ -173,6 +175,10 @@ export function Editor({ templateId, documentId }: EditorProps) {
                 isDownloading={isDownloading}
             />
 
+            <DownloadLoader
+            isVisible={isDownloading}
+            filename={`${draft.reference || 'devis'}.pdf`}
+        />
             {/* Grain Overlay */}
             <div className="fixed inset-0 pointer-events-none z-50 opacity-[0.03] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
 

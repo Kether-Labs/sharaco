@@ -191,10 +191,7 @@ export function EditorHeader({
             </div>
 
             <div className="flex items-center gap-3 min-w-[300px] justify-end">
-                <div className="hidden lg:flex h-8 px-3 rounded-xl bg-zinc-900/50 border border-white/5 items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse" />
-                    <span className="text-[9px] font-black text-zinc-500 uppercase tracking-[0.15em]">Live Sync</span>
-                </div>
+                
 
                 <div className="w-px h-6 bg-white/5 mx-1 hidden sm:block" />
 
@@ -209,7 +206,7 @@ export function EditorHeader({
                                     e.preventDefault();
                                     onSave?.();
                                 }}
-                                className="h-10 px-6 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-black text-[10px] uppercase tracking-widest transition-all shadow-[0_10px_20px_-10px_rgba(14,165,233,0.5)] flex items-center gap-2 active:scale-95 border-t border-white/20"
+                                className="h-10 px-6 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-black text-sm cursor-pointer  transition-all shadow-[0_10px_20px_-10px_rgba(14,165,233,0.5)] flex items-center gap-2 active:scale-95 border-t border-white/20"
                             >
                                 <Save className="w-3.5 h-3.5" strokeWidth={3} />
                                 Enregistrer
@@ -240,24 +237,34 @@ export function EditorHeader({
                                 Actions rapides
                             </DropdownMenuLabel>
                             
-                            <DropdownMenuItem 
-                                onClick={() => {
-                                    setIsExporting(true);
-                                    setTimeout(() => setIsExporting(false), 2000);
-                                }}
-                                className="flex flex-col items-start gap-0.5 p-3 focus:bg-white/5 rounded-xl cursor-pointer group"
-                            >
-                                <div onClick={downloadPdf} className="flex items-center justify-between w-full">
-                                    <div className="flex items-center gap-2">
-                                        <div className="p-1.5 rounded-lg bg-zinc-800 text-zinc-400 group-focus:text-sky-400 transition-colors">
-                                            {isExporting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileDown className="w-3.5 h-3.5" />}
-                                        </div>
-                                        <span className="font-bold text-zinc-200">Télécharger PDF</span>
-                                    </div>
-                                    <DropdownMenuShortcut className="text-zinc-600 opacity-100 group-focus:text-zinc-400">⌘P</DropdownMenuShortcut>
-                                </div>
-                                <p className="text-[10px] text-zinc-500 font-medium pl-8">Générer un document prêt à imprimer</p>
-                            </DropdownMenuItem>
+                           <DropdownMenuItem 
+    onClick={downloadPdf}
+    className="flex flex-col items-start gap-0.5 p-3 focus:bg-white/5 rounded-xl cursor-pointer group"
+>
+    <div className="flex items-center justify-between w-full">
+        <div className="flex items-center gap-2">
+            <div className="p-1.5 rounded-lg bg-zinc-800 text-zinc-400 group-focus:text-sky-400 transition-colors">
+                {isDownloading ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                    <FileDown className="w-3.5 h-3.5" />
+                )}
+            </div>
+            <span className="font-bold text-zinc-200">
+                {isDownloading ? "Génération..." : "Télécharger PDF"}
+            </span>
+        </div>
+        <DropdownMenuShortcut className="text-zinc-600 opacity-100 group-focus:text-zinc-400">
+            ⌘P
+        </DropdownMenuShortcut>
+    </div>
+    <p className="text-[10px] text-zinc-500 font-medium pl-8">
+        {isDownloading 
+            ? "Préparation du document en cours..." 
+            : "Générer un document prêt à imprimer"
+        }
+    </p>
+</DropdownMenuItem>
 
                             <DropdownMenuItem 
                                 className="flex flex-col items-start gap-0.5 p-3 focus:bg-white/5 rounded-xl cursor-pointer group"

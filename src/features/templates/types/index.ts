@@ -13,7 +13,7 @@ export interface DocumentTemplate {
   footer_text?: string;
   show_bank_details: boolean;
   show_tax_id: boolean;
-  layout_style: 'classic' | 'modern' | 'minimal';
+  layout_style: 'classic' | 'modern' | 'minimal' | "bold" | "elegant";
   is_default: boolean;
   created_at: string;
   updated_at: string;
