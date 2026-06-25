@@ -48,6 +48,7 @@ export function TabClient({ draft, onChange }: TabClientProps) {
             onChange("clientEmail", client.email || "");
             onChange("clientAddress", client.address || "");
             onChange("clientPhone", client.phone || "");
+            onChange("clientId", client.id);
         }
     };
 
@@ -58,6 +59,7 @@ export function TabClient({ draft, onChange }: TabClientProps) {
             onChange("clientEmail", client.email || "");
             onChange("clientAddress", client.address || "");
             onChange("clientPhone", client.phone || "");
+            onChange("clientId", client.id);
             setIsDialogOpen(false);
             setNewClient({ name: "", email: "", address: "",phone: "" });
         } catch (error) {

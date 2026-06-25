@@ -19,6 +19,42 @@ export interface DocumentTemplate {
   updated_at: string;
 }
 
+export interface DocumentCreate {
+    id?: string;
+    type: string;
+    client_id: string;
+    client_name: string;
+    client_email: string;
+    client_address: string;
+    client_phone: string;
+    items: Array<{
+        description: string;
+        quantity: number;
+        unit_price_cents: number;
+        tax_rate: number;
+    }>;
+    template_id?: string | null;
+    due_date?: string | null;
+    notes?: string | null;
+    reference?: string | null;
+}
+
+export interface DocumentUpdate {
+    client_id?: string;
+    client_name?: string;
+    client_email?: string;
+    client_address?: string;
+    client_phone?: string;
+    items?: Array<{
+        description: string;
+        quantity: number;
+        unit_price_cents: number;
+        tax_rate: number;
+    }>;
+    template_id?: string | null;
+    due_date?: string | null;
+    notes?: string | null;
+}
 export interface TemplateCreate {
   name: string;
   primary_color: string;

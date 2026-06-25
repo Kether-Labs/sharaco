@@ -144,15 +144,7 @@ export function TemplateSelector({ onSelect, onClose }: TemplateSelectorProps) {
                 <div className="flex mx-44  flex-col  gap-16">
                     {/* Title Section - Deterministic Typography */}
                     <div className="flex flex-col items-center text-center space-y-4">
-                        <motion.div
-                            initial={{ opacity: 0, y: -20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
-                            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-500 font-black text-[10px] uppercase tracking-[0.2em]"
-                        >
-                            <Sparkles className="h-3 w-3" />
-                            <span>Professional Design</span>
-                        </motion.div>
+                        
                         
                         <motion.h2 
                             initial={{ opacity: 0, scale: 0.9 }}

@@ -1,14 +1,17 @@
+// EditorHeader.tsx
 "use client";
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ChevronLeft, Paintbrush, Save, Minus, Plus, Maximize } from "lucide-react";
+import { ChevronLeft, Save, Minus, Plus, Maximize, CheckCircle2, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { QuoteDraft } from "../../types/QuoteBuilder";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuGroup } from "@/components/ui/dropdown-menu";
-import { FileDown, Send, Copy, ExternalLink, ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
+import { FileDown, Send, Copy, ExternalLink, ArrowRight } from "lucide-react";
 import { useState } from "react";
 import Logo from "@/components/ui/logo";
+import { formatDistanceToNow } from "date-fns";
+import { fr } from "date-fns/locale";
 
 interface EditorHeaderProps {
     draft: QuoteDraft;
@@ -22,6 +25,10 @@ interface EditorHeaderProps {
     setShowActions?: (show: boolean) => void;
     downloadPdf: () => void;
     isDownloading: boolean;
+    // Auto-save props
+    isSaving?: boolean;
+    lastSavedAt?: Date | null;
+    saveStatus?: 'idle' | 'saving' | 'saved' | 'error';
 }
 
 const BRAND_COLORS = [
@@ -46,7 +53,10 @@ export function EditorHeader({
     showActions,
     setShowActions,
     downloadPdf,
-    isDownloading
+    isDownloading,
+    isSaving = false,
+    lastSavedAt = null,
+    saveStatus = 'idle'
 }: EditorHeaderProps) {
     const [isExporting, setIsExporting] = useState(false);
 
@@ -70,11 +80,10 @@ export function EditorHeader({
                 
                 <div className="flex flex-col">
                     <Link href="/dashboard" className="flex items-center gap-3 group">
-              <div className="   shadow-sm group-hover:scale-105 group-hover:rotate-2 transition-all duration-500">
-                <Logo width={150} height={150} />
-              </div>
-              
-            </Link>
+                        <div className="shadow-sm group-hover:scale-105 group-hover:rotate-2 transition-all duration-500">
+                            <Logo width={150} height={150} />
+                        </div>
+                    </Link>
                 </div>
             </div>
 
@@ -119,7 +128,7 @@ export function EditorHeader({
                     </Button>
                 </div>
 
-                {/* Brand Color Selector (Wider) */}
+                {/* Brand Color Selector */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <motion.button
@@ -191,10 +200,42 @@ export function EditorHeader({
             </div>
 
             <div className="flex items-center gap-3 min-w-[300px] justify-end">
-                
+                {/* Auto-save Status Indicator */}
+                <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-zinc-900/50 border border-white/5">
+                    {saveStatus === 'saving' ? (
+                        <>
+                            <Loader2 className="w-3.5 h-3.5 text-amber-400 animate-spin" />
+                            <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">
+                                Enregistrement...
+                            </span>
+                        </>
+                    ) : saveStatus === 'error' ? (
+                        <>
+                            <AlertCircle className="w-3.5 h-3.5 text-rose-400" />
+                            <span className="text-[10px] font-bold text-rose-400 uppercase tracking-wider">
+                                Erreur
+                            </span>
+                        </>
+                    ) : lastSavedAt ? (
+                        <>
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                            <span className="text-[10px] font-medium text-emerald-400">
+                                {formatDistanceToNow(lastSavedAt, { addSuffix: true, locale: fr })}
+                            </span>
+                        </>
+                    ) : (
+                        <>
+                            <div className="w-1.5 h-1.5 rounded-full bg-zinc-500" />
+                            <span className="text-[10px] font-medium text-zinc-500">
+                                Non enregistré
+                            </span>
+                        </>
+                    )}
+                </div>
 
                 <div className="w-px h-6 bg-white/5 mx-1 hidden sm:block" />
 
+                {/* Save Button & Actions */}
                 <DropdownMenu open={showActions} onOpenChange={setShowActions}>
                     <DropdownMenuTrigger asChild>
                         <motion.div
@@ -206,9 +247,14 @@ export function EditorHeader({
                                     e.preventDefault();
                                     onSave?.();
                                 }}
-                                className="h-10 px-6 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-black text-sm cursor-pointer  transition-all shadow-[0_10px_20px_-10px_rgba(14,165,233,0.5)] flex items-center gap-2 active:scale-95 border-t border-white/20"
+                                disabled={isSaving}
+                                className="h-10 px-6 rounded-xl bg-sky-500 hover:bg-sky-400 disabled:bg-sky-500/50 text-white font-black text-sm cursor-pointer transition-all shadow-[0_10px_20px_-10px_rgba(14,165,233,0.5)] flex items-center gap-2 active:scale-95 border-t border-white/20"
                             >
-                                <Save className="w-3.5 h-3.5" strokeWidth={3} />
+                                {isSaving ? (
+                                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                ) : (
+                                    <Save className="w-3.5 h-3.5" strokeWidth={3} />
+                                )}
                                 Enregistrer
                             </Button>
                         </motion.div>
@@ -237,34 +283,34 @@ export function EditorHeader({
                                 Actions rapides
                             </DropdownMenuLabel>
                             
-                           <DropdownMenuItem 
-    onClick={downloadPdf}
-    className="flex flex-col items-start gap-0.5 p-3 focus:bg-white/5 rounded-xl cursor-pointer group"
->
-    <div className="flex items-center justify-between w-full">
-        <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-lg bg-zinc-800 text-zinc-400 group-focus:text-sky-400 transition-colors">
-                {isDownloading ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                ) : (
-                    <FileDown className="w-3.5 h-3.5" />
-                )}
-            </div>
-            <span className="font-bold text-zinc-200">
-                {isDownloading ? "Génération..." : "Télécharger PDF"}
-            </span>
-        </div>
-        <DropdownMenuShortcut className="text-zinc-600 opacity-100 group-focus:text-zinc-400">
-            ⌘P
-        </DropdownMenuShortcut>
-    </div>
-    <p className="text-[10px] text-zinc-500 font-medium pl-8">
-        {isDownloading 
-            ? "Préparation du document en cours..." 
-            : "Générer un document prêt à imprimer"
-        }
-    </p>
-</DropdownMenuItem>
+                            <DropdownMenuItem 
+                                onClick={downloadPdf}
+                                className="flex flex-col items-start gap-0.5 p-3 focus:bg-white/5 rounded-xl cursor-pointer group"
+                            >
+                                <div className="flex items-center justify-between w-full">
+                                    <div className="flex items-center gap-2">
+                                        <div className="p-1.5 rounded-lg bg-zinc-800 text-zinc-400 group-focus:text-sky-400 transition-colors">
+                                            {isDownloading ? (
+                                                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                            ) : (
+                                                <FileDown className="w-3.5 h-3.5" />
+                                            )}
+                                        </div>
+                                        <span className="font-bold text-zinc-200">
+                                            {isDownloading ? "Génération..." : "Télécharger PDF"}
+                                        </span>
+                                    </div>
+                                    <DropdownMenuShortcut className="text-zinc-600 opacity-100 group-focus:text-zinc-400">
+                                        ⌘P
+                                    </DropdownMenuShortcut>
+                                </div>
+                                <p className="text-[10px] text-zinc-500 font-medium pl-8">
+                                    {isDownloading 
+                                        ? "Préparation du document en cours..." 
+                                        : "Générer un document prêt à imprimer"
+                                    }
+                                </p>
+                            </DropdownMenuItem>
 
                             <DropdownMenuItem 
                                 className="flex flex-col items-start gap-0.5 p-3 focus:bg-white/5 rounded-xl cursor-pointer group"

@@ -10,6 +10,27 @@ export interface DocumentItem {
   document_id: string;
 }
 
+export interface QuoteDraft {
+  id?: string;
+  isSaved: boolean;
+  clientId: string;
+  clientName: string;
+  clientEmail: string;
+  clientAddress: string;
+  clientPhone: string;
+  items: Array<{
+    description: string;
+    quantity: number;
+    unitPrice: number; // en centimes
+    tax_rate: number; // en pourcentage
+  }>;
+  templateId?: string | null;
+  validityDays?: number | null; // nombre de jours de validité du devis
+  notes?: string | null;
+  layoutStyle?: string | null; // "classic" | "modern" | "minimal"
+  reference?: string | null;
+}
+
 export interface Document {
   id: string;
   type: DocumentType;
@@ -34,16 +55,25 @@ export interface Document {
 }
 
 export interface DocumentCreate {
-  type: DocumentType;
-  client_id: string;
-  template_id?: string;
-  due_date?: string;
-  items: {
-    description: string;
-    quantity: number;
-    unit_price_cents: number;
-    tax_rate: number;
-  }[];
+    id?: string;
+    type: string;
+    // Client : soit ID, soit infos
+    client_id?: string;
+    client_name?: string;
+    client_email?: string;
+    client_phone?: string;
+    client_address?: string;
+    // Items
+    items: Array<{
+        description: string;
+        quantity: number;
+        unit_price_cents: number;
+        tax_rate: number;
+    }>;
+    // Méta
+    template_id?: string | null;
+    due_date?: string | null;
+    notes?: string | null;
 }
 
 export interface DocumentStatusUpdate {

@@ -7,7 +7,7 @@ export interface QuoteLineItem {
 }
 
 export interface QuoteDraft {
-    id?: string;              // UUID du document (si sauvegardé)
+    id?: string | null;              // UUID du document (si sauvegardé)
     clientId?: string;        // ID du client en DB
     clientName: string;
     clientEmail: string;
