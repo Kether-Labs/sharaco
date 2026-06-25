@@ -1,3 +1,4 @@
+// components/quotes/QuoteList.tsx
 "use client"
 
 import { useState } from "react"
@@ -30,6 +31,8 @@ import {
 import { Document, DocumentStatus } from "../types"
 import { formatCurrency } from "../lib/formatCurrency"
 import Link from "next/link"
+import { DocumentPreview } from "./DocumentPreview"
+import { quotesApi } from "../api/quotesApi"
 
 interface QuoteListProps {
     quotes: Document[]
@@ -97,9 +100,17 @@ export function QuoteList({ quotes }: QuoteListProps) {
     const [searchQuery, setSearchQuery] = useState("")
 
     const filteredQuotes = quotes.filter(quote =>
-        quote.client?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        quote.client?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         quote.number?.toLowerCase().includes(searchQuery.toLowerCase())
     )
+    console.log(quotes)
+    const handleDownloadPdf = async (id: string, number?: string) => {
+        try {
+            await quotesApi.downloadPdf(id, `${number || 'devis'}.pdf`)
+        } catch (error) {
+            console.error('Erreur téléchargement PDF:', error)
+        }
+    }
 
     if (quotes.length === 0) {
         return (
@@ -117,7 +128,6 @@ export function QuoteList({ quotes }: QuoteListProps) {
                 <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">Aucun devis pour le moment</h3>
                 <p className="text-slate-500 dark:text-slate-400 max-w-md mb-10 text-lg leading-relaxed">
                     Commencez par créer votre premier devis professionnel en quelques clics.
-                    Vous pourrez ensuite le suivre et le relancer facilement.
                 </p>
                 <Link href="/dashboard/quotes/create">
                     <Button className="bg-sky-600 cursor-pointer hover:bg-sky-700 text-white shadow-lg shadow-sky-500/25 border-0 transition-all active:scale-95 group">
@@ -176,32 +186,64 @@ export function QuoteList({ quotes }: QuoteListProps) {
                                     key={quote.id}
                                     variants={cardVariants}
                                     layout
-                                    className="group relative bg-white dark:bg-slate-950 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 hover:shadow-2xl hover:shadow-slate-200/50 dark:hover:shadow-emerald-500/5 transition-all duration-300"
+                                    className="group relative bg-white dark:bg-slate-950  border border-slate-200 dark:border-slate-800 overflow-hidden hover:shadow-2xl hover:shadow-slate-200/50 dark:hover:shadow-emerald-500/5 transition-all duration-300"
                                 >
-                                    <div className="flex flex-col h-full space-y-6">
-                                        {/* Top Section */}
-                                        <div className="flex items-start justify-between">
-                                            <div className={`p-2 rounded-xl ${config.bg} ${config.text}`}>
-                                                <StatusIcon className="h-5 w-5" />
-                                            </div>
+                                    {/* Preview Image */}
+                                    <div className="relative">
+                                        <DocumentPreview 
+                                            documentId={quote.id} 
+                                            layoutStyle={quote.layout_style} 
+                                        />
+                                        
+                                        {/* Status Badge Overlay */}
+                                        <div className="absolute top-4 left-4 z-10">
+                                            <Badge 
+                                                variant="outline" 
+                                                className={`rounded-xl px-3 py-1 text-[10px] uppercase font-bold tracking-tight backdrop-blur-sm ${config.bg} ${config.text} ${config.border}`}
+                                            >
+                                                <StatusIcon className="h-3 w-3 mr-1" />
+                                                {config.label}
+                                            </Badge>
+                                        </div>
+
+                                        {/* Action Menu */}
+                                        <div className="absolute top-4 right-4 z-10">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="rounded-full h-8 w-8 text-slate-400">
+                                                    <Button 
+                                                        variant="ghost" 
+                                                        size="icon" 
+                                                        className="rounded-full h-8 w-8 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm text-slate-600 hover:bg-white dark:hover:bg-slate-900"
+                                                    >
                                                         <MoreVertical className="h-4 w-4" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2">
                                                     <DropdownMenuItem asChild>
-                                                        <Link href={`/dashboard/quotes/${quote.id}`} className="cursor-pointer">Voir le devis</Link>
+                                                        <Link href={`/dashboard/quotes/${quote.id}`} className="cursor-pointer">
+                                                            <Eye className="mr-2 h-4 w-4" />
+                                                            Voir le devis
+                                                        </Link>
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem className="cursor-pointer">Télécharger PDF</DropdownMenuItem>
+                                                    <DropdownMenuItem 
+                                                        onClick={() => handleDownloadPdf(quote.id, quote.number)}
+                                                        className="cursor-pointer"
+                                                    >
+                                                        <FileText className="mr-2 h-4 w-4" />
+                                                        Télécharger PDF
+                                                    </DropdownMenuItem>
                                                     <DropdownMenuSeparator />
-                                                    <DropdownMenuItem className="text-rose-500 focus:text-rose-500 cursor-pointer">Supprimer</DropdownMenuItem>
+                                                    <DropdownMenuItem className="text-rose-500 focus:text-rose-500 cursor-pointer">
+                                                        <Ban className="mr-2 h-4 w-4" />
+                                                        Supprimer
+                                                    </DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
                                         </div>
+                                    </div>
 
-                                        {/* Identity */}
+                                    {/* Content Section */}
+                                    <div className="p-6 space-y-4">
                                         <div className="space-y-2">
                                             <div className="flex items-center gap-2 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
                                                 <span>{quote.number || `DEV-${quote.id.slice(0, 4)}`}</span>
@@ -211,15 +253,13 @@ export function QuoteList({ quotes }: QuoteListProps) {
                                             </h3>
                                         </div>
 
-                                        {/* Value */}
                                         <div className="pt-2">
                                             <p className="text-3xl font-black text-slate-900 dark:text-white">
-                                                {formatCurrency(quote.total_cents || 0)}
+                                                {formatCurrency(quote.grand_total_cents || 0)}
                                             </p>
                                         </div>
 
-                                        {/* Info */}
-                                        <div className="pt-4 border-t border-slate-100 dark:border-slate-800/50 flex items-center justify-between mt-auto">
+                                        <div className="pt-4 border-t border-slate-100 dark:border-slate-800/50 flex items-center justify-between">
                                             <div className="flex items-center text-xs font-medium text-slate-500">
                                                 <CalendarDays className="mr-1.5 h-3.5 w-3.5" />
                                                 {new Date(quote.created_at).toLocaleDateString("fr-FR", {
@@ -227,21 +267,23 @@ export function QuoteList({ quotes }: QuoteListProps) {
                                                     month: "short"
                                                 })}
                                             </div>
-                                            <Badge variant="outline" className={`rounded-xl px-2.5 py-0.5 text-[10px] uppercase font-bold tracking-tight ${config.bg} ${config.text} ${config.border}`}>
-                                                {config.label}
-                                            </Badge>
-                                        </div>
-
-                                        {/* Hover Overlay Link Style */}
-                                        <Link
-                                            href={`/dashboard/quotes/${quote.id}`}
-                                            className="absolute inset-x-0 bottom-0 top-12 cursor-pointer z-10"
-                                        />
-
-                                        <div className="absolute right-6 bottom-6 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all z-20 pointer-events-none">
-                                            <div className="w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-lg shadow-emerald-500/30">
-                                                <ArrowUpRight className="h-5 w-5" />
+                                            <div className="flex items-center text-xs font-medium text-slate-400">
+                                                <FileText className="mr-1.5 h-3.5 w-3.5" />
+                                                {quote.layout_style || 'classic'}
                                             </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Hover Overlay Link */}
+                                    <Link
+                                        href={`/dashboard/quotes/${quote.id}`}
+                                        className="absolute inset-0 z-0 cursor-pointer"
+                                    />
+
+                                    {/* Hover Arrow */}
+                                    <div className="absolute right-6 bottom-6 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all z-20 pointer-events-none">
+                                        <div className="w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-lg shadow-emerald-500/30">
+                                            <ArrowUpRight className="h-5 w-5" />
                                         </div>
                                     </div>
                                 </motion.div>

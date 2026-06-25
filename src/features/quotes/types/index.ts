@@ -40,6 +40,7 @@ export interface Document {
   due_date?: string;
   sent_at?: string;
   viewed_at?: string;
+  layout_style?: string;
   user_id: string;
   client_id: string;
   template_id?: string;
