@@ -48,6 +48,14 @@ export interface Document {
   subtotal_cents?: number;
   tax_total_cents?: number;
   total_cents?: number;
+  primary_color?: string;
+    secondary_color?: string;
+    accent_color?: string;
+    background_color?: string;
+    text_color?: string;
+    font_family?: string;
+    show_bank_details?: boolean;
+    show_tax_id?: boolean;
   client?: {
     id: string;
     name: string;

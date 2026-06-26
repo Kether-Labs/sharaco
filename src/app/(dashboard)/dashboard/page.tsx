@@ -26,6 +26,7 @@ import { RecentActivity } from "@/features/dashboard/components/RecentActivity"
 import { useDashboardStats, useDashboardRevenue } from "@/features/dashboard/hooks/useDashboard"
 import { formatCurrency } from "@/features/quotes/lib/formatCurrency"
 import { Skeleton } from "@/components/ui/skeleton"
+import Link from "next/link"
 
 export default function DashboardPage() {
     const { data: stats, isLoading: isStatsLoading, error: statsError, refetch: refetchStats } = useDashboardStats();
@@ -71,9 +72,12 @@ export default function DashboardPage() {
                     <Button variant="outline" className="h-12 px-6 rounded-2xl border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 font-bold shadow-sm transition-all hover:bg-slate-50 dark:hover:bg-white/10 active:scale-95">
                         <Download className="mr-2 h-4 w-4" /> Export
                     </Button>
+
+                    <Link href="/dashboard/quotes/create">
                     <Button className="h-12 px-6 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-2xl shadow-lg shadow-sky-500/20 transition-all active:scale-95">
                         <Plus className="mr-2 h-4 w-4" /> Nouveau Devis
                     </Button>
+                    </Link>
                 </div>
             </div>
 
