@@ -1,49 +1,84 @@
+// app/dashboard/quotes/create/page.tsx
 "use client";
 
-import { useEffect, Suspense } from "react";
+import { Suspense, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Editor } from "@/features/quotes/components/QuoteBuilder/Editor"
-import { TemplateSelector } from "@/features/templates/components/TemplateSelector"
-import { v4 as uuidv4 } from "uuid";
+import { TemplateSelector } from "@/features/templates/components/TemplateSelector";
+
+import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
+import { quotesApi } from "@/features/quotes/api/quotesApi";
 
 function QuoteBuilderContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
-    const isChoosing = searchParams.has('choose-template');
-    const templateId = searchParams.get('template-id');
-    const uuidDoc = uuidv4(); // NOUVEAU : support création avec UUID pré-généré
-
+    const { toast } = useToast();
     
-    useEffect(() => {
-        // Redirection initiale si aucun paramètre n'est présent
-        if (!isChoosing && !templateId) {
-            router.replace('/dashboard/quotes/create?choose-template');
-        }
-    }, [isChoosing, templateId, router]);
+    const isChoosing = searchParams.has('choose-template');
+    const [isCreating, setIsCreating] = useState(false);
 
-    const handleSelectTemplate = (id: string) => {
-        router.push(`/dashboard/quotes/create?template-id=${id}&document-id=${uuidDoc}`); // Ajout du document-id dans l'URL
-    };
-
-    if (isChoosing) {
+    // Redirection initiale si aucun paramètre
+    if (!isChoosing) {
         return <TemplateSelector onSelect={handleSelectTemplate} />;
     }
 
-    if (templateId) {
+    async function handleSelectTemplate(layoutStyle: string) {
+        setIsCreating(true);
+        
+        try {
+            // ✅ Créer le document avec le layout_style choisi
+            const document = await quotesApi.create({
+                type: "DEVIS",
+                layout_style: layoutStyle, // ← Layout choisi par l'utilisateur
+                items: [{
+                    description: "",
+                    quantity: 1,
+                    unit_price_cents: 0,
+                    tax_rate: 20
+                }],
+                notes: ""
+            });
+            
+            // ✅ Rediriger vers l'éditeur avec le VRAI ID du document
+            router.push(`/dashboard/quotes/${document.id}`);
+            
+        } catch (error: any) {
+            console.error("❌ Erreur création:", error);
+            
+            const errorMessage = error.response?.data?.detail || "Impossible de créer le devis.";
+            
+            toast({
+                title: "Erreur",
+                description: errorMessage,
+                variant: "destructive",
+            });
+            
+            setIsCreating(false);
+        }
+    }
+
+    if (isCreating) {
         return (
-            <div className="h-screen w-screen overflow-hidden bg-white dark:bg-slate-950 font-sans">
-                <Editor templateId={templateId} documentId={uuidDoc} />
+            <div className="flex h-[100dvh] w-screen items-center justify-center bg-zinc-950">
+                <div className="flex flex-col items-center gap-4">
+                    <Loader2 className="h-12 w-12 text-sky-500 animate-spin" />
+                    <p className="text-zinc-400 font-medium">Création du devis...</p>
+                </div>
             </div>
         );
     }
 
-    return null; // En cours de redirection ou état transitoire
+    return <TemplateSelector onSelect={handleSelectTemplate} />;
 }
 
 export default function LiveQuoteBuilderPage() {
     return (
-        <Suspense fallback={<div className="h-screen w-screen flex items-center justify-center bg-slate-900 text-white">Chargement de l'éditeur...</div>}>
+        <Suspense fallback={
+            <div className="h-screen w-screen flex items-center justify-center bg-slate-900 text-white">
+                Chargement...
+            </div>
+        }>
             <QuoteBuilderContent />
         </Suspense>
-    )
+    );
 }

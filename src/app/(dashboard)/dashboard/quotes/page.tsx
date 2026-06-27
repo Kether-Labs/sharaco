@@ -6,10 +6,15 @@ import { useQuotes } from "@/features/quotes/hooks/useQuotes"
 import { Button } from "@/components/ui/button"
 import { RefreshCcw } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useQueryClient } from "@tanstack/react-query"
 
 export default function QuotesPage() {
+    const queryClient = useQueryClient()
     const { data: quotes, isLoading, error, refetch } = useQuotes()
-
+    const handleDeleteSuccess = () => {
+        // Rafraîchir la liste après suppression
+        queryClient.invalidateQueries({ queryKey: ['documents'] })
+    }
     return (
         <div className="flex-1 space-y-6 lg:space-y-8 p-4 md:p-8 pt-6 max-w-[1600px] mx-auto min-h-screen">
             <QuoteHeader />
@@ -29,7 +34,7 @@ export default function QuotesPage() {
                         </Button>
                     </div>
                 ) : (
-                    <QuoteList quotes={quotes || []} />
+                    <QuoteList quotes={quotes || []} onDeleteSuccess={handleDeleteSuccess}/>
                 )}
             </div>
         </div>

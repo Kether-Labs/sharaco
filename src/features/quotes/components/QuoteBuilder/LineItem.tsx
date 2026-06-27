@@ -42,7 +42,7 @@ export function LineItem({ item, index, onChange, onRemove }: LineItemProps) {
                 </div>
 
                 {/* Row 2: Metrics */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+                <div className="grid grid-cols-2 lg:grid-cols-2 gap-4 items-end">
                     <div className="space-y-1">
                         <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Qté</label>
                         <Input
@@ -55,7 +55,7 @@ export function LineItem({ item, index, onChange, onRemove }: LineItemProps) {
                     </div>
 
                     <div className="space-y-1">
-                        <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Prix Unitaire (HT)</label>
+                        <label className="text-xs font-semibold text-slate-500">Prix Unitaire (HT)</label>
                         <div className="relative">
                             <Input
                                 type="number"
@@ -65,7 +65,7 @@ export function LineItem({ item, index, onChange, onRemove }: LineItemProps) {
                                 onChange={(e) => handleNumberChange('unitPrice', e.target.value)}
                                 className="pl-6 bg-white/50 dark:bg-slate-950/50 border-white/20 dark:border-white/10 focus:border-sky-500 rounded-xl"
                             />
-                            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 font-medium">€</span>
+                            
                         </div>
                     </div>
 
@@ -84,7 +84,7 @@ export function LineItem({ item, index, onChange, onRemove }: LineItemProps) {
                     <div className="space-y-1 flex flex-col pb-1">
                         <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider text-right w-full">Total HT</label>
                         <div className="font-bold text-slate-900 dark:text-white text-lg text-right">
-                            {new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(lineTotal)}
+                            {lineTotal}
                         </div>
                     </div>
                 </div>

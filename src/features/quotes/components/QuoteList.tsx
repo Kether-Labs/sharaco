@@ -15,7 +15,9 @@ import {
     FileCheck,
     Eye,
     CreditCard,
-    Ban
+    Ban,
+    Trash2,
+    Loader2
 } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
@@ -33,9 +35,11 @@ import { formatCurrency } from "../lib/formatCurrency"
 import Link from "next/link"
 import { DocumentPreview } from "./DocumentPreview"
 import { quotesApi } from "../api/quotesApi"
+import { useDeleteDocument } from "../hooks/useDeleteDocument"
 
 interface QuoteListProps {
-    quotes: Document[]
+    quotes: Document[],
+    onDeleteSuccess?: () => void
 }
 
 const statusConfig: Record<DocumentStatus, { bg: string, border: string, text: string, dot: string, label: string, icon: any }> = {
@@ -96,8 +100,21 @@ const cardVariants = {
     show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 260, damping: 20 } }
 }
 
-export function QuoteList({ quotes }: QuoteListProps) {
+export function QuoteList({ quotes,onDeleteSuccess }: QuoteListProps) {
     const [searchQuery, setSearchQuery] = useState("")
+    const [deletingId, setDeletingId] = useState<string | null>(null)
+
+    const { deleteDocument, isDeleting } = useDeleteDocument({
+        onSuccess: () => {
+            onDeleteSuccess?.()
+            setDeletingId(null)
+        },
+    })
+
+    const handleDelete = async (quote: Document) => {
+        setDeletingId(quote.id)
+        await deleteDocument(quote.id, quote.number)
+    }
 
     const filteredQuotes = quotes.filter(quote =>
         quote.client?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -180,13 +197,15 @@ export function QuoteList({ quotes }: QuoteListProps) {
                         {filteredQuotes.map((quote) => {
                             const config = statusConfig[quote.status]
                             const StatusIcon = config.icon
-
+                            const isBeingDeleted = deletingId === quote.id
                             return (
                                 <motion.div
                                     key={quote.id}
                                     variants={cardVariants}
                                     layout
-                                    className="group relative bg-white dark:bg-slate-950  border border-slate-200 dark:border-slate-800 overflow-hidden hover:shadow-2xl hover:shadow-slate-200/50 dark:hover:shadow-emerald-500/5 transition-all duration-300"
+                                    className={`group relative bg-white dark:bg-slate-950 rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:shadow-2xl transition-all duration-300 ${
+                                        isBeingDeleted ? 'opacity-50 pointer-events-none' : ''
+                                    }`}
                                 >
                                     {/* Preview Image */}
                                     <div className="relative">
@@ -214,8 +233,13 @@ export function QuoteList({ quotes }: QuoteListProps) {
                                                         variant="ghost" 
                                                         size="icon" 
                                                         className="rounded-full h-8 w-8 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm text-slate-600 hover:bg-white dark:hover:bg-slate-900"
+                                                        disabled={isBeingDeleted}
                                                     >
-                                                        <MoreVertical className="h-4 w-4" />
+                                                        {isBeingDeleted ? (
+                                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                                        ) : (
+                                                            <MoreVertical className="h-4 w-4" />
+                                                        )}
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2">
@@ -233,8 +257,12 @@ export function QuoteList({ quotes }: QuoteListProps) {
                                                         Télécharger PDF
                                                     </DropdownMenuItem>
                                                     <DropdownMenuSeparator />
-                                                    <DropdownMenuItem className="text-rose-500 focus:text-rose-500 cursor-pointer">
-                                                        <Ban className="mr-2 h-4 w-4" />
+                                                    <DropdownMenuItem 
+                                                        onClick={() => handleDelete(quote)}
+                                                        className="text-rose-500 focus:text-rose-500 focus:bg-rose-500/10 cursor-pointer"
+                                                        disabled={isDeleting}
+                                                    >
+                                                        <Trash2 className="mr-2 h-4 w-4" />
                                                         Supprimer
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>

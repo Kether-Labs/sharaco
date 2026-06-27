@@ -216,7 +216,7 @@ export function EditorHeader({
                     className={`h-10 px-6 rounded-xl text-white font-black text-sm cursor-pointer transition-all flex items-center gap-2 active:scale-95 border-t border-white/20 ${
                         hasUnsavedChanges 
                             ? 'bg-amber-500 hover:bg-amber-400 shadow-[0_10px_20px_-10px_rgba(245,158,11,0.5)]'
-                            : 'bg-sky-500 hover:bg-sky-400 shadow-[0_10px_20px_-10px_rgba(14,165,233,0.5)]'
+                            : 'bg-gray-600 '
                     }`}
                 >
                     {isSaving ? (
