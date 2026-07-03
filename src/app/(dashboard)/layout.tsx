@@ -43,16 +43,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             {/* Main Content */}
             <div className={cn(
                 "flex-1 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
-                isSidebarOpen ? "md:ml-72" : "ml-0"
+                isSidebarOpen ? "md:ml-[88px]" : "ml-0"
             )}>
                 {/* Header */}
-                <Header
-                    setIsSidebarOpen={setIsMobileMenuOpen}
-                    isSidebarOpen={isSidebarOpen}
-                    isQuoteLayout={false}
-                    isShowLogo={false}
-                    isMobile={true}
-                />
+
 
                 {/* Page Content */}
                 <main className="relative flex-1 p-4 md:p-8 lg:p-10 max-w-7xl mx-auto w-full">

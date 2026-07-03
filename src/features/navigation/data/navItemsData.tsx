@@ -13,16 +13,12 @@ import {
 export const navItems: NavItemInterface[] = [
   { title: "Overview", isHeader: true, icon: null },
   {
-    title: "Dashboards",
+    title: "Accueil",
     icon: <Home className="h-4 w-4" />,
-    submenu: [
-      { title: "Analytics", icon: <ChevronRight className="h-4 w-4" />, href: "/dashboard" },
-      { title: "CRM", icon: <ChevronRight className="h-4 w-4" />, href: "/dashboard/crm" },
-      { title: "eCommerce", icon: <ChevronRight className="h-4 w-4" />, href: "/dashboard/ecommerce" },
-    ],
+    href: ""
   },
   { title: "Business", isHeader: true, icon: null },
-  { title: "Quotes", icon: <FileText className="h-4 w-4" />, href: "/dashboard/quotes" },
+  { title: "Devis", icon: <FileText className="h-4 w-4" />, href: "/dashboard/quotes" },
   { title: "Clients", icon: <Users className="h-4 w-4" />, href: "/dashboard/clients" },
   { title: "Billing", icon: <CreditCard className="h-4 w-4" />, href: "/dashboard/billing" },
   { title: "System", isHeader: true, icon: null },
