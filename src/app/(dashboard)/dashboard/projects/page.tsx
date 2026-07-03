@@ -96,7 +96,7 @@ export default function ProjectsPage() {
                 </ContextMenuTrigger>
 
                 <ContextMenuContent className="w-64">
-                    <ContextMenuItem onClick={() => setIsModalOpen(true)}>
+                    <ContextMenuItem onSelect={() => setTimeout(() => setIsModalOpen(true), 150)}>
                         <FolderPlus className="mr-2 h-4 w-4" />
                         Nouveau projet
                     </ContextMenuItem>
