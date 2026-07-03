@@ -34,7 +34,7 @@ export default function Sidebar({ setIsSidebarOpen, isSidebarOpen }: { setIsSide
           {/* Top Logo & Close (Mobile) */}
           <div className="flex flex-col items-center pt-6 pb-4 relative z-10">
             <Link href="/dashboard" className="group">
-              <div className="p-2 rounded-xl bg-white/5 border border-white/10 shadow-sm group-hover:scale-110 group-hover:bg-white/10 transition-all duration-300">
+              <div className="p-2 rounded-xl bg-white/5 border border-white/10 shadow-sm  transition-all duration-300">
                 <Logo width={24} height={24} className="text-white" />
               </div>
             </Link>
@@ -50,7 +50,7 @@ export default function Sidebar({ setIsSidebarOpen, isSidebarOpen }: { setIsSide
           {/* Create Button */}
           <div className="px-3 pb-6 flex justify-center relative z-10">
             <Link href="/dashboard/quotes/create" className="flex flex-col items-center justify-center gap-1 group w-full">
-              <div className="w-[40px] h-[40px] rounded-2xl bg-[#2563EB] flex items-center justify-center text-white shadow-[0_4px_20px_rgba(124,58,237,0.3)] group-hover:shadow-[0_8px_30px_rgba(124,58,237,0.5)] group-hover:scale-105 transition-all duration-300">
+              <div className="w-[40px] h-[40px] rounded-2xl bg-[#2563EB] flex items-center justify-center text-white  transition-all duration-300">
                 <Plus className="h-6 w-6 group-hover:rotate-90 transition-transform duration-300" />
               </div>
               <span className="text-[11px] font-bold text-white/90 mt-1.5 tracking-wide">Créer</span>
@@ -69,14 +69,14 @@ export default function Sidebar({ setIsSidebarOpen, isSidebarOpen }: { setIsSide
                     className={cn(
                       "flex flex-col items-center justify-center w-full py-2 rounded-2xl transition-all duration-300 group relative",
                       isActive
-                        ? "bg-white/8 text-white shadow-inner"
-                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                        ? ""
+                        : "text-slate-400 "
                     )}
                   >
 
                     <div className={cn(
-                      "p-2 rounded-xl mb-1.5 transition-transform duration-300 group-hover:scale-110",
-                      isActive ? "bg-white/5 shadow-sm text-sky-400" : ""
+                      "p-3 rounded-xl mb-1.5 transition-transform duration-300 group-hover:scale-110",
+                      isActive ? "bg-white/5  shadow-sm text-[#2563EB]" : "hover:bg-white/5"
                     )}>
                       {item.icon}
                     </div>
@@ -88,8 +88,8 @@ export default function Sidebar({ setIsSidebarOpen, isSidebarOpen }: { setIsSide
               })}
 
               {/* More button */}
-              <button className="flex flex-col items-center justify-center w-full py-3.5 rounded-2xl transition-all duration-300 group text-slate-400 hover:text-white hover:bg-white/5 mt-2">
-                <div className="flex gap-1 mb-2.5 mt-1 group-hover:scale-110 transition-transform">
+              <button className="flex flex-col items-center justify-center w-full py-3.5 rounded-2xl transition-all duration-300 group text-slate-400 hover:text-white  mt-2">
+                <div className="flex gap-1 mb-2.5 mt-1  transition-transform">
                   <div className="w-1.5 h-1.5 rounded-full bg-current"></div>
                   <div className="w-1.5 h-1.5 rounded-full bg-current"></div>
                   <div className="w-1.5 h-1.5 rounded-full bg-current"></div>
@@ -102,15 +102,15 @@ export default function Sidebar({ setIsSidebarOpen, isSidebarOpen }: { setIsSide
           {/* User Profile / Footer Area */}
           <div className="flex flex-col items-center gap-5 py-6 mt-auto relative z-10 bg-gradient-to-t from-[#0a0a0a] to-transparent">
             <button className="text-slate-400 hover:text-white transition-colors relative group">
-              <Bell className="h-5 w-5 group-hover:scale-110 transition-transform" />
+              <Bell className="h-5 w-5 " />
               <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-violet-500 rounded-full border-2 border-[#0a0a0a]" />
             </button>
 
             <div className="relative group cursor-pointer">
-              <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black text-sm shadow-lg shadow-indigo-500/20 group-hover:scale-110 group-hover:shadow-indigo-500/40 transition-all duration-300">
+              <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black text-sm shadow-lg shadow-indigo-500/20  group-hover:shadow-indigo-500/40 transition-all duration-300">
                 L
               </div>
-              <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-500 border-[2px] border-[#0a0a0a] group-hover:scale-110 transition-transform" />
+              <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-500 border-[2px] border-[#0a0a0a] " />
             </div>
           </div>
         </div>

@@ -8,6 +8,8 @@ import {
   Key,
   FileText,
   Trash,
+  Folder,
+  Settings,
 } from "lucide-react";
 
 export const navItems: NavItemInterface[] = [
@@ -18,9 +20,10 @@ export const navItems: NavItemInterface[] = [
     href: ""
   },
   { title: "Business", isHeader: true, icon: null },
+  { title: "projects", icon: <Folder className="h-4 w-4" />, href: "/dashboard/projects" },
   { title: "Devis", icon: <FileText className="h-4 w-4" />, href: "/dashboard/quotes" },
   { title: "Clients", icon: <Users className="h-4 w-4" />, href: "/dashboard/clients" },
   { title: "Billing", icon: <CreditCard className="h-4 w-4" />, href: "/dashboard/billing" },
   { title: "System", isHeader: true, icon: null },
-  { title: "Paramètres", icon: <Key className="h-4 w-4" />, href: "/dashboard/settings" },
+  { title: "Paramètres", icon: <Settings className="h-4 w-4" />, href: "/dashboard/settings" },
 ];

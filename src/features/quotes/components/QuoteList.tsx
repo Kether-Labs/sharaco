@@ -1,15 +1,8 @@
-// components/quotes/QuoteList.tsx
 "use client"
 
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import {
-    Search,
-    Filter,
-    ChevronDown,
-    CalendarDays,
-    MoreVertical,
-    ArrowUpRight,
     Plus,
     FileText,
     FileCheck,
@@ -17,17 +10,15 @@ import {
     CreditCard,
     Ban,
     Trash2,
-    Loader2
+    Loader2,
+    Search,
+    MoreVertical
 } from "lucide-react"
 
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Document, DocumentStatus } from "../types"
@@ -36,68 +27,32 @@ import Link from "next/link"
 import { DocumentPreview } from "./DocumentPreview"
 import { quotesApi } from "../api/quotesApi"
 import { useDeleteDocument } from "../hooks/useDeleteDocument"
+import { Button } from "@/components/ui/button"
 
 interface QuoteListProps {
     quotes: Document[],
     onDeleteSuccess?: () => void
 }
 
-const statusConfig: Record<DocumentStatus, { bg: string, border: string, text: string, dot: string, label: string, icon: any }> = {
-    PAID: {
-        bg: "bg-emerald-500/10",
-        border: "border-emerald-500/30",
-        text: "text-emerald-700 dark:text-emerald-400",
-        dot: "bg-emerald-500",
-        label: "Payé",
-        icon: CreditCard
-    },
-    CANCELLED: {
-        bg: "bg-rose-500/10",
-        border: "border-rose-500/30",
-        text: "text-rose-700 dark:text-rose-400",
-        dot: "bg-rose-500",
-        label: "Annulé",
-        icon: Ban
-    },
-    SENT: {
-        bg: "bg-sky-500/10",
-        border: "border-sky-500/30",
-        text: "text-sky-700 dark:text-sky-400",
-        dot: "bg-sky-500",
-        label: "Envoyé",
-        icon: FileCheck
-    },
-    VIEWED: {
-        bg: "bg-amber-500/10",
-        border: "border-amber-500/30",
-        text: "text-amber-700 dark:text-amber-400",
-        dot: "bg-amber-500",
-        label: "Consulté",
-        icon: Eye
-    },
-    DRAFT: {
-        bg: "bg-slate-500/10",
-        border: "border-slate-500/30",
-        text: "text-slate-700 dark:text-slate-400",
-        dot: "bg-slate-500",
-        label: "Brouillon",
-        icon: FileText
-    }
+const statusConfig: Record<DocumentStatus, { label: string, icon: any, color: string }> = {
+    PAID: { label: "Payé", icon: CreditCard, color: "text-emerald-500" },
+    CANCELLED: { label: "Annulé", icon: Ban, color: "text-rose-500" },
+    SENT: { label: "Envoyé", icon: FileCheck, color: "text-sky-500" },
+    VIEWED: { label: "Consulté", icon: Eye, color: "text-amber-500" },
+    DRAFT: { label: "Brouillon", icon: FileText, color: "text-slate-500" }
 }
 
 const containerVariants = {
     hidden: { opacity: 0 },
     show: {
         opacity: 1,
-        transition: {
-            staggerChildren: 0.05
-        }
+        transition: { staggerChildren: 0.05 }
     }
 }
 
 const cardVariants = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 260, damping: 20 } }
+    hidden: { opacity: 0, scale: 0.95 },
+    show: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 300, damping: 25 } }
 }
 
 export function QuoteList({ quotes, onDeleteSuccess }: QuoteListProps) {
@@ -120,7 +75,7 @@ export function QuoteList({ quotes, onDeleteSuccess }: QuoteListProps) {
         quote.client?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         quote.number?.toLowerCase().includes(searchQuery.toLowerCase())
     )
-    console.log(quotes)
+
     const handleDownloadPdf = async (id: string, number?: string) => {
         try {
             await quotesApi.downloadPdf(id, `${number || 'devis'}.pdf`)
@@ -129,178 +84,112 @@ export function QuoteList({ quotes, onDeleteSuccess }: QuoteListProps) {
         }
     }
 
-    if (quotes.length === 0) {
-        return (
-            <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="flex flex-col items-center justify-center p-12 md:p-24 text-center bg-white dark:bg-slate-950 rounded-[3rem] border border-slate-200 dark:border-slate-800 shadow-xl"
-            >
-                <div className="relative mb-8">
-                    <div className="absolute inset-0 bg-emerald-500/20 blur-3xl rounded-full" />
-                    <div className="relative w-24 h-24 bg-emerald-500/10 rounded-full flex items-center justify-center border border-emerald-500/20">
-                        <Plus className="h-12 w-12 text-emerald-500" />
-                    </div>
-                </div>
-                <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">Aucun devis pour le moment</h3>
-                <p className="text-slate-500 dark:text-slate-400 max-w-md mb-10 text-lg leading-relaxed">
-                    Commencez par créer votre premier devis professionnel en quelques clics.
-                </p>
-                <Link href="/dashboard/quotes/create">
-                    <Button className="bg-sky-600 cursor-pointer hover:bg-sky-700 text-white shadow-lg shadow-sky-500/25 border-0 transition-all active:scale-95 group">
-                        <Plus className="mr-2 h-4 w-4 group-hover:rotate-90 transition-transform duration-300" />
-                        <span className="font-semibold tracking-wide">Créer un nouveau devis</span>
-                    </Button>
-                </Link>
-            </motion.div>
-        )
-    }
-
     return (
-        <div className="space-y-8">
-            {/* Filtering Header */}
+        <div className="space-y-6">
+            <motion.div
+                variants={containerVariants}
+                initial="hidden"
+                animate="show"
+                className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-6 gap-4 md:gap-6"
+            >
+                {/* Nouveau Devis Card */}
+                <motion.div variants={cardVariants} className="h-full">
+                    <Link href="/dashboard/quotes/create" className="group flex flex-col h-full w-full">
+                        <div className="w-full aspect-[4/5] rounded-2xl bg-slate-100/50 dark:bg-white/[0.02] border border-slate-200/50 dark:border-white/5 flex flex-col items-center justify-center transition-all duration-300 group-hover:bg-slate-100 dark:group-hover:bg-white/[0.05] group-hover:border-violet-500/30 group-hover:shadow-xl group-hover:shadow-violet-500/10 group-hover:-translate-y-1">
+                            <div className="w-12 h-12 rounded-full bg-[#2563EB] flex items-center justify-center text-white mb-3 shadow-[0_4px_15px_rgba(124,58,237,0.3)] group-hover:scale-110 transition-transform">
+                                <Plus className="w-6 h-6" />
+                            </div>
+                            <span className="text-sm font-bold text-slate-700 dark:text-slate-300">Nouveau devis</span>
+                        </div>
+                        {/* Spacer to match text height of other cards */}
+                        <div className="mt-3 opacity-0">
+                            <h4 className="text-sm font-bold">X</h4>
+                            <div className="text-[11px]">X</div>
+                        </div>
+                    </Link>
+                </motion.div>
 
+                {/* Document Cards */}
+                <AnimatePresence mode="popLayout">
+                    {filteredQuotes.map((quote) => {
+                        const config = statusConfig[quote.status] || statusConfig.DRAFT
+                        const StatusIcon = config.icon
+                        const isBeingDeleted = deletingId === quote.id
 
-            {/* Quote Cards */}
-            {filteredQuotes.length === 0 ? (
-                <div className="flex flex-col items-center justify-center p-20 text-center">
-                    <Search className="h-12 w-12 text-slate-300 mb-4" />
-                    <h4 className="text-xl font-semibold">Aucun résultat</h4>
-                    <p className="text-slate-500">Essayez d'ajuster vos filtres de recherche.</p>
-                </div>
-            ) : (
-                <motion.div
-                    variants={containerVariants}
-                    initial="hidden"
-                    animate="show"
-                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6 gap-6"
-                >
-                    <AnimatePresence mode="popLayout">
-                        {filteredQuotes.map((quote) => {
-                            const config = statusConfig[quote.status]
-                            const StatusIcon = config.icon
-                            const isBeingDeleted = deletingId === quote.id
-                            return (
-                                <motion.div
-                                    key={quote.id}
-                                    variants={cardVariants}
-                                    layout
-                                    className={`group relative bg-white dark:bg-slate-950 rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:shadow-2xl transition-all duration-300 ${isBeingDeleted ? 'opacity-50 pointer-events-none' : ''
-                                        }`}
-                                >
-                                    {/* Preview Image */}
-                                    <div className="relative">
+                        return (
+                            <motion.div
+                                key={quote.id}
+                                variants={cardVariants}
+                                layout
+                                className={`group flex flex-col ${isBeingDeleted ? 'opacity-50 pointer-events-none' : ''}`}
+                            >
+                                <div className="relative w-full aspect-[4/5] rounded-2xl bg-slate-100/50 dark:bg-white/[0.02] border border-slate-200/50 dark:border-white/5 overflow-hidden transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1 p-2 flex items-center justify-center">
+
+                                    {/* Preview Container */}
+                                    <div className="w-full h-full rounded-xl overflow-hidden shadow-sm bg-white dark:bg-slate-950/50 relative">
                                         <DocumentPreview
                                             documentId={quote.id}
                                             layoutStyle={quote.layout_style}
                                         />
-
-                                        {/* Status Badge Overlay */}
-                                        <div className="absolute top-4 left-4 z-10">
-                                            <Badge
-                                                variant="outline"
-                                                className={`rounded-xl px-3 py-1 text-[10px] uppercase font-bold tracking-tight backdrop-blur-sm ${config.bg} ${config.text} ${config.border}`}
-                                            >
-                                                <StatusIcon className="h-3 w-3 mr-1" />
-                                                {config.label}
-                                            </Badge>
-                                        </div>
-
-                                        {/* Action Menu */}
-                                        <div className="absolute top-4 right-4 z-10">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="rounded-full h-8 w-8 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm text-slate-600 hover:bg-white dark:hover:bg-slate-900"
-                                                        disabled={isBeingDeleted}
-                                                    >
-                                                        {isBeingDeleted ? (
-                                                            <Loader2 className="h-4 w-4 animate-spin" />
-                                                        ) : (
-                                                            <MoreVertical className="h-4 w-4" />
-                                                        )}
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2">
-                                                    <DropdownMenuItem asChild>
-                                                        <Link href={`/dashboard/quotes/${quote.id}`} className="cursor-pointer">
-                                                            <Eye className="mr-2 h-4 w-4" />
-                                                            Voir le devis
-                                                        </Link>
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem
-                                                        onClick={() => handleDownloadPdf(quote.id, quote.number)}
-                                                        className="cursor-pointer"
-                                                    >
-                                                        <FileText className="mr-2 h-4 w-4" />
-                                                        Télécharger PDF
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuSeparator />
-                                                    <DropdownMenuItem
-                                                        onClick={() => handleDelete(quote)}
-                                                        className="text-rose-500 focus:text-rose-500 focus:bg-rose-500/10 cursor-pointer"
-                                                        disabled={isDeleting}
-                                                    >
-                                                        <Trash2 className="mr-2 h-4 w-4" />
-                                                        Supprimer
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </div>
                                     </div>
 
-                                    {/* Content Section */}
-                                    <div className="p-6 space-y-4">
-                                        <div className="space-y-2">
-                                            <div className="flex items-center gap-2 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-                                                <span>{quote.number || `DEV-${quote.id.slice(0, 4)}`}</span>
-                                            </div>
-                                            <h3 className="text-lg font-bold text-slate-900 dark:text-white line-clamp-1">
-                                                {quote.client?.name || "Client Inconnu"}
-                                            </h3>
-                                        </div>
+                                    {/* Hover Actions Overlay */}
+                                    <div className="absolute inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3">
+                                        <Link href={`/dashboard/quotes/${quote.id}`}>
+                                            <Button size="icon" className="h-10 w-10 rounded-full bg-white text-slate-900 hover:bg-slate-100 shadow-lg hover:scale-110 transition-transform">
+                                                <Eye className="h-4 w-4" />
+                                            </Button>
+                                        </Link>
 
-                                        <div className="pt-2">
-                                            <p className="text-3xl font-black text-slate-900 dark:text-white">
-                                                {formatCurrency(quote.grand_total_cents || 0)}
-                                            </p>
-                                        </div>
-
-                                        <div className="pt-4 border-t border-slate-100 dark:border-slate-800/50 flex items-center justify-between">
-                                            <div className="flex items-center text-xs font-medium text-slate-500">
-                                                <CalendarDays className="mr-1.5 h-3.5 w-3.5" />
-                                                {new Date(quote.created_at).toLocaleDateString("fr-FR", {
-                                                    day: "numeric",
-                                                    month: "short"
-                                                })}
-                                            </div>
-                                            <div className="flex items-center text-xs font-medium text-slate-400">
-                                                <FileText className="mr-1.5 h-3.5 w-3.5" />
-                                                {quote.layout_style || 'classic'}
-                                            </div>
-                                        </div>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button size="icon" className="h-10 w-10 rounded-full bg-white text-slate-900 hover:bg-slate-100 shadow-lg hover:scale-110 transition-transform">
+                                                    {isBeingDeleted ? <Loader2 className="h-4 w-4 animate-spin" /> : <MoreVertical className="h-4 w-4" />}
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="center" className="rounded-2xl p-2 w-48">
+                                                <DropdownMenuItem onClick={() => handleDownloadPdf(quote.id, quote.number)} className="cursor-pointer font-medium">
+                                                    <FileText className="mr-2 h-4 w-4 text-sky-500" />
+                                                    Télécharger PDF
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleDelete(quote)} className="cursor-pointer text-rose-500 focus:text-rose-500 focus:bg-rose-500/10 font-medium mt-1">
+                                                    <Trash2 className="mr-2 h-4 w-4" />
+                                                    Supprimer
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
                                     </div>
+                                </div>
 
-                                    {/* Hover Overlay Link */}
-                                    <Link
-                                        href={`/dashboard/quotes/${quote.id}`}
-                                        className="absolute inset-0 z-0 cursor-pointer"
-                                    />
-
-                                    {/* Hover Arrow */}
-                                    <div className="absolute right-6 bottom-6 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all z-20 pointer-events-none">
-                                        <div className="w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-lg shadow-emerald-500/30">
-                                            <ArrowUpRight className="h-5 w-5" />
+                                {/* Text Details */}
+                                <div className="mt-3 px-1">
+                                    <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate">
+                                        {quote.client?.name || "Client Inconnu"}
+                                    </h4>
+                                    <div className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-1.5 truncate">
+                                        <div className={`p-0.5 rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 ${config.color}`}>
+                                            <StatusIcon className="w-3 h-3" />
                                         </div>
+                                        <span>{config.label}</span>
+                                        <span className="text-slate-300 dark:text-slate-600">•</span>
+                                        <span className="font-bold text-slate-700 dark:text-slate-300">{formatCurrency(quote.grand_total_cents || 0)}</span>
+                                        <span className="text-slate-300 dark:text-slate-600">•</span>
+                                        <span>{new Date(quote.created_at).toLocaleDateString("fr-FR", { day: 'numeric', month: 'short' })}</span>
                                     </div>
-                                </motion.div>
-                            )
-                        })}
-                    </AnimatePresence>
-                </motion.div>
-            )}
+                                </div>
+                            </motion.div>
+                        )
+                    })}
+                </AnimatePresence>
+
+                {filteredQuotes.length === 0 && (
+                    <div className="col-span-full py-20 flex flex-col items-center justify-center text-center">
+                        <Search className="h-10 w-10 text-slate-300 dark:text-slate-600 mb-4" />
+                        <h4 className="text-lg font-bold text-slate-900 dark:text-white">Aucun devis trouvé</h4>
+                        <p className="text-sm text-slate-500 mt-1">Essayez de modifier votre recherche.</p>
+                    </div>
+                )}
+            </motion.div>
         </div>
     )
 }
