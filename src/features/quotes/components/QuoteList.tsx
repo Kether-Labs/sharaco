@@ -100,7 +100,7 @@ const cardVariants = {
     show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 260, damping: 20 } }
 }
 
-export function QuoteList({ quotes,onDeleteSuccess }: QuoteListProps) {
+export function QuoteList({ quotes, onDeleteSuccess }: QuoteListProps) {
     const [searchQuery, setSearchQuery] = useState("")
     const [deletingId, setDeletingId] = useState<string | null>(null)
 
@@ -159,25 +159,7 @@ export function QuoteList({ quotes,onDeleteSuccess }: QuoteListProps) {
     return (
         <div className="space-y-8">
             {/* Filtering Header */}
-            <div className="flex flex-col lg:flex-row gap-4 items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-8">
-                <div className="relative w-full lg:w-96 group">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-emerald-500 transition-colors" />
-                    <Input
-                        placeholder="Rechercher un client..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-12 h-12 bg-slate-50 dark:bg-slate-900/50 border-transparent focus:bg-white dark:focus:bg-slate-900 rounded-xl transition-all"
-                    />
-                </div>
-                <div className="flex items-center gap-3 w-full lg:w-auto overflow-x-auto pb-2 lg:pb-0 scrollbar-hide">
-                    <Button variant="outline" className="h-10 px-4 rounded-xl font-medium bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800">
-                        <Filter className="mr-2 h-4 w-4" /> Filtres
-                    </Button>
-                    <Button variant="outline" className="h-10 px-4 rounded-xl font-medium bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 whitespace-nowrap">
-                        Statuts <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
-                    </Button>
-                </div>
-            </div>
+
 
             {/* Quote Cards */}
             {filteredQuotes.length === 0 ? (
@@ -191,7 +173,7 @@ export function QuoteList({ quotes,onDeleteSuccess }: QuoteListProps) {
                     variants={containerVariants}
                     initial="hidden"
                     animate="show"
-                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6"
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6 gap-6"
                 >
                     <AnimatePresence mode="popLayout">
                         {filteredQuotes.map((quote) => {
@@ -203,21 +185,20 @@ export function QuoteList({ quotes,onDeleteSuccess }: QuoteListProps) {
                                     key={quote.id}
                                     variants={cardVariants}
                                     layout
-                                    className={`group relative bg-white dark:bg-slate-950 rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:shadow-2xl transition-all duration-300 ${
-                                        isBeingDeleted ? 'opacity-50 pointer-events-none' : ''
-                                    }`}
+                                    className={`group relative bg-white dark:bg-slate-950 rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:shadow-2xl transition-all duration-300 ${isBeingDeleted ? 'opacity-50 pointer-events-none' : ''
+                                        }`}
                                 >
                                     {/* Preview Image */}
                                     <div className="relative">
-                                        <DocumentPreview 
-                                            documentId={quote.id} 
-                                            layoutStyle={quote.layout_style} 
+                                        <DocumentPreview
+                                            documentId={quote.id}
+                                            layoutStyle={quote.layout_style}
                                         />
-                                        
+
                                         {/* Status Badge Overlay */}
                                         <div className="absolute top-4 left-4 z-10">
-                                            <Badge 
-                                                variant="outline" 
+                                            <Badge
+                                                variant="outline"
                                                 className={`rounded-xl px-3 py-1 text-[10px] uppercase font-bold tracking-tight backdrop-blur-sm ${config.bg} ${config.text} ${config.border}`}
                                             >
                                                 <StatusIcon className="h-3 w-3 mr-1" />
@@ -229,9 +210,9 @@ export function QuoteList({ quotes,onDeleteSuccess }: QuoteListProps) {
                                         <div className="absolute top-4 right-4 z-10">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button 
-                                                        variant="ghost" 
-                                                        size="icon" 
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
                                                         className="rounded-full h-8 w-8 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm text-slate-600 hover:bg-white dark:hover:bg-slate-900"
                                                         disabled={isBeingDeleted}
                                                     >
@@ -249,7 +230,7 @@ export function QuoteList({ quotes,onDeleteSuccess }: QuoteListProps) {
                                                             Voir le devis
                                                         </Link>
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem 
+                                                    <DropdownMenuItem
                                                         onClick={() => handleDownloadPdf(quote.id, quote.number)}
                                                         className="cursor-pointer"
                                                     >
@@ -257,7 +238,7 @@ export function QuoteList({ quotes,onDeleteSuccess }: QuoteListProps) {
                                                         Télécharger PDF
                                                     </DropdownMenuItem>
                                                     <DropdownMenuSeparator />
-                                                    <DropdownMenuItem 
+                                                    <DropdownMenuItem
                                                         onClick={() => handleDelete(quote)}
                                                         className="text-rose-500 focus:text-rose-500 focus:bg-rose-500/10 cursor-pointer"
                                                         disabled={isDeleting}

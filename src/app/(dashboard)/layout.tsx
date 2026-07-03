@@ -49,7 +49,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
 
                 {/* Page Content */}
-                <main className="relative flex-1 p-4 md:p-8 lg:p-10 max-w-7xl mx-auto w-full">
+                <main className="relative flex-1 p-4 md:p-8 lg:p-10  w-full">
                     {children}
                     <Toaster />
                 </main>

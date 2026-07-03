@@ -49,12 +49,12 @@ export default function Sidebar({ setIsSidebarOpen, isSidebarOpen }: { setIsSide
 
           {/* Create Button */}
           <div className="px-3 pb-6 flex justify-center relative z-10">
-            <button className="flex flex-col items-center justify-center gap-1 group w-full">
-              <div className="w-[40px] h-[40px] rounded-2xl bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center text-white shadow-[0_4px_20px_rgba(124,58,237,0.3)] group-hover:shadow-[0_8px_30px_rgba(124,58,237,0.5)] group-hover:scale-105 transition-all duration-300">
+            <Link href="/dashboard/quotes/create" className="flex flex-col items-center justify-center gap-1 group w-full">
+              <div className="w-[40px] h-[40px] rounded-2xl bg-[#2563EB] flex items-center justify-center text-white shadow-[0_4px_20px_rgba(124,58,237,0.3)] group-hover:shadow-[0_8px_30px_rgba(124,58,237,0.5)] group-hover:scale-105 transition-all duration-300">
                 <Plus className="h-6 w-6 group-hover:rotate-90 transition-transform duration-300" />
               </div>
               <span className="text-[11px] font-bold text-white/90 mt-1.5 tracking-wide">Créer</span>
-            </button>
+            </Link>
           </div>
 
           {/* Navigation Area */}

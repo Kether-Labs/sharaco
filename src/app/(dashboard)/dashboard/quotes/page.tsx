@@ -16,7 +16,7 @@ export default function QuotesPage() {
         queryClient.invalidateQueries({ queryKey: ['documents'] })
     }
     return (
-        <div className="flex-1 space-y-6 lg:space-y-8 p-4 md:p-8 pt-6 max-w-[1600px] mx-auto min-h-screen">
+        <div className="flex-1 space-y-6 lg:space-y-20 p-4 md:p-8 pt-6   min-h-screen">
             <QuoteHeader />
 
             <div className="mt-8">
@@ -34,7 +34,7 @@ export default function QuotesPage() {
                         </Button>
                     </div>
                 ) : (
-                    <QuoteList quotes={quotes || []} onDeleteSuccess={handleDeleteSuccess}/>
+                    <QuoteList quotes={quotes || []} onDeleteSuccess={handleDeleteSuccess} />
                 )}
             </div>
         </div>
