@@ -95,8 +95,8 @@ export function QuoteList({ quotes, onDeleteSuccess }: QuoteListProps) {
                 {/* Nouveau Devis Card */}
                 <motion.div variants={cardVariants} className="h-full">
                     <Link href="/dashboard/quotes/create" className="group flex flex-col h-full w-full">
-                        <div className="w-full aspect-[4/5] rounded-2xl bg-slate-100/50 dark:bg-white/[0.02] border border-slate-200/50 dark:border-white/5 flex flex-col items-center justify-center transition-all duration-300 group-hover:bg-slate-100 dark:group-hover:bg-white/[0.05] group-hover:border-violet-500/30 group-hover:shadow-xl group-hover:shadow-violet-500/10 group-hover:-translate-y-1">
-                            <div className="w-12 h-12 rounded-full bg-[#2563EB] flex items-center justify-center text-white mb-3 shadow-[0_4px_15px_rgba(124,58,237,0.3)] group-hover:scale-110 transition-transform">
+                        <div className="w-full aspect-[4/5] rounded-2xl bg-slate-100/50 dark:bg-white/[0.02] border border-slate-200/50 dark:border-white/5 flex flex-col items-center justify-center  group-hover:bg-slate-100 dark:group-hover:bg-white/[0.05] group-hover:border-violet-500/30 group-hover:shadow-xl group-hover:shadow-violet-500/10 group-hover:-translate-y-1">
+                            <div className="w-12 h-12 rounded-full bg-[#2563EB] flex items-center justify-center text-white mb-3 shadow-[0_4px_15px_rgba(124,58,237,0.3)] group-hover:scale-110 ">
                                 <Plus className="w-6 h-6" />
                             </div>
                             <span className="text-sm font-bold text-slate-700 dark:text-slate-300">Nouveau devis</span>
@@ -123,7 +123,7 @@ export function QuoteList({ quotes, onDeleteSuccess }: QuoteListProps) {
                                 layout
                                 className={`group flex flex-col ${isBeingDeleted ? 'opacity-50 pointer-events-none' : ''}`}
                             >
-                                <div className="relative w-full aspect-[4/5] rounded-2xl bg-slate-100/50 dark:bg-white/[0.02] border border-slate-200/50 dark:border-white/5 overflow-hidden transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1 p-2 flex items-center justify-center">
+                                <div className="relative w-full aspect-[4/5] rounded-2xl bg-slate-100/50 dark:bg-white/[0.02] border border-slate-200/50 dark:border-white/5 overflow-hidden group-hover:-translate-y-1 p-2 flex items-center justify-center">
 
                                     {/* Preview Container */}
                                     <div className="w-full h-full rounded-xl overflow-hidden shadow-sm bg-white dark:bg-slate-950/50 relative">
@@ -134,16 +134,16 @@ export function QuoteList({ quotes, onDeleteSuccess }: QuoteListProps) {
                                     </div>
 
                                     {/* Hover Actions Overlay */}
-                                    <div className="absolute inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3">
+                                    <div className="absolute inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-[2px] opacity-0 group-hover:opacity-100  duration-300 flex items-center justify-center gap-3">
                                         <Link href={`/dashboard/quotes/${quote.id}`}>
-                                            <Button size="icon" className="h-10 w-10 rounded-full bg-white text-slate-900 hover:bg-slate-100 shadow-lg hover:scale-110 transition-transform">
+                                            <Button size="icon" className="h-10 w-10 rounded-full bg-white text-slate-900 hover:bg-slate-100 shadow-lg hover:scale-110 ">
                                                 <Eye className="h-4 w-4" />
                                             </Button>
                                         </Link>
 
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
-                                                <Button size="icon" className="h-10 w-10 rounded-full bg-white text-slate-900 hover:bg-slate-100 shadow-lg hover:scale-110 transition-transform">
+                                                <Button size="icon" className="h-10 w-10 rounded-full bg-white text-slate-900 hover:bg-slate-100 shadow-lg hover:scale-110 ">
                                                     {isBeingDeleted ? <Loader2 className="h-4 w-4 animate-spin" /> : <MoreVertical className="h-4 w-4" />}
                                                 </Button>
                                             </DropdownMenuTrigger>

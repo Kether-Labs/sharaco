@@ -33,11 +33,7 @@ export default function Sidebar({ setIsSidebarOpen, isSidebarOpen }: { setIsSide
 
           {/* Top Logo & Close (Mobile) */}
           <div className="flex flex-col items-center pt-6 pb-4 relative z-10">
-            <Link href="/dashboard" className="group">
-              <div className="p-2 rounded-xl bg-white/5 border border-white/10 shadow-sm  transition-all duration-300">
-                <Logo width={24} height={24} className="text-white" />
-              </div>
-            </Link>
+
 
             <button
               onClick={() => setIsSidebarOpen(false)}
@@ -80,7 +76,7 @@ export default function Sidebar({ setIsSidebarOpen, isSidebarOpen }: { setIsSide
                     )}>
                       {item.icon}
                     </div>
-                    <span className="text-[10px] font-bold text-center w-full px-1 truncate tracking-wide">
+                    <span className="text-[12px] font-bold text-center w-full px-1 truncate tracking-wide">
                       {item.title}
                     </span>
                   </Link>
