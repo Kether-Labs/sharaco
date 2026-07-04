@@ -53,6 +53,7 @@ export interface Document {
   accent_color?: string;
   background_color?: string;
   text_color?: string;
+  project_id?: string | null;
   font_family?: string;
   show_bank_details?: boolean;
   show_tax_id?: boolean;

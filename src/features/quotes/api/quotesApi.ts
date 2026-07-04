@@ -5,9 +5,16 @@ import type { Document, DocumentCreate, DocumentStatus, DocumentPreviewRequest }
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 export const quotesApi = {
-    getAll: async (params?: { type?: string }): Promise<Document[]> => {
-        const query = params?.type ? `?type=${params.type}` : '';
-        return api.get<Document[]>(`/api/v1/documents${query}`);
+    getAll: async (params?: {
+        type?: string;
+        project_id?: string;  // ✅ NOUVEAU
+    }): Promise<Document[]> => {
+        const query = new URLSearchParams();
+        if (params?.type) query.set('type', params.type);
+        if (params?.project_id) query.set('project_id', params.project_id);
+
+        const queryString = query.toString();
+        return api.get<Document[]>(`/api/v1/documents${queryString ? `?${queryString}` : ''}`);
     },
 
     getById: async (id: string): Promise<Document> => {
@@ -42,6 +49,10 @@ export const quotesApi = {
         return api.patch<Document>(`/api/v1/documents/${documentId}/project`, {
             project_id: projectId
         });
+    },
+
+    unlinkFromProject: async (documentId: string): Promise<Document> => {
+        return api.delete<Document>(`/api/v1/documents/${documentId}/project`);
     },
 
     /**

@@ -13,7 +13,8 @@ import {
     Trash2,
     Loader2,
     Search,
-    MoreVertical
+    MoreVertical,
+    Unlink
 } from "lucide-react"
 
 import {
@@ -32,6 +33,7 @@ import { Button } from "@/components/ui/button"
 import { useLinkToProject } from "../hooks/useLinkToProject"
 import { useQuery } from "@tanstack/react-query"
 import { projectsApi } from "@/features/projects/api/projectsApi"
+import { useUnlinkFromProject } from "../hooks/useUnlinkFromProject"
 
 interface QuoteListProps {
     quotes: Document[],
@@ -63,7 +65,7 @@ const cardVariants = {
 export function QuoteList({ quotes, onDeleteSuccess, projectId }: QuoteListProps) {
     const [searchQuery, setSearchQuery] = useState("")
     const [deletingId, setDeletingId] = useState<string | null>(null)
-
+    const unlinkMutation = useUnlinkFromProject();
     const { deleteDocument, isDeleting } = useDeleteDocument({
         onSuccess: () => {
             onDeleteSuccess?.()
@@ -71,6 +73,18 @@ export function QuoteList({ quotes, onDeleteSuccess, projectId }: QuoteListProps
         },
     })
 
+    const handleUnlinkFromProject = async (documentId: string) => {
+        const confirmed = window.confirm(
+            "Êtes-vous sûr de vouloir dissocier ce document de son projet ?"
+        );
+        if (confirmed) {
+            try {
+                await unlinkMutation.mutateAsync(documentId);
+            } catch (error) {
+                console.error("Erreur dissociation:", error);
+            }
+        }
+    };
     const linkToProjectMutation = useLinkToProject();
 
     const { data: projects = [] } = useQuery({
@@ -175,6 +189,16 @@ export function QuoteList({ quotes, onDeleteSuccess, projectId }: QuoteListProps
                                                 <div className="px-2 py-1.5 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                                                     Actions
                                                 </div>
+
+                                                {quote.project_id && (
+                                                    <DropdownMenuItem
+                                                        onClick={() => handleUnlinkFromProject(quote.id)}
+                                                        className="text-amber-600 focus:text-amber-600 cursor-pointer"
+                                                    >
+                                                        <Unlink className="mr-2 h-4 w-4" />
+                                                        Dissocier du projet
+                                                    </DropdownMenuItem>
+                                                )}
                                                 <DropdownMenuItem className="cursor-pointer rounded-xl p-2 focus:bg-slate-100 dark:focus:bg-white/5" onSelect={(e) => e.preventDefault()}>
                                                     <div className="flex flex-col w-full gap-2">
                                                         <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Associer à un projet</span>
