@@ -4,32 +4,43 @@
 import { Suspense, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { TemplateSelector } from "@/features/templates/components/TemplateSelector";
-
+import { quotesApi } from "@/features/quotes/api/quotesApi";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
-import { quotesApi } from "@/features/quotes/api/quotesApi";
+import { useQuery } from "@tanstack/react-query";
+import { projectsApi } from "@/features/projects/api/projectsApi";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 function QuoteBuilderContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const { toast } = useToast();
-    
+
     const isChoosing = searchParams.has('choose-template');
     const [isCreating, setIsCreating] = useState(false);
+    const [selectedProjectId, setSelectedProjectId] = useState<string>("");
 
-    // Redirection initiale si aucun paramètre
+    // Charger les projets
+    const { data: projects = [] } = useQuery({
+        queryKey: ['projects'],
+        queryFn: () => projectsApi.getAll(),
+    });
+
     if (!isChoosing) {
         return <TemplateSelector onSelect={handleSelectTemplate} />;
     }
 
     async function handleSelectTemplate(layoutStyle: string) {
         setIsCreating(true);
-        
+
         try {
-            // ✅ Créer le document avec le layout_style choisi
+            // ✅ Créer le document avec le projet sélectionné
             const document = await quotesApi.create({
                 type: "DEVIS",
-                layout_style: layoutStyle, // ← Layout choisi par l'utilisateur
+                layout_style: layoutStyle,
+                project_id: selectedProjectId || undefined, // ← Projet optionnel
                 items: [{
                     description: "",
                     quantity: 1,
@@ -38,21 +49,18 @@ function QuoteBuilderContent() {
                 }],
                 notes: ""
             });
-            
-            // ✅ Rediriger vers l'éditeur avec le VRAI ID du document
+
             router.push(`/dashboard/quotes/${document.id}`);
-            
+
         } catch (error: any) {
             console.error("❌ Erreur création:", error);
-            
-            const errorMessage = error.response?.data?.detail || "Impossible de créer le devis.";
-            
+
             toast({
                 title: "Erreur",
-                description: errorMessage,
+                description: error.response?.data?.detail || "Impossible de créer le devis.",
                 variant: "destructive",
             });
-            
+
             setIsCreating(false);
         }
     }
@@ -68,7 +76,47 @@ function QuoteBuilderContent() {
         );
     }
 
-    return <TemplateSelector onSelect={handleSelectTemplate} />;
+    return (
+        <div className="min-h-screen bg-zinc-950 p-8">
+            <div className="max-w-4xl mx-auto space-y-8">
+                {/* Sélecteur de projet */}
+                <Card className="bg-zinc-900 border-zinc-800">
+                    <CardHeader>
+                        <CardTitle className="text-white">Projet associé (optionnel)</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <Label className="text-zinc-400 mb-2 block">Sélectionner un projet</Label>
+                        <Select value={selectedProjectId} onValueChange={setSelectedProjectId}>
+                            <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
+                                <SelectValue placeholder="Aucun projet" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-zinc-800 border-zinc-700">
+                                <SelectItem value="">Aucun projet</SelectItem>
+                                {projects.map((project) => (
+                                    <SelectItem key={project.id} value={project.id}>
+                                        {project.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <p className="text-xs text-zinc-500 mt-2">
+                            Si vous sélectionnez un projet, le client sera automatiquement récupéré.
+                        </p>
+                    </CardContent>
+                </Card>
+
+                {/* Sélecteur de template */}
+                <Card className="bg-zinc-900 border-zinc-800">
+                    <CardHeader>
+                        <CardTitle className="text-white">Choisir un modèle</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <TemplateSelector onSelect={handleSelectTemplate} />
+                    </CardContent>
+                </Card>
+            </div>
+        </div>
+    );
 }
 
 export default function LiveQuoteBuilderPage() {

@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
     Plus,
     FileText,
@@ -28,6 +29,9 @@ import { DocumentPreview } from "./DocumentPreview"
 import { quotesApi } from "../api/quotesApi"
 import { useDeleteDocument } from "../hooks/useDeleteDocument"
 import { Button } from "@/components/ui/button"
+import { useLinkToProject } from "../hooks/useLinkToProject"
+import { useQuery } from "@tanstack/react-query"
+import { projectsApi } from "@/features/projects/api/projectsApi"
 
 interface QuoteListProps {
     quotes: Document[],
@@ -65,6 +69,25 @@ export function QuoteList({ quotes, onDeleteSuccess }: QuoteListProps) {
             setDeletingId(null)
         },
     })
+
+    const linkToProjectMutation = useLinkToProject();
+
+    const { data: projects = [] } = useQuery({
+        queryKey: ['projects'],
+        queryFn: () => projectsApi.getAll(),
+    });
+
+    const handleLinkToProject = async (documentId: string, projectId: string) => {
+        try {
+            await linkToProjectMutation.mutateAsync({
+                documentId,
+                projectId: projectId === "none" ? null : projectId
+            });
+        } catch (error) {
+            console.error("Erreur association:", error);
+        }
+    };
+
 
     const handleDelete = async (quote: Document) => {
         setDeletingId(quote.id)
@@ -147,14 +170,38 @@ export function QuoteList({ quotes, onDeleteSuccess }: QuoteListProps) {
                                                     {isBeingDeleted ? <Loader2 className="h-4 w-4 animate-spin" /> : <MoreVertical className="h-4 w-4" />}
                                                 </Button>
                                             </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="center" className="rounded-2xl p-2 w-48">
-                                                <DropdownMenuItem onClick={() => handleDownloadPdf(quote.id, quote.number)} className="cursor-pointer font-medium">
-                                                    <FileText className="mr-2 h-4 w-4 text-sky-500" />
+                                            <DropdownMenuContent align="end" className="rounded-2xl p-2 w-56 bg-white dark:bg-[#111113] border border-slate-200/60 dark:border-white/10 shadow-2xl shadow-violet-500/5">
+                                                <div className="px-2 py-1.5 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                                                    Actions
+                                                </div>
+                                                <DropdownMenuItem className="cursor-pointer rounded-xl p-2 focus:bg-slate-100 dark:focus:bg-white/5" onSelect={(e) => e.preventDefault()}>
+                                                    <div className="flex flex-col w-full gap-2">
+                                                        <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Associer à un projet</span>
+                                                        <Select onValueChange={(value) => handleLinkToProject(quote.id, value)}>
+                                                            <SelectTrigger className="h-9 rounded-lg bg-slate-50 dark:bg-black/20 border-slate-200 dark:border-white/10">
+                                                                <SelectValue placeholder="Choisir un projet" />
+                                                            </SelectTrigger>
+                                                            <SelectContent className="rounded-xl bg-white dark:bg-[#111113] border-slate-200 dark:border-white/10 shadow-xl">
+                                                                <SelectItem value="none" className="rounded-lg cursor-pointer">Aucun projet</SelectItem>
+                                                                {projects.map((project) => (
+                                                                    <SelectItem key={project.id} value={project.id} className="rounded-lg cursor-pointer">
+                                                                        {project.name}
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                </DropdownMenuItem>
+
+                                                <div className="h-px bg-slate-200/60 dark:bg-white/10 my-1.5 mx-1" />
+
+                                                <DropdownMenuItem onClick={() => handleDownloadPdf(quote.id, quote.number)} className="cursor-pointer rounded-xl py-2.5 px-3 font-medium text-slate-700 dark:text-slate-300 focus:bg-slate-100 dark:focus:bg-white/5 transition-colors">
+                                                    <FileText className="mr-2.5 h-4 w-4 text-sky-500" />
                                                     Télécharger PDF
                                                 </DropdownMenuItem>
-                                                <DropdownMenuItem onClick={() => handleDelete(quote)} className="cursor-pointer text-rose-500 focus:text-rose-500 focus:bg-rose-500/10 font-medium mt-1">
-                                                    <Trash2 className="mr-2 h-4 w-4" />
-                                                    Supprimer
+                                                <DropdownMenuItem onClick={() => handleDelete(quote)} className="cursor-pointer rounded-xl py-2.5 px-3 text-rose-600 dark:text-rose-500 focus:text-rose-700 dark:focus:text-rose-400 focus:bg-rose-50 dark:focus:bg-rose-500/10 font-medium transition-colors">
+                                                    <Trash2 className="mr-2.5 h-4 w-4" />
+                                                    Supprimer devis
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>

@@ -49,13 +49,13 @@ export interface Document {
   tax_total_cents?: number;
   total_cents?: number;
   primary_color?: string;
-    secondary_color?: string;
-    accent_color?: string;
-    background_color?: string;
-    text_color?: string;
-    font_family?: string;
-    show_bank_details?: boolean;
-    show_tax_id?: boolean;
+  secondary_color?: string;
+  accent_color?: string;
+  background_color?: string;
+  text_color?: string;
+  font_family?: string;
+  show_bank_details?: boolean;
+  show_tax_id?: boolean;
   client?: {
     id: string;
     name: string;
@@ -64,25 +64,26 @@ export interface Document {
 }
 
 export interface DocumentCreate {
-    id?: string;
-    type: string;
-    // Client : soit ID, soit infos
-    client_id?: string;
-    client_name?: string;
-    client_email?: string;
-    client_phone?: string;
-    client_address?: string;
-    // Items
-    items: Array<{
-        description: string;
-        quantity: number;
-        unit_price_cents: number;
-        tax_rate: number;
-    }>;
-    // Méta
-    template_id?: string | null;
-    due_date?: string | null;
-    notes?: string | null;
+  id?: string;
+  type: string;
+  // Client : soit ID, soit infos
+  client_id?: string;
+  client_name?: string;
+  client_email?: string;
+  client_phone?: string;
+  client_address?: string;
+  project_id?: string | null;
+  // Items
+  items: Array<{
+    description: string;
+    quantity: number;
+    unit_price_cents: number;
+    tax_rate: number;
+  }>;
+  // Méta
+  template_id?: string | null;
+  due_date?: string | null;
+  notes?: string | null;
 }
 
 export interface DocumentStatusUpdate {

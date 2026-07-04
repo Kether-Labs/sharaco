@@ -38,6 +38,12 @@ export const quotesApi = {
         return api.get<string>(`/api/v1/documents/${id}/preview`);
     },
 
+    linkToProject: async (documentId: string, projectId: string | null): Promise<Document> => {
+        return api.patch<Document>(`/api/v1/documents/${documentId}/project`, {
+            project_id: projectId
+        });
+    },
+
     /**
      * Récupère la preview PNG d'un document avec authentification.
      * Retourne un Blob URL utilisable dans <img src="...">.
@@ -50,7 +56,7 @@ export const quotesApi = {
             headers['Authorization'] = `Bearer ${token}`;
         }
 
-        const res = await fetch(`${API_URL}/api/v1/documents/${id}/preview.png`, { 
+        const res = await fetch(`${API_URL}/api/v1/documents/${id}/preview.png`, {
             headers,
             cache: 'force-cache',
         });
