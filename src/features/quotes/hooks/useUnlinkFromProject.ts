@@ -15,6 +15,7 @@ export function useUnlinkFromProject() {
             // Invalider les caches concernés
             queryClient.invalidateQueries({ queryKey: ['documents'] });
             queryClient.invalidateQueries({ queryKey: ['projects'] });
+            queryClient.invalidateQueries({ queryKey: ['project-documents'] });
             toast({
                 title: 'Document dissocié',
                 description: 'Le document a été retiré du projet.',

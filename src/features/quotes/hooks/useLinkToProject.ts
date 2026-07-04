@@ -15,6 +15,7 @@ export function useLinkToProject() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['documents'] });
             queryClient.invalidateQueries({ queryKey: ['projects'] });
+            queryClient.invalidateQueries({ queryKey: ['project-documents'] });
             toast({
                 title: 'Association mise à jour',
                 description: 'Le document a été associé au projet.',
