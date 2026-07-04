@@ -5,26 +5,31 @@ import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Loader2, FolderPlus } from "lucide-react"
+import { Loader2, FolderPlus, Edit3 } from "lucide-react"
 import { useQuery } from "@tanstack/react-query"
 import { clientsApi } from "@/features/clients/api/clientsApi"
 
 import { useRouter } from "next/navigation"
-import { useCreateProject } from "../hooks/useProject"
+import { useCreateProject, useUpdateProject } from "../hooks/useProject"
+import { Project } from "../types"
 
 interface CreateProjectModalProps {
     open: boolean
     onOpenChange: (open: boolean) => void
+    project?: Project
 }
 
-export function CreateProjectModal({ open, onOpenChange }: CreateProjectModalProps) {
+export function CreateProjectModal({ open, onOpenChange, project }: CreateProjectModalProps) {
     const router = useRouter()
     const createMutation = useCreateProject()
+    const updateMutation = useUpdateProject()
 
     const [name, setName] = useState("")
     const [description, setDescription] = useState("")
     const [clientId, setClientId] = useState("")
     const [budget, setBudget] = useState("")
+
+    const isPending = createMutation.isPending || updateMutation.isPending
 
     // Charger les clients pour le select
     const { data: clients = [], isLoading: isLoadingClients } = useQuery({
@@ -33,33 +38,44 @@ export function CreateProjectModal({ open, onOpenChange }: CreateProjectModalPro
         enabled: open, // Ne charger que si le modal est ouvert
     })
 
-    // Reset form quand on ferme
+    // Reset form quand on ouvre/ferme
     useEffect(() => {
-        if (!open) {
+        if (open) {
+            setName(project?.name || "")
+            setDescription(project?.description || "")
+            setClientId(project?.client_id || "")
+            setBudget(project?.budget_cents ? (project.budget_cents / 100).toString() : "")
+        } else {
             setName("")
             setDescription("")
             setClientId("")
             setBudget("")
         }
-    }, [open])
+    }, [open, project])
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         if (!name || !clientId) return
 
         try {
-            const project = await createMutation.mutateAsync({
+            const data = {
                 name,
                 description: description || undefined,
                 client_id: clientId,
-                budget_cents: budget ? parseInt(budget) * 100 : undefined, // Convertir en centimes
-                status: "DRAFT"
-            })
+                budget_cents: budget ? parseInt(budget) * 100 : undefined, 
+                status: project ? project.status : "DRAFT"
+            }
 
-            onOpenChange(false)
-            router.push(`/dashboard/projects/${project.id}`)
+            if (project) {
+                await updateMutation.mutateAsync({ id: project.id, data })
+                onOpenChange(false)
+            } else {
+                const newProject = await createMutation.mutateAsync(data)
+                onOpenChange(false)
+                router.push(`/dashboard/projects/${newProject.id}`)
+            }
         } catch (error) {
-            console.error("Erreur création:", error)
+            console.error("Erreur:", error)
         }
     }
 
@@ -70,12 +86,16 @@ export function CreateProjectModal({ open, onOpenChange }: CreateProjectModalPro
                     {/* Top Area - Icon & Name */}
                     <div className="pt-10 pb-6 px-6 flex flex-col items-center justify-center bg-gradient-to-b from-sky-500/10 to-transparent">
                         <div className="w-24 h-24 bg-sky-100 dark:bg-sky-500/20 rounded-3xl flex items-center justify-center mb-6 shadow-inner ring-1 ring-white/20 dark:ring-white/10 relative group">
-                            <FolderPlus className="w-12 h-12 text-sky-600 dark:text-sky-400 transition-transform group-hover:scale-110 duration-300" strokeWidth={1.5} />
+                            {project ? (
+                                <Edit3 className="w-12 h-12 text-sky-600 dark:text-sky-400 transition-transform group-hover:scale-110 duration-300" strokeWidth={1.5} />
+                            ) : (
+                                <FolderPlus className="w-12 h-12 text-sky-600 dark:text-sky-400 transition-transform group-hover:scale-110 duration-300" strokeWidth={1.5} />
+                            )}
                         </div>
                         
                         <input
                             autoFocus
-                            placeholder="Nouveau dossier"
+                            placeholder={project ? "Modifier le dossier" : "Nouveau dossier"}
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             required
@@ -142,20 +162,20 @@ export function CreateProjectModal({ open, onOpenChange }: CreateProjectModalPro
                                 type="button"
                                 variant="ghost"
                                 onClick={() => onOpenChange(false)}
-                                disabled={createMutation.isPending}
+                                disabled={isPending}
                                 className="flex-1 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5"
                             >
                                 Annuler
                             </Button>
                             <Button
                                 type="submit"
-                                disabled={!name || !clientId || createMutation.isPending}
+                                disabled={!name || !clientId || isPending}
                                 className="flex-1 rounded-xl bg-sky-600 hover:bg-sky-700 text-white shadow-lg shadow-sky-500/20"
                             >
-                                {createMutation.isPending ? (
+                                {isPending ? (
                                     <Loader2 className="h-4 w-4 animate-spin" />
                                 ) : (
-                                    "Créer"
+                                    project ? "Enregistrer" : "Créer"
                                 )}
                             </Button>
                         </div>
