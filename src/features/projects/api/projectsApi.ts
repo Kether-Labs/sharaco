@@ -24,6 +24,24 @@ export const projectsApi = {
         return api.get<Project[]>(`/api/v1/projects${queryString ? `?${queryString}` : ''}`);
     },
 
+
+    getDocuments: async (
+        projectId: string,
+        params?: {
+            type?: 'DEVIS' | 'FACTURE';
+            status?: string;
+        }
+    ): Promise<any[]> => {
+        const query = new URLSearchParams();
+        if (params?.type) query.set('type', params.type);
+        if (params?.status) query.set('status', params.status);
+
+        const queryString = query.toString();
+        return api.get<any[]>(
+            `/api/v1/projects/${projectId}/documents${queryString ? `?${queryString}` : ''}`
+        );
+    },
+
     /**
      * Récupère un projet par son ID
      */

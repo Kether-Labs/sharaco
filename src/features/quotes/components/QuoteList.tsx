@@ -35,7 +35,8 @@ import { projectsApi } from "@/features/projects/api/projectsApi"
 
 interface QuoteListProps {
     quotes: Document[],
-    onDeleteSuccess?: () => void
+    onDeleteSuccess?: () => void,
+    projectId?: string
 }
 
 const statusConfig: Record<DocumentStatus, { label: string, icon: any, color: string }> = {
@@ -59,7 +60,7 @@ const cardVariants = {
     show: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 300, damping: 25 } }
 }
 
-export function QuoteList({ quotes, onDeleteSuccess }: QuoteListProps) {
+export function QuoteList({ quotes, onDeleteSuccess, projectId }: QuoteListProps) {
     const [searchQuery, setSearchQuery] = useState("")
     const [deletingId, setDeletingId] = useState<string | null>(null)
 
@@ -117,7 +118,7 @@ export function QuoteList({ quotes, onDeleteSuccess }: QuoteListProps) {
             >
                 {/* Nouveau Devis Card */}
                 <motion.div variants={cardVariants} className="h-full">
-                    <Link href="/dashboard/quotes/create" className="group flex flex-col h-full w-full">
+                    <Link href={`/dashboard/quotes/create${projectId ? `?project_id=${projectId}` : ''}`} className="group flex flex-col h-full w-full">
                         <div className="w-full aspect-[4/5] rounded-2xl bg-slate-100/50 dark:bg-white/[0.02] border border-slate-200/50 dark:border-white/5 flex flex-col items-center justify-center  group-hover:bg-slate-100 dark:group-hover:bg-white/[0.05] group-hover:border-violet-500/30 group-hover:shadow-xl group-hover:shadow-violet-500/10 group-hover:-translate-y-1">
                             <div className="w-12 h-12 rounded-full bg-[#2563EB] flex items-center justify-center text-white mb-3 shadow-[0_4px_15px_rgba(124,58,237,0.3)] group-hover:scale-110 ">
                                 <Plus className="w-6 h-6" />

@@ -3,7 +3,7 @@
 
 import { useState } from "react"
 import { useParams, useRouter } from "next/navigation"
-
+import { ProjectDocuments } from "@/features/projects/components/ProjectDocuments"
 import { Loader2, ArrowLeft, Trash2, Edit3, FileText, TrendingUp, DollarSign, Calendar, PlusCircle, Settings, RefreshCw, Paperclip, Folder } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -53,8 +53,6 @@ export default function ProjectDetailPage() {
         )
     }
 
-    // Ici on pourra récupérer les devis liés avec un hook personnalisé (ex: useProjectQuotes(projectId))
-    const quotes: any[] = [] // Temporaire, simule la liste des devis liés au projet
 
     return (
         <>
@@ -66,7 +64,7 @@ export default function ProjectDetailPage() {
                             <button onClick={() => router.back()} className="p-1.5 hover:bg-white/10 rounded-md transition-colors text-slate-400 hover:text-white mr-2">
                                 <ArrowLeft className="w-4 h-4" />
                             </button>
-                            
+
                             <div className="flex items-center gap-1 font-medium text-[13px] bg-black/20 rounded-md px-2 py-1 ring-1 ring-white/5">
                                 <Link href="/dashboard/projects" className="px-2 py-1 hover:bg-white/10 rounded transition-colors text-slate-400 hover:text-white">
                                     Projets
@@ -78,18 +76,7 @@ export default function ProjectDetailPage() {
 
                         {/* Content Area */}
                         <div className="flex-1 flex flex-col p-6">
-                            {quotes.length > 0 ? (
-                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 place-content-start">
-                                    {/* Insérer les composants QuoteFolder ou QuoteCard ici */}
-                                </div>
-                            ) : (
-                                <div className="flex-1 flex flex-col items-center justify-center opacity-60 pointer-events-none select-none">
-                                    <Folder className="w-24 h-24 mb-4 text-slate-300" strokeWidth={1} />
-                                    <span className="text-lg font-bold tracking-wide text-slate-100">
-                                        Le projet est vide
-                                    </span>
-                                </div>
-                            )}
+                            <ProjectDocuments projectId={project.id} />
                         </div>
                     </div>
                 </ContextMenuTrigger>
@@ -105,7 +92,7 @@ export default function ProjectDetailPage() {
                         Actualiser
                     </ContextMenuItem>
                     <ContextMenuSeparator className="bg-[#333]" />
-                    <ContextMenuItem 
+                    <ContextMenuItem
                         className="focus:bg-sky-600 focus:text-white cursor-pointer"
                         onSelect={() => setTimeout(() => setIsPropertiesOpen(true), 150)}
                     >
@@ -121,11 +108,11 @@ export default function ProjectDetailPage() {
                     </ContextMenuItem>
                 </ContextMenuContent>
             </ContextMenu>
-            
-            <ProjectPropertiesModal 
-                project={project} 
-                open={isPropertiesOpen} 
-                onOpenChange={setIsPropertiesOpen} 
+
+            <ProjectPropertiesModal
+                project={project}
+                open={isPropertiesOpen}
+                onOpenChange={setIsPropertiesOpen}
             />
         </>
     )
