@@ -40,7 +40,7 @@ function QuoteBuilderContent() {
             const document = await quotesApi.create({
                 type: "DEVIS",
                 layout_style: layoutStyle,
-                project_id: selectedProjectId || undefined, // ← Projet optionnel
+                project_id: searchParams.get("project_id") || undefined, // ← Projet optionnel
                 items: [{
                     description: "",
                     quantity: 1,

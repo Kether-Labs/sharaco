@@ -27,11 +27,11 @@ export function Editor({ templateId, documentId }: EditorProps) {
     const router = useRouter();
     const { downloadPdf, isDownloading } = useDownloadPdf();
     const { toast } = useToast();
-    
+
     const [isLoading, setIsLoading] = useState(!!documentId);
     const [loadError, setLoadError] = useState<string | null>(null);
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-    
+
     // ✅ Déterminer le mode
     const isEditMode = !!documentId;
 
@@ -68,10 +68,10 @@ export function Editor({ templateId, documentId }: EditorProps) {
     });
 
     // ✅ Hook pour la CRÉATION (auto-save une fois)
-    const { 
-        isSaving, 
-        lastSavedAt, 
-        saveStatus, 
+    const {
+        isSaving,
+        lastSavedAt,
+        saveStatus,
         documentId: savedDocumentId,
         isSaved,
         markAsChanged,
@@ -94,7 +94,7 @@ export function Editor({ templateId, documentId }: EditorProps) {
         },
     });
 
-    
+
     // Alerte de sortie
     useBeforeUnload(hasUnsavedChanges);
 
@@ -111,7 +111,7 @@ export function Editor({ templateId, documentId }: EditorProps) {
                 setLoadError(null);
 
                 const doc = await quotesApi.getById(documentId);
-                
+
                 let clientData = { name: "", email: "", phone: "", address: "" };
                 try {
                     const client = await clientsApi.getById(doc.client_id);
@@ -140,35 +140,35 @@ export function Editor({ templateId, documentId }: EditorProps) {
                 }
 
                 setDraft({
-    id: doc.id,
-    clientId: doc.client_id,
-    clientName: clientData.name,
-    clientEmail: clientData.email,
-    clientPhone: clientData.phone,
-    clientAddress: clientData.address,
-    reference: doc.number || `DEV-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000)}`,
-    date: doc.created_at ? new Date(doc.created_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-    validityDays,
-    hasVat: true,
-    vatRate: 20,
-    isTaxExempt: false,
-    discountRate: 0,
-    items: mappedItems.length > 0 ? mappedItems : [{
-        id: uuidv4(),
-        description: "",
-        quantity: 1,
-        unitPrice: 0,
-        tax_rate: 20,
-    }],
-    notes: doc.notes || "",
-    internalNotes: "",
-    logoUrl: null,
-    // ✅ CORRECTION : Lire la couleur sauvegardée
-    brandColor: (doc as any).primary_color || "#0ea5e9",
-    isSaved: true,
-    templateId: doc.template_id || null,
-    layoutStyle: (doc as any).layout_style || "classic",
-});
+                    id: doc.id,
+                    clientId: doc.client_id,
+                    clientName: clientData.name,
+                    clientEmail: clientData.email,
+                    clientPhone: clientData.phone,
+                    clientAddress: clientData.address,
+                    reference: doc.number || `DEV-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000)}`,
+                    date: doc.created_at ? new Date(doc.created_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+                    validityDays,
+                    hasVat: true,
+                    vatRate: 20,
+                    isTaxExempt: false,
+                    discountRate: 0,
+                    items: mappedItems.length > 0 ? mappedItems : [{
+                        id: uuidv4(),
+                        description: "",
+                        quantity: 1,
+                        unitPrice: 0,
+                        tax_rate: 20,
+                    }],
+                    notes: doc.notes || "",
+                    internalNotes: "",
+                    logoUrl: null,
+                    // ✅ CORRECTION : Lire la couleur sauvegardée
+                    brandColor: (doc as any).primary_color || "#0ea5e9",
+                    isSaved: true,
+                    templateId: doc.template_id || null,
+                    layoutStyle: (doc as any).layout_style || "classic",
+                });
                 console.log("✅ Document chargé:", doc.id, "- Mode édition");
 
             } catch (error: any) {
@@ -313,6 +313,8 @@ export function Editor({ templateId, documentId }: EditorProps) {
         <div className="flex h-[100dvh] w-screen overflow-hidden bg-zinc-950 font-sans">
             <EditorHeader
                 draft={draft}
+                documentId={documentId}
+                documentNumber={draft.reference}
                 zoom={zoom}
                 onZoomIn={() => setZoom(prev => Math.min(prev + 0.1, 1.5))}
                 onZoomOut={() => setZoom(prev => Math.max(prev - 0.1, 0.4))}
