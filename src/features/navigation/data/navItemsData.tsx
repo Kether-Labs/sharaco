@@ -13,13 +13,11 @@ import {
 } from "lucide-react";
 
 export const navItems: NavItemInterface[] = [
-  { title: "Overview", isHeader: true, icon: null },
   {
     title: "Accueil",
     icon: <Home className="h-6 w-8" />,
-    href: ""
+    href: "/dashboard"
   },
-  { title: "Business", isHeader: true, icon: null },
   { title: "projects", icon: <Folder className="h-6 w-8" />, href: "/dashboard/projects" },
   { title: "Devis", icon: <FileText className="h-6 w-8" />, href: "/dashboard/quotes" },
   { title: "Clients", icon: <Users className="h-6 w-8" />, href: "/dashboard/clients" },
