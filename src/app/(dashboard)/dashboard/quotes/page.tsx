@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button"
 import { RefreshCcw } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useQueryClient } from "@tanstack/react-query"
+import { useState } from "react"
+import { DocumentsStats } from "@/features/quotes/components/DocumentsStats"
 
 export default function QuotesPage() {
     const queryClient = useQueryClient()
@@ -15,10 +17,40 @@ export default function QuotesPage() {
         // Rafraîchir la liste après suppression
         queryClient.invalidateQueries({ queryKey: ['documents'] })
     }
+
+    const [statusFilter, setStatusFilter] = useState<string | null>(null);
+    const [typeFilter, setTypeFilter] = useState<string>("all");
+
+    // Construire les paramètres de requête
+    const queryParams: any = {};
+
+    // Mapper le filtre KPI vers les vrais statuts
+    if (statusFilter === "ACCEPTED") {
+        queryParams.status = "ACCEPTED";
+    } else if (statusFilter === "REFUSED") {
+        queryParams.status = "REFUSED";
+    } else if (statusFilter === "PENDING") {
+        // Pas de filtre direct, on filtre côté client
+    }
+
+    if (typeFilter !== "all") {
+        queryParams.type = typeFilter;
+    }
+
+    const filteredQuotes = statusFilter === "PENDING"
+        ? quotes && quotes.filter(q => q.status === "SENT" || q.status === "VIEWED")
+        : quotes;
+
+    const handleFilterByStatus = (status: string | null) => {
+        setStatusFilter(status);
+    };
     return (
         <div className="flex-1 space-y-6 lg:space-y-20 p-4 md:p-8 pt-6   min-h-screen">
             <QuoteHeader />
-
+            <DocumentsStats
+                onFilterByStatus={handleFilterByStatus}
+                currentFilter={statusFilter}
+            />
             <div className="mt-8">
                 {isLoading ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
