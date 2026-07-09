@@ -57,7 +57,7 @@ export default function Sidebar({ setIsSidebarOpen, isSidebarOpen }: { setIsSide
           <ScrollArea className="flex-1 w-full hide-scrollbar relative z-10">
             <nav className="flex flex-col items-center gap-1 px-2 pb-4">
               {mainNavItems.map((item, index) => {
-                const isActive = item.href ? pathname.startsWith(item.href) : false;
+                const isActive = item.href ? pathname === item.href : false;
                 return (
                   <Link
                     key={index}

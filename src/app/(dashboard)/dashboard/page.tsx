@@ -21,11 +21,14 @@ export default function DashboardPage() {
             <DocumentsStats />
 
             {/* Activité récente */}
-            <div className="bg-zinc-950 border border-white/5 rounded-3xl p-6">
-                <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-black text-white">
+            <div className="mt-12 md:mt-16">
+                <div className="mb-8">
+                    <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
                         Activité récente
                     </h2>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                        Suivez les dernières actions sur vos projets et devis.
+                    </p>
                 </div>
                 <ActivityFeed limit={20} />
             </div>

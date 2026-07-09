@@ -3,10 +3,9 @@
 
 import { useDocumentsStats } from "../hooks/useDocumentsStats";
 import {
-    CheckCircle2, XCircle, Clock, Eye, Send, Loader2,
-    TrendingUp, FileText, DollarSign, Target
+    CheckCircle2, XCircle, Clock, Target
 } from "lucide-react";
-
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "../lib/formatCurrency";
 
@@ -20,11 +19,17 @@ export function DocumentsStats({ onFilterByStatus, currentFilter }: DocumentsSta
 
     if (isLoading || !stats) {
         return (
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                 {[...Array(4)].map((_, i) => (
-                    <div key={i} className="bg-zinc-900 border border-white/5 rounded-2xl p-6 animate-pulse">
-                        <div className="h-4 w-20 bg-white/10 rounded mb-3" />
-                        <div className="h-8 w-16 bg-white/10 rounded" />
+                    <div key={i} className="bg-white/50 dark:bg-[#0a0a0a]/50 backdrop-blur-xl border border-slate-200/50 dark:border-white/5 rounded-3xl p-6 md:p-8 animate-pulse flex flex-col justify-between h-44">
+                        <div className="flex justify-between items-center">
+                            <div className="h-3 w-24 bg-slate-200 dark:bg-white/10 rounded-full" />
+                            <div className="h-10 w-10 bg-slate-200 dark:bg-white/10 rounded-2xl" />
+                        </div>
+                        <div>
+                            <div className="h-10 w-20 bg-slate-200 dark:bg-white/10 rounded-xl mb-3" />
+                            <div className="h-3 w-24 bg-slate-200 dark:bg-white/10 rounded-full" />
+                        </div>
                     </div>
                 ))}
             </div>
@@ -58,7 +63,7 @@ export function DocumentsStats({ onFilterByStatus, currentFilter }: DocumentsSta
         },
         {
             key: "CONVERSION",
-            label: "Taux de conversion",
+            label: "Conversion",
             icon: Target,
             color: "violet",
             count: stats.conversion_rate,
@@ -67,77 +72,128 @@ export function DocumentsStats({ onFilterByStatus, currentFilter }: DocumentsSta
         },
     ];
 
-    const colorMap: Record<string, { bg: string; text: string; border: string; icon: string }> = {
+    const colorMap: Record<string, { text: string; icon: string; glow: string; bar: string }> = {
         emerald: {
-            bg: "bg-emerald-500/10",
-            text: "text-emerald-400",
-            border: "border-emerald-500/20",
-            icon: "bg-emerald-500/10 text-emerald-400",
+            text: "text-emerald-600 dark:text-emerald-400",
+            icon: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+            glow: "from-emerald-500/20 via-transparent to-transparent",
+            bar: "bg-emerald-500",
         },
         rose: {
-            bg: "bg-rose-500/10",
-            text: "text-rose-400",
-            border: "border-rose-500/20",
-            icon: "bg-rose-500/10 text-rose-400",
+            text: "text-rose-600 dark:text-rose-400",
+            icon: "bg-rose-500/10 text-rose-600 dark:text-rose-400",
+            glow: "from-rose-500/20 via-transparent to-transparent",
+            bar: "bg-rose-500",
         },
         amber: {
-            bg: "bg-amber-500/10",
-            text: "text-amber-400",
-            border: "border-amber-500/20",
-            icon: "bg-amber-500/10 text-amber-400",
+            text: "text-amber-600 dark:text-amber-400",
+            icon: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+            glow: "from-amber-500/20 via-transparent to-transparent",
+            bar: "bg-amber-500",
         },
         violet: {
-            bg: "bg-violet-500/10",
-            text: "text-violet-400",
-            border: "border-violet-500/20",
-            icon: "bg-violet-500/10 text-violet-400",
+            text: "text-violet-600 dark:text-violet-400",
+            icon: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
+            glow: "from-violet-500/20 via-transparent to-transparent",
+            bar: "bg-violet-500",
         },
     };
 
     return (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {statusCards.map((card) => {
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            {statusCards.map((card, index) => {
                 const colors = colorMap[card.color];
                 const Icon = card.icon;
                 const isActive = currentFilter === card.key;
+                const isClickable = !!onFilterByStatus;
 
                 return (
-                    <button
+                    <motion.button
                         key={card.key}
-                        onClick={() => onFilterByStatus?.(isActive ? null : card.key)}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, delay: index * 0.1, ease: "easeOut" }}
+                        onClick={() => {
+                            if (isClickable) onFilterByStatus(isActive ? null : card.key);
+                        }}
+                        disabled={!isClickable}
                         className={cn(
-                            "bg-zinc-900 border rounded-2xl p-6 text-left transition-all hover:scale-[1.02]",
-                            colors.border,
-                            isActive && "ring-2 ring-offset-2 ring-offset-black",
-                            isActive && card.key === "ACCEPTED" && "ring-emerald-500",
-                            isActive && card.key === "REFUSED" && "ring-rose-500",
-                            isActive && card.key === "PENDING" && "ring-amber-500",
-                            isActive && card.key === "CONVERSION" && "ring-violet-500",
+                            "relative group overflow-hidden text-left transition-all duration-500 rounded-3xl",
+                            "bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-xl border",
+                            isClickable ? "cursor-pointer" : "cursor-default",
+                            isActive 
+                                ? "border-transparent shadow-lg scale-[1.02] ring-1 ring-offset-2 ring-offset-white dark:ring-offset-[#0a0a0a]"
+                                : "border-slate-200/50 dark:border-white/5 shadow-sm",
+                            !isActive && isClickable && "hover:border-slate-300 dark:hover:border-white/10 hover:scale-[1.02]",
+                            isActive && card.key === "ACCEPTED" && "ring-emerald-500 shadow-emerald-500/20",
+                            isActive && card.key === "REFUSED" && "ring-rose-500 shadow-rose-500/20",
+                            isActive && card.key === "PENDING" && "ring-amber-500 shadow-amber-500/20",
+                            isActive && card.key === "CONVERSION" && "ring-violet-500 shadow-violet-500/20"
                         )}
                     >
-                        <div className="flex items-center justify-between mb-3">
-                            <span className="text-xs font-black uppercase tracking-wider text-zinc-500">
-                                {card.label}
-                            </span>
-                            <div className={cn("h-8 w-8 rounded-lg flex items-center justify-center", colors.icon)}>
-                                <Icon className="h-4 w-4" />
-                            </div>
-                        </div>
+                        {/* Background subtle glow */}
+                        <div className={cn(
+                            "absolute inset-0 opacity-0 transition-opacity duration-500 bg-gradient-to-br",
+                            colors.glow,
+                            isClickable && "group-hover:opacity-100"
+                        )} />
 
-                        <div className={cn("text-3xl font-black", colors.text)}>
-                            {card.isPercentage ? (
-                                <>{card.count}%</>
-                            ) : (
-                                card.count
+                        {isActive && (
+                            <div className={cn(
+                                "absolute inset-0 opacity-20 bg-gradient-to-br",
+                                colors.glow
+                            )} />
+                        )}
+
+                        <div className="relative z-10 p-5 md:p-8 flex flex-col h-full justify-between gap-6">
+                            <div className="flex items-center justify-between">
+                                <span className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-zinc-500">
+                                    {card.label}
+                                </span>
+                                <div className={cn(
+                                    "h-10 w-10 rounded-2xl flex items-center justify-center transition-transform duration-500", 
+                                    colors.icon,
+                                    isClickable && "group-hover:scale-110",
+                                    isActive && "scale-110"
+                                )}>
+                                    <Icon className="h-5 w-5" />
+                                </div>
+                            </div>
+
+                            <div>
+                                <div className="flex items-baseline gap-1.5">
+                                    <span className={cn(
+                                        "text-4xl md:text-5xl font-black tracking-tighter transition-colors duration-500", 
+                                        isActive ? colors.text : "text-slate-900 dark:text-white",
+                                        isClickable && !isActive && `group-hover:${colors.text}`
+                                    )}>
+                                        {card.count}
+                                        {card.isPercentage && <span className="text-2xl md:text-3xl ml-1 opacity-60">%</span>}
+                                    </span>
+                                </div>
+
+                                {card.total !== null && !card.isPercentage && (
+                                    <div className="flex items-center gap-2 mt-2">
+                                        <div className={cn("h-1.5 w-1.5 rounded-full", colors.bar)} />
+                                        <p className="text-sm font-semibold text-slate-600 dark:text-zinc-400">
+                                            {formatCurrency(card.total)}
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                            
+                            {card.isPercentage && (
+                                <div className="w-full bg-slate-100 dark:bg-white/5 rounded-full h-1.5 mt-2 overflow-hidden">
+                                    <motion.div 
+                                        initial={{ width: 0 }}
+                                        animate={{ width: `${card.count}%` }}
+                                        transition={{ duration: 1, delay: 0.5, ease: "easeOut" }}
+                                        className={cn("h-full rounded-full", colors.bar)} 
+                                    />
+                                </div>
                             )}
                         </div>
-
-                        {card.total !== null && !card.isPercentage && (
-                            <p className="text-xs text-zinc-500 mt-1 font-medium">
-                                {formatCurrency(card.total)}
-                            </p>
-                        )}
-                    </button>
+                    </motion.button>
                 );
             })}
         </div>
