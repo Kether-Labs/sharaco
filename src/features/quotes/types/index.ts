@@ -1,5 +1,5 @@
 export type DocumentType = 'DEVIS' | 'FACTURE';
-export type DocumentStatus = 'DRAFT' | 'SENT' | 'VIEWED' | 'PAID' | 'CANCELLED';
+export type DocumentStatus = 'DRAFT' | 'SENT' | 'VIEWED' | 'ACCEPTED' | 'REFUSED';
 
 export interface DocumentItem {
   id: string;

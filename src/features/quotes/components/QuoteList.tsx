@@ -38,12 +38,14 @@ import { useUnlinkFromProject } from "../hooks/useUnlinkFromProject"
 interface QuoteListProps {
     quotes: Document[],
     onDeleteSuccess?: () => void,
-    projectId?: string
+    projectId?: string,
+    searchQuery?: string,
+    statusFilter?: string
 }
 
 const statusConfig: Record<DocumentStatus, { label: string, icon: any, color: string }> = {
-    PAID: { label: "Payé", icon: CreditCard, color: "text-emerald-500" },
-    CANCELLED: { label: "Annulé", icon: Ban, color: "text-rose-500" },
+    ACCEPTED: { label: "Accepté", icon: CreditCard, color: "text-emerald-500" },
+    REFUSED: { label: "Refusé", icon: Ban, color: "text-rose-500" },
     SENT: { label: "Envoyé", icon: FileCheck, color: "text-sky-500" },
     VIEWED: { label: "Consulté", icon: Eye, color: "text-amber-500" },
     DRAFT: { label: "Brouillon", icon: FileText, color: "text-slate-500" }
@@ -62,10 +64,10 @@ const cardVariants = {
     show: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 300, damping: 25 } }
 }
 
-export function QuoteList({ quotes, onDeleteSuccess, projectId }: QuoteListProps) {
-    const [searchQuery, setSearchQuery] = useState("")
+export function QuoteList({ quotes, onDeleteSuccess, projectId, searchQuery = "", statusFilter = "ALL" }: QuoteListProps) {
     const [deletingId, setDeletingId] = useState<string | null>(null)
     const unlinkMutation = useUnlinkFromProject();
+
     const { deleteDocument, isDeleting } = useDeleteDocument({
         onSuccess: () => {
             onDeleteSuccess?.()
@@ -109,10 +111,19 @@ export function QuoteList({ quotes, onDeleteSuccess, projectId }: QuoteListProps
         await deleteDocument(quote.id, quote.number)
     }
 
-    const filteredQuotes = quotes.filter(quote =>
-        quote.client?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        quote.number?.toLowerCase().includes(searchQuery.toLowerCase())
-    )
+    const filteredQuotes = quotes.filter(quote => {
+        const clientName = quote.client?.name || "";
+        const quoteNumber = quote.number || "";
+
+        const matchesSearch = !searchQuery ||
+            clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            quoteNumber.toLowerCase().includes(searchQuery.toLowerCase());
+
+        const matchesStatus = statusFilter === "ALL" || quote.status === statusFilter;
+        return matchesSearch && matchesStatus;
+    });
+
+    console.log('ldld', filteredQuotes)
 
     const handleDownloadPdf = async (id: string, number?: string) => {
         try {
@@ -158,6 +169,9 @@ export function QuoteList({ quotes, onDeleteSuccess, projectId }: QuoteListProps
                             <motion.div
                                 key={quote.id}
                                 variants={cardVariants}
+                                initial="hidden"
+                                animate="show"
+                                exit="hidden"
                                 layout
                                 className={`group flex flex-col ${isBeingDeleted ? 'opacity-50 pointer-events-none' : ''}`}
                             >

@@ -32,10 +32,10 @@ export function ProjectDocuments({ projectId }: ProjectDocumentsProps) {
     }
 
     return (
-        <QuoteList 
-            quotes={documents} 
-            onDeleteSuccess={refetch} 
-            projectId={projectId} 
+        <QuoteList
+            quotes={documents}
+            onDeleteSuccess={refetch}
+            projectId={projectId}
         />
     );
 }
