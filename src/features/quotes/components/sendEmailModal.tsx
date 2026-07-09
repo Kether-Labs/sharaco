@@ -190,7 +190,7 @@ export function SendEmailModal({
                             {/* Info box */}
                             <div className="p-4 rounded-xl bg-gradient-to-r from-sky-50 to-blue-50 dark:from-sky-500/10 dark:to-blue-600/10 border border-sky-100 dark:border-sky-500/20">
                                 <div className="flex gap-3">
-                                    <div className="text-xl leading-none mt-0.5">💡</div>
+
                                     <p className="text-sm text-sky-800 dark:text-sky-200 leading-relaxed">
                                         Le client recevra un email avec un lien pour consulter le devis en ligne.
                                         Le statut du devis sera automatiquement mis à jour en <span className="font-semibold">"Envoyé"</span>.
