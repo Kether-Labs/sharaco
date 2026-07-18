@@ -65,7 +65,7 @@ export function LoginForm() {
                 setError('Email non trouvé ou non autorisé.');
             }
         } catch (err) {
-            setError("Une erreur est survenue lors de la vérification.");
+            setError("Cet email n'existe pas");
         }
     };
 

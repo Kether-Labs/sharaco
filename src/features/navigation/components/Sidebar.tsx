@@ -3,14 +3,25 @@
 import { cn } from "@/lib/utils"
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { navItems } from '../data/navItemsData'
-import { Plus, Bell, X } from 'lucide-react'
+import { Plus, Bell, X, User, LogOut } from 'lucide-react'
 import Link from "next/link"
 import Logo from "@/components/ui/logo"
 import { motion, AnimatePresence } from "framer-motion"
 import { usePathname } from "next/navigation"
+import { useCurrentUser } from "@/features/auth/hooks/useAuth"
+import { useAuthStore } from "@/store/auth-store"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 export default function Sidebar({ setIsSidebarOpen, isSidebarOpen }: { setIsSidebarOpen: (open: boolean) => void, isSidebarOpen: boolean }) {
   const pathname = usePathname() || "";
+  const { data: user } = useCurrentUser();
+  const logout = useAuthStore((s) => s.logout);
 
   // Filter out headers for the slim rail
   const mainNavItems = navItems.filter(item => !item.isHeader);
@@ -102,12 +113,43 @@ export default function Sidebar({ setIsSidebarOpen, isSidebarOpen }: { setIsSide
               <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-violet-500 rounded-full border-2 border-[#0a0a0a]" />
             </button>
 
-            <div className="relative group cursor-pointer">
-              <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black text-sm shadow-lg shadow-indigo-500/20  group-hover:shadow-indigo-500/40 transition-all duration-300">
-                L
-              </div>
-              <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-500 border-[2px] border-[#0a0a0a] " />
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div className="relative group cursor-pointer outline-none">
+                  <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-[#2563EB] to-indigo-600 flex items-center justify-center text-white font-black text-sm shadow-lg shadow-indigo-500/20 group-hover:shadow-indigo-500/40 group-hover:scale-105 transition-all duration-300 uppercase">
+                    {user?.full_name ? user.full_name.charAt(0) : "U"}
+                  </div>
+                  <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-500 border-[2px] border-[#0a0a0a]" />
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent 
+                side="right" 
+                align="end" 
+                sideOffset={16}
+                className="w-60 rounded-2xl border-white/10 shadow-2xl bg-white dark:bg-zinc-950 p-2"
+              >
+                <div className="px-3 py-2.5 mb-1">
+                  <p className="text-sm font-black text-slate-900 dark:text-white truncate">{user?.full_name || "Mon Espace"}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">{user?.email || "Chargement..."}</p>
+                </div>
+                <DropdownMenuSeparator className="bg-slate-100 dark:bg-white/5 mb-1.5" />
+                <DropdownMenuItem className="gap-3 cursor-pointer rounded-xl font-bold focus:bg-slate-100 dark:focus:bg-white/5 py-2.5 transition-colors">
+                  <div className="p-1.5 bg-slate-100 dark:bg-white/5 rounded-lg text-slate-500 dark:text-slate-400">
+                    <User className="h-4 w-4" />
+                  </div>
+                  Profil
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => logout()}
+                  className="gap-3 cursor-pointer rounded-xl font-bold text-rose-500 focus:bg-rose-50 dark:focus:bg-rose-500/10 focus:text-rose-600 dark:focus:text-rose-400 py-2.5 mt-1 transition-colors"
+                >
+                  <div className="p-1.5 bg-rose-50 dark:bg-rose-500/10 rounded-lg text-rose-500 dark:text-rose-400">
+                    <LogOut className="h-4 w-4" />
+                  </div>
+                  Déconnexion
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </motion.aside>
