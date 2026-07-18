@@ -18,6 +18,8 @@ export interface AuthResponse {
 }
 
 export interface RegisterRequest {
+    full_name: string;
+    phone?: string;
     email: string;
     password: string;
     company_name?: string;
