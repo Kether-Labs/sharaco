@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useLayouts } from "@/features/templates/hooks/useTemplates"
-import type { Layout } from "@/features/templates/types"
+
 import { LayoutPreview } from "./LayoutPreview"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
@@ -21,24 +21,24 @@ interface TemplateSelectorProps {
  * Isolated Client Component for the Template Card to ensure high performance
  * and perpetual micro-interactions without parent re-renders.
  */
-const TemplateCard = React.memo(({ 
-    layout, 
-    onSelect, 
-    index 
-}: { 
-    layout: Layout
+const TemplateCard = React.memo(({
+    layout,
+    onSelect,
+    index
+}: {
+    layout: any
     onSelect: (id: string) => void
-    index: number 
+    index: number
 }) => {
     const router = useRouter()
-    
+
     return (
         <motion.div
             variants={{
                 hidden: { opacity: 0, y: 30, scale: 0.95 },
-                show: { 
-                    opacity: 1, 
-                    y: 0, 
+                show: {
+                    opacity: 1,
+                    y: 0,
                     scale: 1,
                     transition: {
                         type: "spring",
@@ -69,8 +69,8 @@ const TemplateCard = React.memo(({
             {/* Premium Container Area */}
             <div className="relative w-full aspect-[3/4] rounded-[2.5rem] overflow-hidden border border-slate-200/50 dark:border-white/5 bg-white dark:bg-slate-950 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] dark:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] group-hover:shadow-2xl transition-all duration-500">
                 {/* Perpetual Motion Background Glow */}
-                <motion.div 
-                    animate={{ 
+                <motion.div
+                    animate={{
                         opacity: [0.1, 0.2, 0.1],
                         scale: [1, 1.1, 1]
                     }}
@@ -92,7 +92,7 @@ const TemplateCard = React.memo(({
                     <div className="p-4 rounded-full bg-white/10 border border-white/20 mb-2">
                         <Sparkles className="h-6 w-6 text-sky-400" />
                     </div>
-                    
+
                     <p className="text-white text-center text-sm font-medium max-w-[200px] mb-4">
                         {layout.description}
                     </p>
@@ -102,7 +102,7 @@ const TemplateCard = React.memo(({
                             onClick={() => onSelect(layout.id)}
                             className="w-full h-12 bg-sky-500 hover:bg-sky-400 text-white font-black rounded-2xl shadow-lg shadow-sky-500/30 transition-all active:scale-95 group/btn"
                         >
-                            <Check className="h-4 w-4 mr-2" /> 
+                            <Check className="h-4 w-4 mr-2" />
                             <span>Sélectionner</span>
                             <ArrowRight className="h-4 w-4 ml-auto opacity-0 -translate-x-2 group-hover/btn:opacity-100 group-hover/btn:translate-x-0 transition-all" />
                         </Button>
@@ -144,9 +144,9 @@ export function TemplateSelector({ onSelect, onClose }: TemplateSelectorProps) {
                 <div className="flex mx-44  flex-col  gap-16">
                     {/* Title Section - Deterministic Typography */}
                     <div className="flex flex-col items-center text-center space-y-4">
-                        
-                        
-                        <motion.h2 
+
+
+                        <motion.h2
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ duration: 0.8, ease: [0.34, 1.56, 0.64, 1] }}
@@ -154,8 +154,8 @@ export function TemplateSelector({ onSelect, onClose }: TemplateSelectorProps) {
                         >
                             Choisissez votre <span className="text-sky-500">modèle.</span>
                         </motion.h2>
-                        
-                        <motion.p 
+
+                        <motion.p
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ delay: 0.4 }}
@@ -178,7 +178,7 @@ export function TemplateSelector({ onSelect, onClose }: TemplateSelectorProps) {
                                 </div>
                             ))
                         ) : error ? (
-                            <motion.div 
+                            <motion.div
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 className="col-span-full flex flex-col items-center justify-center py-24 text-center gap-6 glass-dark rounded-[3rem] p-12"
@@ -190,15 +190,15 @@ export function TemplateSelector({ onSelect, onClose }: TemplateSelectorProps) {
                                     <p className="text-white font-black text-2xl tracking-tighter">Échec de la récupération</p>
                                     <p className="text-slate-400 font-medium">Nous n'avons pas pu charger les modèles de documents.</p>
                                 </div>
-                                <Button 
-                                    onClick={() => window.location.reload()} 
+                                <Button
+                                    onClick={() => window.location.reload()}
                                     className="h-12 px-8 rounded-2xl bg-white text-black font-black hover:bg-slate-200 transition-all active:scale-95"
                                 >
                                     Réessayer
                                 </Button>
                             </motion.div>
                         ) : (
-                            <motion.div 
+                            <motion.div
                                 initial="hidden"
                                 animate="show"
                                 variants={{
@@ -221,9 +221,9 @@ export function TemplateSelector({ onSelect, onClose }: TemplateSelectorProps) {
                             </motion.div>
                         )}
                     </div>
-                    
+
                     {/* Footer Tip */}
-                    <motion.div 
+                    <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 1 }}

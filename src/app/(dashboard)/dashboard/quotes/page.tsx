@@ -4,11 +4,11 @@ import { QuoteHeader } from "@/features/quotes/components/QuoteHeader"
 import { QuoteList } from "@/features/quotes/components/QuoteList"
 import { useQuotes } from "@/features/quotes/hooks/useQuotes"
 import { Button } from "@/components/ui/button"
-import { RefreshCcw } from "lucide-react"
+import { RefreshCcw, FileText, Plus } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
-import { DocumentsStats } from "@/features/quotes/components/DocumentsStats"
+import Link from "next/link"
 
 export default function QuotesPage() {
     const queryClient = useQueryClient()
@@ -22,38 +22,60 @@ export default function QuotesPage() {
     const [statusFilter, setStatusFilter] = useState<string>("ALL");
 
 
-    return (
-        <div className="flex-1 space-y-6 lg:space-y-20 p-4 md:p-8 pt-6   min-h-screen">
-            <QuoteHeader 
-                searchQuery={searchQuery}
-                onSearchChange={setSearchQuery}
-                statusFilter={statusFilter}
-                onStatusChange={setStatusFilter}
-            />
+    const hasQuotes = quotes && quotes.length > 0;
 
-            <div className="mt-8">
-                {isLoading ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {[...Array(8)].map((_, i) => (
-                            <Skeleton key={i} className="h-64 rounded-[2rem]" />
-                        ))}
+    return (
+        <div className="flex-1 space-y-6 lg:space-y-12 p-4 md:p-8 pt-6 min-h-screen">
+            {isLoading ? (
+                <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {[...Array(8)].map((_, i) => (
+                        <Skeleton key={i} className="h-64 rounded-[2rem]" />
+                    ))}
+                </div>
+            ) : error ? (
+                <div className="flex flex-col items-center justify-center p-20 text-center bg-white/40 dark:bg-slate-950/40 rounded-3xl border border-rose-500/20 backdrop-blur-xl mt-8">
+                    <p className="text-rose-500 font-medium mb-4">Impossible de charger les devis.</p>
+                    <Button onClick={() => refetch()} variant="outline" className="rounded-xl">
+                        <RefreshCcw className="mr-2 h-4 w-4" /> Réessayer
+                    </Button>
+                </div>
+            ) : !hasQuotes ? (
+                <div className="flex flex-col items-center justify-center py-32 text-center animate-in fade-in zoom-in duration-500">
+                    <div className="h-24 w-24 bg-[#2563EB]/10 rounded-[2rem] flex items-center justify-center mb-6 border border-sky-500/20 shadow-xl shadow-sky-500/10 group hover:scale-110 transition-transform duration-500">
+                        <FileText className="h-10 w-10 text-[#2563EB]" />
                     </div>
-                ) : error ? (
-                    <div className="flex flex-col items-center justify-center p-20 text-center bg-white/40 dark:bg-slate-950/40 rounded-3xl border border-rose-500/20 backdrop-blur-xl">
-                        <p className="text-rose-500 font-medium mb-4">Impossible de charger les devis.</p>
-                        <Button onClick={() => refetch()} variant="outline" className="rounded-xl">
-                            <RefreshCcw className="mr-2 h-4 w-4" /> Réessayer
+                    <h2 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight mb-4">
+                        Aucun devis pour le moment
+                    </h2>
+                    <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto mb-10 text-lg">
+                        Commencez par créer votre premier devis. Il sera ajouté à cette liste et vous pourrez le partager directement avec vos clients.
+                    </p>
+                    <Link href="/dashboard/quotes/create">
+                        <Button className="h-14 px-8 bg-[#2563EB] hover:bg-[#2563EB]/80 text-white rounded-2xl font-bold  text-lg">
+                            <Plus className="h-6 w-6 mr-2" />
+                            Créer mon premier devis
                         </Button>
-                    </div>
-                ) : (
-                    <QuoteList 
-                        quotes={quotes || []} 
-                        onDeleteSuccess={handleDeleteSuccess} 
+                    </Link>
+                </div>
+            ) : (
+                <>
+                    <QuoteHeader
                         searchQuery={searchQuery}
+                        onSearchChange={setSearchQuery}
                         statusFilter={statusFilter}
+                        onStatusChange={setStatusFilter}
                     />
-                )}
-            </div>
+
+                    <div className="mt-8">
+                        <QuoteList
+                            quotes={quotes}
+                            onDeleteSuccess={handleDeleteSuccess}
+                            searchQuery={searchQuery}
+                            statusFilter={statusFilter}
+                        />
+                    </div>
+                </>
+            )}
         </div>
     )
 }
