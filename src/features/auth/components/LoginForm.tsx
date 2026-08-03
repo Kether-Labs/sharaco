@@ -16,13 +16,14 @@ import {
     FormControl,
     FormField,
     FormItem,
-
     FormMessage,
 } from '@/components/ui/form';
 
 import Logo from '@/components/ui/logo';
 import { useLogin, useVerifyIfEmailExist } from '../hooks/useAuth';
 import { Label } from '@/components/ui/label';
+import { useAuthStore } from '@/store/auth-store';
+import { authApi } from '@/features/auth/api/authApi';
 
 const loginSchema = z.object({
     email: z.string().min(1, "L'email est requis").email("Format d'email invalide"),
@@ -35,6 +36,9 @@ export function LoginForm() {
     const router = useRouter();
     const loginMutation = useLogin();
     const verifyIfEmailExistMutation = useVerifyIfEmailExist();
+
+    // ✅ Import du store pour sauvegarder le token et l'utilisateur
+    const { setToken, setUser } = useAuthStore();
 
     const [email, setEmail] = useState('');
     const [step, setStep] = useState<'email' | 'password'>('email');
@@ -58,7 +62,7 @@ export function LoginForm() {
 
         try {
             const exists = await verifyIfEmailExistMutation.mutateAsync(email);
-            if (exists) {
+            if (!exists) {
                 form.setValue('email', email);
                 setStep('password');
             } else {
@@ -70,14 +74,35 @@ export function LoginForm() {
     };
 
     const onSubmit = async (data: LoginFormValues) => {
-        const response = await loginMutation.mutateAsync({
-            username: data.email,
-            password: data.password,
-        });
-        if (response) {
-            router.push('/dashboard');
-        } else {
-            setError("Une erreur est survenue lors de la connexion.");
+        setError('');
+        try {
+            const response = await loginMutation.mutateAsync({
+                username: data.email,
+                password: data.password,
+            });
+
+            if (response?.access_token) {
+                // ✅ Sauvegarde du token dans localStorage + Cookie + Zustand
+                setToken(response.access_token);
+
+                // ✅ Récupération du profil utilisateur
+                try {
+                    const user = await authApi.getMe();
+                    setUser(user);
+                } catch (err) {
+                    console.error("Erreur lors de la récupération du profil:", err);
+                }
+
+                // ✅ Redirection vers le dashboard
+                router.push('/dashboard');
+            } else {
+                setError("Une erreur est survenue lors de la connexion.");
+            }
+        } catch (err: any) {
+            setError(
+                err.response?.data?.detail ||
+                "Identifiants incorrects. Veuillez réessayer."
+            );
         }
     };
 
@@ -112,7 +137,8 @@ export function LoginForm() {
                                 variant="outline"
                                 className="w-full cursor-pointer h-12 bg-zinc-900/50 border-zinc-800 text-white hover:bg-zinc-800/50 hover:text-white font-semibold rounded-xl transition-all flex items-center justify-center gap-2"
                                 onClick={() => {
-                                    // TODO: Lier au backend
+                                    // ✅ Redirection vers le backend OAuth
+                                    window.location.href = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/auth/google/login`;
                                 }}
                             >
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -152,7 +178,7 @@ export function LoginForm() {
                             )}
                             <Button
                                 onClick={onStepNext}
-                                disabled={verifyIfEmailExistMutation.isPending}
+                                disabled={verifyIfEmailExistMutation.isPending || !email}
                                 className="w-full cursor-pointer h-12 bg-[#2563EB] hover:bg-[#2563EB]/80 text-white font-bold rounded-xl transition-all"
                             >
                                 {verifyIfEmailExistMutation.isPending ? (
@@ -172,11 +198,9 @@ export function LoginForm() {
                         >
                             <Form {...form}>
                                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                                    {loginMutation.isError && (
+                                    {(error || loginMutation.isError) && (
                                         <div className="rounded-lg border border-red-500/50 bg-red-500/10 p-3 text-sm text-red-500 text-left">
-                                            {loginMutation.error instanceof Error
-                                                ? loginMutation.error.message
-                                                : 'Identifiants incorrects. Veuillez réessayer.'}
+                                            {error || "Identifiants incorrects. Veuillez réessayer."}
                                         </div>
                                     )}
 
@@ -197,7 +221,7 @@ export function LoginForm() {
                                         render={({ field }) => (
                                             <FormItem className="text-left">
                                                 <div className="flex items-center mt-6 justify-between mb-5">
-                                                    <Label htmlFor="password" className="text-zinc-400  text-xs  tracking-widest font-bold">Mot de passe</Label>
+                                                    <Label htmlFor="password" className="text-zinc-400 text-xs tracking-widest font-bold">Mot de passe</Label>
                                                     <button
                                                         type="button"
                                                         className="text-xs text-sky-500 cursor-pointer hover:text-sky-400 font-bold transition-colors"
@@ -223,7 +247,7 @@ export function LoginForm() {
 
                                     <Button
                                         type="submit"
-                                        className="w-full cursor-pointer h-12 bg-[#2563EB] hover:bg-[#2563EB]/80 font-bold rounded-xl transition-all"
+                                        className="w-full cursor-pointer h-12 bg-[#2563EB] hover:bg-[#2563EB]/80 text-white font-bold rounded-xl transition-all"
                                         disabled={loginMutation.isPending}
                                     >
                                         {loginMutation.isPending ? (
@@ -241,8 +265,6 @@ export function LoginForm() {
                     )}
                 </AnimatePresence>
             </div>
-
-
 
             <p className="text-zinc-500 text-sm font-medium pt-4">
                 Don't have an account?{" "}

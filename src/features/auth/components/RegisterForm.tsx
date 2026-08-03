@@ -11,6 +11,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { authApi } from '@/features/auth/api/authApi';
+
 import {
     Form,
     FormControl,
@@ -21,11 +23,13 @@ import {
 import { Label } from '@/components/ui/label';
 import Logo from '@/components/ui/logo';
 import { useRegister, useVerifyIfEmailExist } from '../hooks/useAuth';
-import { api } from '@/lib/api'; // Assure-toi que cet import existe
+import { api } from '@/lib/api';
+import { useAuthStore } from '@/store/auth-store';
 
+// ✅ Schéma avec password OPTIONNEL (car OAuth n'en a pas besoin)
 const registerSchema = z.object({
     full_name: z.string().min(2, "Le nom complet est requis"),
-    password: z.string().min(8, "Le mot de passe doit faire au moins 8 caractères"),
+    password: z.string().optional(), // ✅ Était : z.string().min(8, ...)
     phone: z.string().optional(),
     company_name: z.string().optional(),
 });
@@ -36,11 +40,11 @@ export function RegisterForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
 
-    // Récupérer les params OAuth si l'utilisateur vient de Google
     const oauthToken = searchParams.get('oauth_token');
     const oauthEmail = searchParams.get('email');
     const oauthName = searchParams.get('name');
 
+    const { setToken, setUser } = useAuthStore();
     const registerMutation = useRegister();
     const verifyIfEmailExistMutation = useVerifyIfEmailExist();
 
@@ -48,6 +52,7 @@ export function RegisterForm() {
     const [step, setStep] = useState<'email' | 'details'>(oauthToken ? 'details' : 'email');
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false); // ✅ État local pour OAuth
 
     const form = useForm<RegisterFormValues>({
         resolver: zodResolver(registerSchema),
@@ -61,7 +66,6 @@ export function RegisterForm() {
 
     const currentPassword = form.watch("password") || "";
 
-    // Si on arrive avec un token OAuth, on pré-remplit tout et on passe à l'étape 2
     useEffect(() => {
         if (oauthToken && oauthEmail) {
             setEmail(oauthEmail);
@@ -78,9 +82,7 @@ export function RegisterForm() {
         }
 
         try {
-            // ✅ CORRECTION : Si exists est TRUE, l'email est DÉJÀ pris
             const exists = await verifyIfEmailExistMutation.mutateAsync(email);
-
             if (exists) {
                 setError("Cet email est déjà utilisé. Veuillez vous connecter.");
             } else {
@@ -94,11 +96,20 @@ export function RegisterForm() {
 
     const onSubmit = async (data: RegisterFormValues) => {
         setError('');
+
+        // ✅ VALIDATION MANUELLE : password requis uniquement si PAS OAuth
+        if (!oauthToken && (!data.password || data.password.length < 8)) {
+            setError("Le mot de passe doit faire au moins 8 caractères");
+            return;
+        }
+
+        setIsSubmitting(true);
+
         try {
             let response;
 
             if (oauthToken) {
-                // ✅ CAS GOOGLE : On utilise l'endpoint de finalisation
+                // ✅ CAS GOOGLE
                 response = await api.post("/api/v1/auth/complete-google-registration", {
                     temp_token: oauthToken,
                     full_name: data.full_name,
@@ -106,30 +117,44 @@ export function RegisterForm() {
                     phone: data.phone || undefined,
                 });
             } else {
-                // ✅ CAS CLASSIQUE : Inscription normale
+                // ✅ CAS CLASSIQUE
                 response = await registerMutation.mutateAsync({
                     email,
                     full_name: data.full_name,
-                    password: data.password,
+                    password: data.password!, // ✅ On sait qu'il existe ici
                     phone: data.phone || undefined,
                     company_name: data.company_name || undefined,
                 });
             }
 
-            if (response?.access_token) {
-                localStorage.setItem("sharaco_token", response.access_token);
+            if (response?.access_token || response?.data?.access_token) {
+                const accessToken = response.access_token || response.data.access_token;
+                setToken(accessToken);
+
+                try {
+                    const user = await authApi.getMe();
+                    setUser(user);
+                } catch (err) {
+                    console.error("Erreur lors de la récupération du profil:", err);
+                }
+
                 router.push('/dashboard');
             } else {
-                setError("Une erreur est survenue.");
+                setError("Une erreur est survenue (pas de token reçu).");
             }
         } catch (err: any) {
+            console.error(err);
             setError(err.response?.data?.detail || "Une erreur est survenue lors de la création du compte.");
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
+    // ✅ État de soumission unifié (classique + OAuth)
+    const isPending = isSubmitting || registerMutation.isPending;
+
     return (
         <div className="w-full max-w-[400px] space-y-8 text-center overflow-hidden">
-            {/* Logo & Heading */}
             <div className="flex flex-col items-center space-y-6">
                 <div className="p-3 bg-white/5 rounded-2xl border border-white/10 dark:border-slate-800">
                     <Logo width={80} height={80} />
@@ -153,13 +178,11 @@ export function RegisterForm() {
                             transition={{ duration: 0.3, ease: 'easeInOut' }}
                             className="space-y-4"
                         >
-                            {/* ✅ BOUTON GOOGLE ACTIF */}
                             <Button
                                 type="button"
                                 variant="outline"
                                 className="w-full cursor-pointer h-12 bg-zinc-900/50 border-zinc-800 text-white hover:bg-zinc-800/50 hover:text-white font-semibold rounded-xl transition-all flex items-center justify-center gap-2"
                                 onClick={() => {
-                                    // Redirection vers le backend qui gère OAuth
                                     window.location.href = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/auth/google/login`;
                                 }}
                             >
@@ -227,9 +250,9 @@ export function RegisterForm() {
                         >
                             <Form {...form}>
                                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 text-left">
-                                    {(error || registerMutation.isError) && (
+                                    {error && (
                                         <div className="rounded-lg border border-red-500/50 bg-red-500/10 p-3 text-sm text-red-500 text-left mb-4">
-                                            {error || "Une erreur est survenue."}
+                                            {error}
                                         </div>
                                     )}
 
@@ -258,7 +281,7 @@ export function RegisterForm() {
                                                     <Input
                                                         placeholder="Jean Dupont"
                                                         className="h-12 bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-600 focus:ring-[#2563EB] focus:border-[#2563EB] rounded-xl"
-                                                        disabled={registerMutation.isPending}
+                                                        disabled={isPending}
                                                         {...field}
                                                     />
                                                 </FormControl>
@@ -277,7 +300,7 @@ export function RegisterForm() {
                                                     <Input
                                                         placeholder="Sharaco Inc."
                                                         className="h-12 bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-600 focus:ring-[#2563EB] focus:border-[#2563EB] rounded-xl"
-                                                        disabled={registerMutation.isPending}
+                                                        disabled={isPending}
                                                         {...field}
                                                     />
                                                 </FormControl>
@@ -297,7 +320,7 @@ export function RegisterForm() {
                                                         type="tel"
                                                         placeholder="+33 6 12 34 56 78"
                                                         className="h-12 bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-600 focus:ring-[#2563EB] focus:border-[#2563EB] rounded-xl"
-                                                        disabled={registerMutation.isPending}
+                                                        disabled={isPending}
                                                         {...field}
                                                     />
                                                 </FormControl>
@@ -306,7 +329,7 @@ export function RegisterForm() {
                                         )}
                                     />
 
-                                    {/* ✅ On masque le mot de passe si l'utilisateur vient de Google */}
+                                    {/* ✅ Masquer le mot de passe UNIQUEMENT si OAuth */}
                                     {!oauthToken && (
                                         <FormField
                                             control={form.control}
@@ -329,7 +352,7 @@ export function RegisterForm() {
                                                             placeholder="••••••••"
                                                             className="h-12 bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-600 focus:ring-[#2563EB] focus:border-[#2563EB] rounded-xl"
                                                             autoComplete="new-password"
-                                                            disabled={registerMutation.isPending}
+                                                            disabled={isPending}
                                                             {...field}
                                                         />
                                                     </FormControl>
@@ -339,12 +362,15 @@ export function RegisterForm() {
                                         />
                                     )}
 
+                                    {/* ✅ Info rassurante pour OAuth */}
+
+
                                     <Button
                                         type="submit"
                                         className="w-full cursor-pointer h-12 bg-[#2563EB] hover:bg-[#2563EB]/80 text-white font-bold rounded-xl transition-all mt-4"
-                                        disabled={registerMutation.isPending || (!oauthToken && currentPassword.length < 8)}
+                                        disabled={isPending}
                                     >
-                                        {registerMutation.isPending ? (
+                                        {isPending ? (
                                             <>
                                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                                 Création en cours...
