@@ -26,7 +26,6 @@ export function useLogin() {
     return useMutation({
         mutationFn: (data: LoginRequest) => authApi.login(data),
         onSuccess: async (response) => {
-            // 1. Sauvegarder le token (localStorage + cookie)
             setToken(response.access_token);
 
             // 2. Fetch les infos utilisateur
