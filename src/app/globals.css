@@ -57,11 +57,11 @@ body {
     box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05);
   }
 
-  
+
 
   .mesh-gradient {
     background-color: #f9fafb;
-    background-image: 
+    background-image:
       radial-gradient(at 0% 0%, rgba(14, 165, 233, 0.05) 0px, transparent 50%),
       radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.05) 0px, transparent 50%),
       radial-gradient(at 100% 100%, rgba(14, 165, 233, 0.05) 0px, transparent 50%),
@@ -70,7 +70,7 @@ body {
 
   .dark .mesh-gradient {
     background-color: #020617;
-    background-image: 
+    background-image:
       radial-gradient(at 0% 0%, rgba(14, 165, 233, 0.1) 0px, transparent 50%),
       radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.1) 0px, transparent 50%);
   }
@@ -80,15 +80,103 @@ body {
   }
 
   @keyframes float {
-    0%, 100% { transform: translateY(0) scale(1); }
-    50% { transform: translateY(-10px) scale(1.02); }
+
+    0%,
+    100% {
+      transform: translateY(0) scale(1);
+    }
+
+    50% {
+      transform: translateY(-10px) scale(1.02);
+    }
   }
 
   @keyframes shimmer {
-    100% { transform: translateX(100%); }
+    100% {
+      transform: translateX(100%);
+    }
   }
 
   .text-premium {
     @apply tracking-tighter leading-none font-bold;
   }
+}
+
+.driver-popover {
+  background: #18181b !important;
+  border: 1px solid #27272a !important;
+  border-radius: 12px !important;
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.4), 0 8px 10px -6px rgb(0 0 0 / 0.4) !important;
+  max-width: 320px !important;
+}
+
+.driver-popover-title {
+  color: #fff !important;
+  font-weight: 700 !important;
+  font-size: 1rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.driver-popover-description {
+  color: #a1a1aa !important;
+  font-size: 0.875rem !important;
+  line-height: 1.6 !important;
+}
+
+.driver-popover-progress-text {
+  color: #71717a !important;
+  font-size: 0.75rem !important;
+  font-weight: 500 !important;
+}
+
+.driver-popover-prev-btn,
+.driver-popover-next-btn,
+.driver-popover-done-btn {
+  border-radius: 8px !important;
+  padding: 10px 18px !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  border: none !important;
+  text-shadow: none !important;
+  transition: all 0.2s !important;
+}
+
+.driver-popover-prev-btn {
+  background: #27272a !important;
+  color: #a1a1aa !important;
+}
+
+.driver-popover-prev-btn:hover {
+  background: #3f3f46 !important;
+  color: #fff !important;
+}
+
+.driver-popover-next-btn,
+.driver-popover-done-btn {
+  background: #2563EB !important;
+  color: #fff !important;
+}
+
+.driver-popover-next-btn:hover,
+.driver-popover-done-btn:hover {
+  background: #1d4ed8 !important;
+  transform: translateY(-1px);
+}
+
+.driver-popover-close-btn {
+  color: #71717a !important;
+  font-size: 20px !important;
+}
+
+.driver-popover-close-btn:hover {
+  color: #fff !important;
+}
+
+.driver-popover-arrow {
+  border-color: #18181b !important;
+}
+
+/* Stage highlight */
+.driver-active-element {
+  box-shadow: 0 0 0 4px #2563EB, 0 0 0 9999px rgba(0, 0, 0, 0.8) !important;
 }
