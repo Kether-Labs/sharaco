@@ -65,7 +65,7 @@ export default function Header({
             <Bell className="h-5 w-5 text-slate-600 dark:text-slate-400 group-hover:rotate-12 transition-transform" />
             <span className="absolute top-3.5 right-3.5 h-2 w-2 rounded-full bg-rose-500 border-2 border-white dark:border-slate-950 shadow-sm" />
           </Button>
-          
+
           <div className="h-8 w-[1px] bg-slate-200 dark:bg-white/10 mx-2 hidden sm:block" />
 
           <SwitchTheme />
@@ -92,7 +92,7 @@ export default function Header({
           <DropdownMenuContent align="end" className="w-72 rounded-3xl p-3 border-slate-200/50 dark:border-white/5 bg-white/90 dark:bg-slate-950/90 backdrop-blur-2xl shadow-2xl overflow-hidden relative">
             {/* Background decorative element */}
             <div className="absolute -top-10 -right-10 w-24 h-24 bg-sky-500/5 rounded-full blur-2xl" />
-            
+
             <DropdownMenuLabel className="px-4 py-3 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Account Hub</DropdownMenuLabel>
             <DropdownMenuSeparator className="bg-slate-100 dark:bg-white/5 mx-1 mb-2" />
             <DropdownMenuItem className="flex items-center justify-between rounded-2xl px-4 py-3.5 transition-all text-slate-700 dark:text-slate-300 hover:bg-sky-500/10 hover:text-sky-600 dark:hover:text-sky-400 group/item cursor-pointer">

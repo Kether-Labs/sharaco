@@ -40,7 +40,7 @@ export default function QuotesPage() {
                     </Button>
                 </div>
             ) : !hasQuotes ? (
-                <div className="flex flex-col items-center justify-center py-32 text-center animate-in fade-in zoom-in duration-500">
+                <div className="flex flex-col items-center justify-center py-32 text-center ">
                     <div className="h-24 w-24 bg-[#2563EB]/10 rounded-[2rem] flex items-center justify-center mb-6 border border-sky-500/20 shadow-xl shadow-sky-500/10 group hover:scale-110 transition-transform duration-500">
                         <FileText className="h-10 w-10 text-[#2563EB]" />
                     </div>
