@@ -3,6 +3,8 @@ import { useCallback } from 'react';
 import { driver } from 'driver.js';
 import 'driver.js/dist/driver.css';
 
+const TOUR_STORAGE_KEY = 'sharaco_tour_completed';
+
 export function useOnboardingTour() {
     const startTour = useCallback(() => {
         const driverObj = driver({
@@ -14,8 +16,11 @@ export function useOnboardingTour() {
             stageRadius: 8,
             nextBtnText: 'Suivant →',
             prevBtnText: '← Précédent',
-            doneBtnText: 'Terminer 🎉',
+            doneBtnText: 'Fait 🎉',
             progressText: '{{current}} sur {{total}}',
+            onDestroyed: () => {
+                localStorage.setItem(TOUR_STORAGE_KEY, 'true');
+            },
             steps: [
                 {
                     element: '[data-tour="sidebar-create"]',
@@ -26,10 +31,26 @@ export function useOnboardingTour() {
                     },
                 },
                 {
-                    element: '[data-tour="sidebar-nav"]',
+                    element: '[data-tour="sidebar-projects"]',
                     popover: {
-                        title: '🧭 Navigation',
-                        description: 'Accédez à toutes les sections de Sharaco depuis ce menu.',
+                        title: '📁 Vos Projets',
+                        description: 'Gérez et suivez l\'avancement de tous vos projets au même endroit.',
+                        side: 'right',
+                    },
+                },
+                {
+                    element: '[data-tour="sidebar-devis"]',
+                    popover: {
+                        title: '📄 Devis et Factures',
+                        description: 'Créez des devis professionnels et transformez-les en factures en un instant.',
+                        side: 'right',
+                    },
+                },
+                {
+                    element: '[data-tour="sidebar-clients"]',
+                    popover: {
+                        title: '🤝 Vos Clients',
+                        description: 'Centralisez toutes les informations et l\'historique de vos clients.',
                         side: 'right',
                     },
                 },
@@ -69,7 +90,7 @@ export function useOnboardingTour() {
                     element: '[data-tour="dashboard-activity"]',
                     popover: {
                         title: '🕐 Activité récente',
-                        description: 'Toutes les actions sur vos projets apparaissent ici en temps réel.',
+                        description: 'Toutes les actions sur vos projets apparaissent ici en temps réel. C\'est parti !',
                         side: 'top',
                     },
                 },
@@ -79,5 +100,16 @@ export function useOnboardingTour() {
         driverObj.drive();
     }, []);
 
-    return { startTour };
+    const autoStartTour = useCallback(() => {
+        const hasSeenTour = localStorage.getItem(TOUR_STORAGE_KEY);
+        if (!hasSeenTour) {
+            const timer = setTimeout(() => {
+                startTour();
+            }, 1000);
+            return () => clearTimeout(timer);
+        }
+        return () => { };
+    }, [startTour]);
+
+    return { startTour, autoStartTour };
 }

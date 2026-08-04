@@ -64,14 +64,16 @@ export default function Sidebar({ setIsSidebarOpen, isSidebarOpen }: { setIsSide
           </div>
 
           {/* ✅ Navigation avec data-tour */}
-          <ScrollArea className="flex-1 w-full hide-scrollbar relative z-10" data-tour="sidebar-nav">
+          <ScrollArea className="flex-1 w-full hide-scrollbar relative z-10">
             <nav className="flex flex-col items-center gap-1 px-2 pb-4">
               {mainNavItems.map((item, index) => {
                 const isActive = item.href ? pathname === item.href : false;
+                const tourId = `sidebar-${item.title.toLowerCase()}`;
                 return (
                   <Link
                     key={index}
                     href={item.href || "#"}
+                    data-tour={tourId}
                     className={cn(
                       "flex flex-col items-center justify-center w-full py-2 rounded-2xl transition-all duration-300 group relative",
                       isActive ? "" : "text-slate-400"
