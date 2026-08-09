@@ -108,17 +108,15 @@ export function DocumentsStats({ onFilterByStatus, currentFilter }: DocumentsSta
                 const isClickable = !!onFilterByStatus;
 
                 return (
-                    <motion.button
+                    <button
                         key={card.key}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.4, delay: index * 0.1, ease: "easeOut" }}
+                        
                         onClick={() => {
                             if (isClickable) onFilterByStatus(isActive ? null : card.key);
                         }}
                         disabled={!isClickable}
                         className={cn(
-                            "relative group overflow-hidden text-left transition-all duration-500 rounded-3xl",
+                            "relative group overflow-hidden text-left rounded-3xl",
                             "bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-xl border",
                             isClickable ? "cursor-pointer" : "cursor-default",
                             isActive 
@@ -193,7 +191,7 @@ export function DocumentsStats({ onFilterByStatus, currentFilter }: DocumentsSta
                                 </div>
                             )}
                         </div>
-                    </motion.button>
+                    </button>
                 );
             })}
         </div>
