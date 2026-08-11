@@ -56,6 +56,15 @@ export function useDocumentUpdate({ draft, documentId, onUpdateSuccess }: UseDoc
             notes: draftRef.current.notes || undefined,
             // ✅ NOUVEAU : Envoyer les couleurs et styles
             primary_color: draftRef.current.brandColor || "#2563EB",
+            payment_schedule: draft.paymentMode === 'schedule' && draft.paymentMilestones && draft.paymentMilestones.length > 0
+            ? draft.paymentMilestones.map((ms, idx) => ({
+                sequence: idx + 1,
+                title: ms.title || `Échéance ${idx + 1}`,
+                percent: ms.percent,
+                description: ms.description || null,
+                trigger_date: ms.trigger_date || null,
+            }))
+            : null,
             secondary_color: "#1E40AF",
             accent_color: "#DBEAFE",
             background_color: "#FFFFFF",

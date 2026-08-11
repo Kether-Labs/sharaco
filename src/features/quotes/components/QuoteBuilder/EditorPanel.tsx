@@ -1,11 +1,8 @@
 "use client";
 
 import { QuoteDraft, QuoteLineItem } from "../../types/QuoteBuilder";
-import { Plus, User, FileText, Calendar, ChevronLeft, Save, Send, Paintbrush, ReceiptText } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import Link from "next/link";
+import { User, Calendar, Paintbrush, ReceiptText, CreditCard } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useQuoteTotal } from "../../hooks/useQuoteTotal";
 
@@ -14,20 +11,18 @@ import { TabDetails } from "./tabs/TabDetails";
 import { TabClient } from "./tabs/TabClient";
 import { TabItems } from "./tabs/TabItems";
 import { TabDesign } from "./tabs/TabDesign";
+import { PaymentScheduleEditor } from "@/features/invoices/components/PaymentScheduleEditor";
 
 interface EditorPanelProps {
     draft: QuoteDraft;
-    onChange: (field: keyof QuoteDraft, value: any) => void;
-    onItemChange: (id: string, field: keyof QuoteLineItem, value: any) => void;
+    onChange: <K extends keyof QuoteDraft>(field: K, value: QuoteDraft[K]) => void;
+    onItemChange: <K extends keyof QuoteLineItem>(id: string, field: K, value: QuoteLineItem[K]) => void;
     onAddItem: () => void;
     onRemoveItem: (id: string) => void;
 }
 
 export function EditorPanel({ draft, onChange, onItemChange, onAddItem, onRemoveItem }: EditorPanelProps) {
     const { grandTotal } = useQuoteTotal(draft.items, draft.hasVat, draft.vatRate, draft.discountRate, draft.isTaxExempt);
-
-    const formatCurrency = (amount: number) => 
-        new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XAF' }).format(amount);
 
     return (
         <div className="w-full h-full bg-zinc-950 flex flex-col border-r border-white/5 relative z-20 pt-[72px]">
@@ -39,6 +34,7 @@ export function EditorPanel({ draft, onChange, onItemChange, onAddItem, onRemove
                             { value: "items", icon: ReceiptText, label: "Items" },
                             { value: "client", icon: User, label: "Client" },
                             { value: "details", icon: Calendar, label: "Info" },
+                            { value: "payment", icon: CreditCard, label: "Paiement" },
                             { value: "design", icon: Paintbrush, label: "Design" },
                         ].map((tab) => (
                             <TabsTrigger
@@ -70,6 +66,17 @@ export function EditorPanel({ draft, onChange, onItemChange, onAddItem, onRemove
                                 onAddItem={onAddItem}
                                 onRemoveItem={onRemoveItem}
                                 onDraftChange={onChange}
+                            />
+                        </TabsContent>
+
+                        <TabsContent value="payment" className="mt-0 outline-none">
+                            <PaymentScheduleEditor
+                                totalAmount={grandTotal}
+                                value={draft.paymentMilestones}
+                                onChange={(milestones) => onChange('paymentMilestones', milestones)}
+                                paymentMode={draft.paymentMode}
+                                onModeChange={(mode) => onChange('paymentMode', mode)}
+                                disabled={false}
                             />
                         </TabsContent>
 

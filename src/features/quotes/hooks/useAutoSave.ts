@@ -63,6 +63,15 @@ export function useAutoSave({ draft, enabled = true }: UseAutoSaveProps) {
     })),
     layout_style: draftRef.current.layoutStyle || "classic",
     template_id: null,
+    payment_schedule: draft.paymentMode === 'schedule' && draft.paymentMilestones && draft.paymentMilestones.length > 0
+            ? draft.paymentMilestones.map((ms, idx) => ({
+                sequence: idx + 1,
+                title: ms.title || `Échéance ${idx + 1}`,
+                percent: ms.percent,
+                description: ms.description || null,
+                trigger_date: ms.trigger_date || null,
+            }))
+            : null,
     due_date: draftRef.current.validityDays 
         ? new Date(Date.now() + draftRef.current.validityDays * 24 * 60 * 60 * 1000).toISOString()
         : undefined,

@@ -6,8 +6,8 @@ import { templatesApi } from "@/features/templates/api/templatesApi";
 import type { QuoteDraft } from "../../types/QuoteBuilder";
 import { DocumentPreviewRequest } from "@/features/templates/types";
 import { Loader2 } from "lucide-react";
-// ton type ajouté précédemment
 import { cn } from "@/lib/utils"
+
 interface LivePreviewProps {
     draft: QuoteDraft;
     layoutStyle?: string;
@@ -22,21 +22,25 @@ function draftToPreviewRequest(
     layoutStyle: string,
     templateId?: string | null
 ): DocumentPreviewRequest {
+    // ✅ Helper : détecte si l'échéancier est valide
+    const hasValidSchedule = 
+        draft.paymentMilestones && 
+        draft.paymentMilestones.length > 0 &&
+        // Ignorer le cas "100% par défaut" qui équivaut à un paiement simple
+        !(draft.paymentMilestones.length === 1 && draft.paymentMilestones[0].percent === 100);
+
     return {
         type: "DEVIS",
-        // Client
         client_name: draft.clientName || "Client Exemple",
         client_email: draft.clientEmail || "",
         client_address: draft.clientAddress || "",
-        client_phone: "",
-        // Articles — mapping des champs frontend → backend
+        client_phone: draft.clientPhone || "",
         items: draft.items.map((item) => ({
             description: item.description,
             quantity: item.quantity,
-            unit_price_cents: item.unitPrice, // FCFA = pas de centimes
+            unit_price_cents: item.unitPrice,
             tax_rate: draft.hasVat ? draft.vatRate : 0,
         })),
-        // Template
         template_id: templateId || null,
         layout_style: layoutStyle,
         primary_color: draft.brandColor || "#2563EB",
@@ -49,10 +53,22 @@ function draftToPreviewRequest(
         footer_text: null,
         show_bank_details: true,
         show_tax_id: true,
-        // Méta
         notes: draft.notes || null,
         reference: draft.reference || null,
+        
+        // ✅ NOUVELLE LOGIQUE : basé sur les milestones, pas sur le mode
+        payment_schedule: hasValidSchedule
+            ? draft.paymentMilestones!.map((ms, idx) => ({
+                sequence: idx + 1,
+                title: ms.title || `Échéance ${idx + 1}`,
+                percent: ms.percent,
+                description: ms.description || null,
+                trigger_date: ms.trigger_date || null,
+            }))
+            : null,
     };
+
+   
 }
 
 export function LivePreview({ draft, layoutStyle = "classic", templateId }: LivePreviewProps) {
@@ -60,6 +76,7 @@ export function LivePreview({ draft, layoutStyle = "classic", templateId }: Live
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    console.log(draft.paymentMode, draft.paymentMilestones, "LivePreview - draft payment info");
     // 🔑 Debounce : attend 500ms après la dernière modif
     const debouncedDraft = useDebouncedValue(draft, 500);
 
@@ -76,6 +93,8 @@ export function LivePreview({ draft, layoutStyle = "classic", templateId }: Live
                     layoutStyle,
                     templateId
                 );
+
+                console.log('🔄 FETCH PREVIEW - Request Data:', requestData);
                 const html = await templatesApi.previewDocument(requestData);
 
                 if (!cancelled) {
@@ -133,19 +152,18 @@ export function LivePreview({ draft, layoutStyle = "classic", templateId }: Live
                 />
             ) : (
                 /* Loading skeleton avant le premier rendu */
-                 <div className={cn(
-                                
-                                "flex flex-col h-[120vh] items-center justify-center bg-slate-50 dark:bg-slate-900 overflow-hidden relative"
-                            )}>
-                                {/* Shimmer effect */}
-                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
-                                <div className="flex flex-col items-center gap-4 relative z-10">
-                                    <div className="h-12 w-12 rounded-2xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center">
-                                        <Loader2 className="h-6 w-6 text-sky-500 animate-spin" />
-                                    </div>
-                                    <span className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">Engine Rendering...</span>
-                                </div>
-                            </div>
+                <div className={cn(
+                    "flex flex-col h-[120vh] items-center justify-center bg-slate-50 dark:bg-slate-900 overflow-hidden relative"
+                )}>
+                    {/* Shimmer effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+                    <div className="flex flex-col items-center gap-4 relative z-10">
+                        <div className="h-12 w-12 rounded-2xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center">
+                            <Loader2 className="h-6 w-6 text-sky-500 animate-spin" />
+                        </div>
+                        <span className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">Engine Rendering...</span>
+                    </div>
+                </div>
             )}
         </div>
     );

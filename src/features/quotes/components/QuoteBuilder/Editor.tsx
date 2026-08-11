@@ -58,6 +58,16 @@ export function Editor({ templateId, documentId }: EditorProps) {
                 tax_rate: 20
             }
         ],
+        paymentMode: 'simple',
+        paymentMilestones: [
+            {
+                id: uuidv4(),
+                title: 'Paiement intégral',
+                percent: 100,
+                description: '',
+                trigger_date: ''
+            }
+        ],
         notes: "Merci pour votre confiance.",
         internalNotes: "",
         logoUrl: null,
@@ -160,6 +170,24 @@ export function Editor({ templateId, documentId }: EditorProps) {
                         unitPrice: 0,
                         tax_rate: 20,
                     }],
+                    paymentMode: 'simple',
+                    paymentMilestones: (doc as any).payment_schedule && (doc as any).payment_schedule.length > 0
+        ? (doc as any).payment_schedule.map((ms: any) => ({
+            id: uuidv4(),  // nouveau ID frontend
+            title: ms.title,
+            percent: ms.percent,
+            description: ms.description || '',
+            trigger_date: ms.trigger_date ? ms.trigger_date.split('T')[0] : '',
+        }))
+        : [
+            {
+                id: uuidv4(),
+                title: 'Paiement intégral',
+                percent: 100,
+                description: '',
+                trigger_date: ''
+            }
+        ],
                     notes: doc.notes || "",
                     internalNotes: "",
                     logoUrl: null,
@@ -239,41 +267,52 @@ export function Editor({ templateId, documentId }: EditorProps) {
     }, [isEditMode, updateDocument]);
 
     const handleDownload = useCallback(async () => {
-        const previewRequest = {
-            type: "DEVIS",
-            client_name: draft.clientName || "Client Exemple",
-            client_email: draft.clientEmail || "",
-            client_address: draft.clientAddress || "",
-            client_phone: draft.clientPhone || "",
-            items: draft.items.map(item => ({
-                description: item.description,
-                quantity: item.quantity,
-                unit_price_cents: item.unitPrice,
-                tax_rate: item.tax_rate,
-            })),
-            template_id: draft.templateId || null,
-            layout_style: draft.layoutStyle || "classic",
-            primary_color: draft.brandColor || "#2563EB",
-            secondary_color: "#1E40AF",
-            accent_color: "#DBEAFE",
-            text_color: "#1F2937",
-            background_color: "#FFFFFF",
-            font_family: "Inter",
-            header_text: null,
-            footer_text: null,
-            show_bank_details: true,
-            show_tax_id: true,
-            notes: draft.notes || null,
-            reference: draft.reference || null,
-        };
+    const previewRequest = {
+        type: "DEVIS",
+        client_name: draft.clientName || "Client Exemple",
+        client_email: draft.clientEmail || "",
+        client_address: draft.clientAddress || "",
+        client_phone: draft.clientPhone || "",
+        items: draft.items.map(item => ({
+            description: item.description,
+            quantity: item.quantity,
+            unit_price_cents: item.unitPrice,
+            tax_rate: item.tax_rate,
+        })),
+        template_id: draft.templateId || null,
+        layout_style: draft.layoutStyle || "classic",
+        primary_color: draft.brandColor || "#2563EB",
+        secondary_color: "#1E40AF",
+        accent_color: "#DBEAFE",
+        text_color: "#1F2937",
+        background_color: "#FFFFFF",
+        font_family: "Inter",
+        header_text: null,
+        footer_text: null,
+        show_bank_details: true,
+        show_tax_id: true,
+        notes: draft.notes || null,
+        reference: draft.reference || null,
+        
+        // ✅ AJOUTÉ : échéancier de paiement
+        payment_schedule: draft.paymentMode === 'schedule' && draft.paymentMilestones.length > 0
+            ? draft.paymentMilestones.map((ms, idx) => ({
+                sequence: idx + 1,
+                title: ms.title || `Échéance ${idx + 1}`,
+                percent: ms.percent,
+                description: ms.description || null,
+                trigger_date: ms.trigger_date || null,
+            }))
+            : null,
+    };
 
-        try {
-            await downloadPdf(previewRequest, draft.isSaved ? draft.id : null, `${draft.reference || 'devis'}.pdf`);
-            toast({ title: "PDF téléchargé", description: "Le fichier a été téléchargé avec succès." });
-        } catch (error) {
-            toast({ title: "Erreur", description: "Impossible de télécharger le PDF.", variant: "destructive" });
-        }
-    }, [draft, downloadPdf, toast]);
+    try {
+        await downloadPdf(previewRequest, draft.isSaved ? draft.id : null, `${draft.reference || 'devis'}.pdf`);
+        toast({ title: "PDF téléchargé", description: "Le fichier a été téléchargé avec succès." });
+    } catch (error) {
+        toast({ title: "Erreur", description: "Impossible de télécharger le PDF.", variant: "destructive" });
+    }
+}, [draft, downloadPdf, toast]);
 
     const [zoom, setZoom] = useState(0.85);
     const [showActions, setShowActions] = useState(false);
