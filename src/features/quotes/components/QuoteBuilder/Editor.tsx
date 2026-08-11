@@ -267,6 +267,12 @@ export function Editor({ templateId, documentId }: EditorProps) {
     }, [isEditMode, updateDocument]);
 
     const handleDownload = useCallback(async () => {
+    // ✅ Helper : détecte si l'échéancier est valide (même logique que le preview)
+    const hasValidSchedule = 
+        draft.paymentMilestones && 
+        draft.paymentMilestones.length > 0 &&
+        !(draft.paymentMilestones.length === 1 && draft.paymentMilestones[0].percent === 100);
+
     const previewRequest = {
         type: "DEVIS",
         client_name: draft.clientName || "Client Exemple",
@@ -277,7 +283,7 @@ export function Editor({ templateId, documentId }: EditorProps) {
             description: item.description,
             quantity: item.quantity,
             unit_price_cents: item.unitPrice,
-            tax_rate: item.tax_rate,
+            tax_rate: draft.hasVat ? draft.vatRate : 0,
         })),
         template_id: draft.templateId || null,
         layout_style: draft.layoutStyle || "classic",
@@ -294,9 +300,9 @@ export function Editor({ templateId, documentId }: EditorProps) {
         notes: draft.notes || null,
         reference: draft.reference || null,
         
-        // ✅ AJOUTÉ : échéancier de paiement
-        payment_schedule: draft.paymentMode === 'schedule' && draft.paymentMilestones.length > 0
-            ? draft.paymentMilestones.map((ms, idx) => ({
+        // ✅ NOUVELLE LOGIQUE : basé sur les milestones, pas sur le mode
+        payment_schedule: hasValidSchedule
+            ? draft.paymentMilestones!.map((ms, idx) => ({
                 sequence: idx + 1,
                 title: ms.title || `Échéance ${idx + 1}`,
                 percent: ms.percent,
@@ -305,6 +311,10 @@ export function Editor({ templateId, documentId }: EditorProps) {
             }))
             : null,
     };
+
+    // ✅ DEBUG : voir ce qui est envoyé avant le téléchargement
+    console.log("📥 Download PDF request:", previewRequest);
+    console.log("📅 payment_schedule:", previewRequest.payment_schedule);
 
     try {
         await downloadPdf(previewRequest, draft.isSaved ? draft.id : null, `${draft.reference || 'devis'}.pdf`);
