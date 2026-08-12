@@ -14,7 +14,7 @@ export const quotesApi = {
         if (params?.project_id) query.set('project_id', params.project_id);
 
         const queryString = query.toString();
-        return api.get<Document[]>(`/api/v1/documents${queryString ? `?${queryString}` : ''}`);
+        return api.get<Document[]>(`/api/v1/documents?type=DEVIS${queryString ? `?${queryString}` : ''}`);
     },
 
     getById: async (id: string): Promise<Document> => {

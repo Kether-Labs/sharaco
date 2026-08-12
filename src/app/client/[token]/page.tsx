@@ -24,6 +24,7 @@ import { formatCurrency } from "@/features/quotes/lib/formatCurrency";
 import { templatesApi } from "@/features/templates/api/templatesApi";
 import type { DocumentPreviewRequest } from "@/features/templates/types";
 import { cn } from "@/lib/utils";
+import { MilestonePreview } from "@/features/quotes/types";
 
 interface ClientDocument {
     id: string;
@@ -50,6 +51,7 @@ interface ClientDocument {
     refused_at?: string;
     refusal_reason?: string;
     signature_name?: string;
+    payment_schedule?: MilestonePreview[] | null;
 }
 
 export default function ClientDocumentPage() {
@@ -72,63 +74,79 @@ export default function ClientDocumentPage() {
 
     const [actionCompleted, setActionCompleted] = useState(false);
 
-    useEffect(() => {
-        let cancelled = false;
-        const fetchDocument = async () => {
-            try {
-                const data = await api.get<ClientDocument>(`/api/v1/documents/client/${token}`);
+useEffect(() => {
+    let cancelled = false;
+    const fetchDocument = async () => {
+        try {
+            const data = await api.get<ClientDocument>(`/api/v1/documents/client/${token}`);
+            console.log(data)
+            if (cancelled) return;
+            setDocument(data);
 
-                if (cancelled) return;
-                setDocument(data);
+            // ✅ Helper pour détecter l'échéancier valide
+            const hasValidSchedule = 
+                data.payment_schedule && 
+                data.payment_schedule.length > 0 &&
+                !(data.payment_schedule.length === 1 && data.payment_schedule[0].percent === 100);
 
-                // Fetch HTML preview
-                const requestData: DocumentPreviewRequest = {
-                    type: data.type,
-                    client_name: data.client_name || "Client Exemple",
-                    client_email: data.client_email || "",
-                    client_address: data.client_address || "",
-                    client_phone: "",
+            // Fetch HTML preview
+            const requestData: DocumentPreviewRequest = {
+                type: data.type,
+                client_name: data.client_name || "Client Exemple",
+                client_email: data.client_email || "",
+                client_address: data.client_address || "",
+                client_phone: "",
+                items: data.items.map((item) => ({
+                    description: item.description,
+                    quantity: item.quantity,
+                    unit_price_cents: item.unit_price_cents,
+                    tax_rate: item.tax_rate || 0,
+                })),
+                template_id: null,
+                layout_style: data.layout_style || "classic",
+                primary_color: data.primary_color || "#2563EB",
+                secondary_color: "#1E40AF",  // ✅ Corrigé : valeur par défaut
+                accent_color: "#DBEAFE",      // ✅ Corrigé : valeur par défaut
+                text_color: "#1F2937",         // ✅ Corrigé
+                background_color: "#FFFFFF",   // ✅ Corrigé
+                font_family: "Inter",
+                header_text: null,
+                footer_text: null,
+                show_bank_details: true,
+                show_tax_id: true,
+                notes: data.notes || null,
+                reference: data.number || null,
+                
+                // ✅ AJOUTÉ : échéancier de paiement
+                payment_schedule: hasValidSchedule
+                    ? data.payment_schedule!.map((ms, idx) => ({
+                        sequence: ms.sequence || (idx + 1),
+                        title: ms.title || `Échéance ${idx + 1}`,
+                        percent: ms.percent,
+                        description: ms.description || null,
+                        trigger_date: ms.trigger_date || null,
+                    }))
+                    : null,
+            };
 
-                    items: data.items.map((item) => ({
-                        description: item.description,
-                        quantity: item.quantity,
-                        unit_price_cents: item.unit_price_cents,
-                        tax_rate: item.tax_rate || 0,
-                    })),
-                    template_id: null,
-                    layout_style: data.layout_style || "classic",
-                    primary_color: data.primary_color || "#2563EB",
-                    secondary_color: data.background_color || "#1E40AF",
-                    accent_color: data.text_color || "#DBEAFE",
-                    text_color: data.text_color || "#1F2937",
-                    background_color: data.background_color || "#FFFFFF",
-                    font_family: "Inter",
-                    header_text: null,
-                    footer_text: null,
-                    show_bank_details: true,
-                    show_tax_id: true,
-                    notes: data.notes || null,
-                    reference: data.number || null,
-                };
-
-                const html = await templatesApi.previewDocument(requestData);
-                if (!cancelled) {
-                    setPreviewHtml(html);
-                }
-            } catch (err: any) {
-                if (!cancelled) {
-                    setError(err.response?.data?.detail || "Document introuvable");
-                }
-            } finally {
-                if (!cancelled) {
-                    setLoading(false);
-                }
+            const html = await templatesApi.previewDocument(requestData);
+            if (!cancelled) {
+                setPreviewHtml(html);
             }
-        };
+        } catch (err: any) {
+            if (!cancelled) {
+                setError(err.response?.data?.detail || "Document introuvable");
+            }
+        } finally {
+            if (!cancelled) {
+                setLoading(false);
+            }
+        }
+    };
 
-        if (token) fetchDocument();
-        return () => { cancelled = true; };
-    }, [token]);
+    if (token) fetchDocument();
+    return () => { cancelled = true; };
+}, [token]);
 
 
     const handleAccept = async () => {
