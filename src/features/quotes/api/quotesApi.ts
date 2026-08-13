@@ -17,6 +17,32 @@ export const quotesApi = {
         return api.get<Document[]>(`/api/v1/documents?type=DEVIS${queryString ? `?${queryString}` : ''}`);
     },
 
+    generateNextInvoice: async (quoteId: string): Promise<{
+        message: string;
+        invoice_id: string;
+        invoice_number: string;
+        milestone_title: string;
+        milestone_percent: number;
+        milestone_amount_cents: number;
+        remaining_milestones: number;
+    }> => {
+        const token = localStorage.getItem('sharaco_token');
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/v1/documents/${quoteId}/next-invoice`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        );
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.detail || 'Erreur génération facture');
+        }
+        return res.json();
+    },
     getById: async (id: string): Promise<Document> => {
         return api.get<Document>(`/api/v1/documents/${id}`);
     },

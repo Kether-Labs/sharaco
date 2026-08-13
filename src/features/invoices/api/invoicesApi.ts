@@ -12,6 +12,26 @@ export const invoicesApi = {
         return api.get<Document>(`/api/v1/documents/${id}`);
     },
 
+    markAsPaid: async (invoiceId: string): Promise<{
+        message: string;
+        invoice_number: string;
+        milestone_updated: boolean;
+        already_paid: boolean;
+    }> => {
+        const token = localStorage.getItem('sharaco_token');
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/v1/documents/invoices/${invoiceId}/mark-paid`,
+            {
+                method: 'POST',
+                headers: { Authorization: `Bearer ${token}` },
+            }
+        );
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.detail || 'Erreur marquage payée');
+        }
+        return res.json();
+    },
     create: async (data: DocumentCreate): Promise<Document> => {
         return api.post<Document>('/api/v1/documents', data);
     },
