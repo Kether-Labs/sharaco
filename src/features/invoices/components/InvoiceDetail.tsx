@@ -11,12 +11,13 @@ import { useToast } from "@/hooks/use-toast"
 import { useState } from "react"
 
 export function InvoiceDetail({ invoiceId }: { invoiceId: string }) {
-    const { data: invoice, isLoading, error } = useInvoice(invoiceId)
+    const { data: invoice, isLoading, error, refetch } = useInvoice(invoiceId)
     const updateStatus = useUpdateInvoiceStatus()
     const { toast } = useToast()
     
     const [isSending, setIsSending] = useState(false)
     const [isReminding, setIsReminding] = useState(false)
+    const [isMarkingPaid, setIsMarkingPaid] = useState(false)
 
     if (isLoading) {
         return (
@@ -39,12 +40,28 @@ export function InvoiceDetail({ invoiceId }: { invoiceId: string }) {
         )
     }
 
-    const isPaid = invoice.status === "ACCEPTED"
+    const isPaid = invoice.status === "PAID"
 
     const handleMarkAsPaid = async () => {
+        if (!confirm("Confirmer que cette facture a été payée ?")) return;
+        
+        setIsMarkingPaid(true);
         try {
-            await updateStatus.mutateAsync({ id: invoiceId, status: "ACCEPTED" })
-        } catch (e) {}
+            const result = await invoicesApi.markAsPaid(invoiceId);
+            toast({
+                title: "✅ Facture payée",
+                description: result.message + (result.milestone_updated ? " (milestone mise à jour)" : ""),
+            });
+            refetch();
+        } catch (err: any) {
+            toast({
+                title: "Erreur",
+                description: err.message,
+                variant: "destructive",
+            });
+        } finally {
+            setIsMarkingPaid(false);
+        }
     }
 
     const handleDownload = () => {
@@ -170,12 +187,12 @@ export function InvoiceDetail({ invoiceId }: { invoiceId: string }) {
                             {!isPaid && (
                                 <Button 
                                     onClick={handleMarkAsPaid}
-                                    disabled={updateStatus.isPending}
+                                    disabled={isMarkingPaid}
                                     variant="outline"
                                     className="w-full h-10 rounded-md border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-900 dark:text-slate-100 font-medium justify-between px-4 transition-colors duration-200"
                                 >
                                     <span>Marquer comme payée</span>
-                                    {updateStatus.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                                    {isMarkingPaid ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
                                 </Button>
                             )}
 

@@ -3,7 +3,8 @@
 
 import { useDocumentsStats } from "../hooks/useDocumentsStats";
 import {
-    CheckCircle2, XCircle, Clock, Target
+    Wallet, Clock, Target, TrendingUp,
+    FileEdit
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -36,81 +37,103 @@ export function DocumentsStats({ onFilterByStatus, currentFilter }: DocumentsSta
         );
     }
 
-    const statusCards = [
-        {
-            key: "ACCEPTED",
-            label: "Acceptés",
-            icon: CheckCircle2,
-            color: "emerald",
-            count: stats.by_status.ACCEPTED?.count || 0,
-            total: stats.by_status.ACCEPTED?.total_cents || 0,
-        },
-        {
-            key: "REFUSED",
-            label: "Refusés",
-            icon: XCircle,
-            color: "rose",
-            count: stats.by_status.REFUSED?.count || 0,
-            total: stats.by_status.REFUSED?.total_cents || 0,
-        },
-        {
-            key: "PENDING",
-            label: "En attente",
-            icon: Clock,
-            color: "amber",
-            count: (stats.by_status.SENT?.count || 0) + (stats.by_status.VIEWED?.count || 0),
-            total: (stats.by_status.SENT?.total_cents || 0) + (stats.by_status.VIEWED?.total_cents || 0),
-        },
-        {
-            key: "CONVERSION",
-            label: "Conversion",
-            icon: Target,
-            color: "violet",
-            count: stats.conversion_rate,
-            total: null,
-            isPercentage: true,
-        },
-    ];
+   const metricCards = [
+    {
+        key: "REVENUE",
+        label: "Chiffre d'affaires",
+        sublabel: "Encaissé",
+        icon: Wallet,
+        color: "emerald",
+        value: formatCurrency(stats.revenue_cents),
+        count: stats.paid_invoices_count,
+        countLabel: "factures payées",
+        glow: true,
+    },
+    {
+        key: "RECEIVABLES",
+        label: "En attente",
+        sublabel: "Créances clients",
+        icon: Clock,
+        color: "amber",
+        value: formatCurrency(stats.receivables_cents),
+        count: stats.receivables_count,
+        countLabel: "factures à encaisser",
+    },
+    {
+        key: "DRAFTS",  // ✅ NOUVEAU : brouillons
+        label: "Brouillons",
+        sublabel: "À envoyer",
+        icon: FileEdit,  // ou FileText
+        color: "slate",
+        value: formatCurrency(stats.drafts_cents),
+        count: stats.drafts_count,
+        countLabel: "factures en préparation",
+    },
+    {
+        key: "COLLECTION",
+        label: "Encaissement",
+        sublabel: "Taux de paiement",
+        icon: TrendingUp,
+        color: "violet",
+        value: `${stats.collection_rate}%`,
+        count: stats.conversion_rate,
+        countLabel: `% conversion devis`,
+        isPercentage: true,
+    },
+];
 
-    const colorMap: Record<string, { text: string; icon: string; glow: string; bar: string }> = {
+    const colorMap: Record<string, { text: string; icon: string; glow: string; bar: string; ring: string }> = {
         emerald: {
             text: "text-emerald-600 dark:text-emerald-400",
             icon: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
             glow: "from-emerald-500/20 via-transparent to-transparent",
             bar: "bg-emerald-500",
-        },
-        rose: {
-            text: "text-rose-600 dark:text-rose-400",
-            icon: "bg-rose-500/10 text-rose-600 dark:text-rose-400",
-            glow: "from-rose-500/20 via-transparent to-transparent",
-            bar: "bg-rose-500",
+            ring: "ring-emerald-500 shadow-emerald-500/20",
         },
         amber: {
             text: "text-amber-600 dark:text-amber-400",
             icon: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
             glow: "from-amber-500/20 via-transparent to-transparent",
             bar: "bg-amber-500",
+            ring: "ring-amber-500 shadow-amber-500/20",
+        },
+        sky: {
+            text: "text-sky-600 dark:text-sky-400",
+            icon: "bg-sky-500/10 text-sky-600 dark:text-sky-400",
+            glow: "from-sky-500/20 via-transparent to-transparent",
+            bar: "bg-sky-500",
+            ring: "ring-sky-500 shadow-sky-500/20",
         },
         violet: {
             text: "text-violet-600 dark:text-violet-400",
             icon: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
             glow: "from-violet-500/20 via-transparent to-transparent",
             bar: "bg-violet-500",
+            ring: "ring-violet-500 shadow-violet-500/20",
         },
+        slate: {
+        text: "text-slate-600 dark:text-slate-400",
+        icon: "bg-slate-500/10 text-slate-600 dark:text-slate-400",
+        glow: "from-slate-500/20 via-transparent to-transparent",
+        bar: "bg-slate-500",
+        ring: "ring-slate-500 shadow-slate-500/20",
+    },
     };
 
     return (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-            {statusCards.map((card, index) => {
+            {metricCards.map((card, index) => {
                 const colors = colorMap[card.color];
                 const Icon = card.icon;
                 const isActive = currentFilter === card.key;
                 const isClickable = !!onFilterByStatus;
 
                 return (
-                    <button
+                    <motion.button
                         key={card.key}
-                        
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
                         onClick={() => {
                             if (isClickable) onFilterByStatus(isActive ? null : card.key);
                         }}
@@ -123,17 +146,15 @@ export function DocumentsStats({ onFilterByStatus, currentFilter }: DocumentsSta
                                 ? "border-transparent shadow-lg scale-[1.02] ring-1 ring-offset-2 ring-offset-white dark:ring-offset-[#0a0a0a]"
                                 : "border-slate-200/50 dark:border-white/5 shadow-sm",
                             !isActive && isClickable && "hover:border-slate-300 dark:hover:border-white/10 hover:scale-[1.02]",
-                            isActive && card.key === "ACCEPTED" && "ring-emerald-500 shadow-emerald-500/20",
-                            isActive && card.key === "REFUSED" && "ring-rose-500 shadow-rose-500/20",
-                            isActive && card.key === "PENDING" && "ring-amber-500 shadow-amber-500/20",
-                            isActive && card.key === "CONVERSION" && "ring-violet-500 shadow-violet-500/20"
+                            isActive && colors.ring
                         )}
                     >
                         {/* Background subtle glow */}
                         <div className={cn(
                             "absolute inset-0 opacity-0 transition-opacity duration-500 bg-gradient-to-br",
-                            colors.glow,
-                            isClickable && "group-hover:opacity-100"
+                            colors?.glow,
+                            isClickable && "group-hover:opacity-100",
+                            card.glow && "opacity-100"
                         )} />
 
                         {isActive && (
@@ -143,14 +164,20 @@ export function DocumentsStats({ onFilterByStatus, currentFilter }: DocumentsSta
                             )} />
                         )}
 
-                        <div className="relative z-10 p-5 md:p-8 flex flex-col h-full justify-between gap-6">
-                            <div className="flex items-center justify-between">
-                                <span className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-zinc-500">
-                                    {card.label}
-                                </span>
+                        <div className="relative z-10 p-5 md:p-6 flex flex-col h-full justify-between gap-4">
+                            {/* Header */}
+                            <div className="flex items-start justify-between">
+                                <div>
+                                    <span className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-zinc-500 block">
+                                        {card.label}
+                                    </span>
+                                    <span className="text-[10px] text-slate-400 dark:text-zinc-600 mt-0.5 block">
+                                        {card.sublabel}
+                                    </span>
+                                </div>
                                 <div className={cn(
                                     "h-10 w-10 rounded-2xl flex items-center justify-center transition-transform duration-500", 
-                                    colors.icon,
+                                    colors?.icon,
                                     isClickable && "group-hover:scale-110",
                                     isActive && "scale-110"
                                 )}>
@@ -158,28 +185,30 @@ export function DocumentsStats({ onFilterByStatus, currentFilter }: DocumentsSta
                                 </div>
                             </div>
 
+                            {/* Valeur principale */}
                             <div>
                                 <div className="flex items-baseline gap-1.5">
                                     <span className={cn(
-                                        "text-4xl md:text-5xl font-black tracking-tighter transition-colors duration-500", 
+                                        "text-3xl md:text-4xl font-black tracking-tighter transition-colors duration-500", 
                                         isActive ? colors.text : "text-slate-900 dark:text-white",
                                         isClickable && !isActive && `group-hover:${colors.text}`
                                     )}>
-                                        {card.count}
-                                        {card.isPercentage && <span className="text-2xl md:text-3xl ml-1 opacity-60">%</span>}
+                                        {card.value}
                                     </span>
                                 </div>
 
-                                {card.total !== null && !card.isPercentage && (
+                                {/* Sous-info */}
+                                {!card.isPercentage && (
                                     <div className="flex items-center gap-2 mt-2">
-                                        <div className={cn("h-1.5 w-1.5 rounded-full", colors.bar)} />
-                                        <p className="text-sm font-semibold text-slate-600 dark:text-zinc-400">
-                                            {formatCurrency(card.total)}
+                                        <div className={cn("h-1.5 w-1.5 rounded-full", colors?.bar)} />
+                                        <p className="text-xs font-semibold text-slate-600 dark:text-zinc-400">
+                                            {card.count} {card.countLabel}
                                         </p>
                                     </div>
                                 )}
                             </div>
                             
+                            {/* Barre de progression pour les pourcentages */}
                             {card.isPercentage && (
                                 <div className="w-full bg-slate-100 dark:bg-white/5 rounded-full h-1.5 mt-2 overflow-hidden">
                                     <motion.div 
@@ -191,7 +220,7 @@ export function DocumentsStats({ onFilterByStatus, currentFilter }: DocumentsSta
                                 </div>
                             )}
                         </div>
-                    </button>
+                    </motion.button>
                 );
             })}
         </div>

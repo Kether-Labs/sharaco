@@ -1,7 +1,7 @@
 // features/templates/types.ts
 
 export type DocumentType = 'DEVIS' | 'FACTURE';
-export type DocumentStatus = 'DRAFT' | 'SENT' | 'VIEWED' | 'ACCEPTED' | 'REFUSED';
+export type DocumentStatus = 'DRAFT' | 'SENT' | 'VIEWED' | 'ACCEPTED' | 'REFUSED'| 'PAID';
 
 export interface DocumentItem {
     id: string;
