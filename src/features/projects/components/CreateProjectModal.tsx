@@ -78,7 +78,7 @@ export function CreateProjectModal({ open, onOpenChange, project }: CreateProjec
             console.error("Erreur:", error)
         }
     }
-
+    console.log("clients", clients)
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[400px] p-0 overflow-hidden bg-white/70 dark:bg-[#0a0a0a]/80 backdrop-blur-3xl border-slate-200/50 dark:border-white/10 shadow-2xl rounded-3xl">
@@ -113,9 +113,9 @@ export function CreateProjectModal({ open, onOpenChange, project }: CreateProjec
                                     <SelectTrigger className="h-8 border-none bg-transparent hover:bg-slate-100 dark:hover:bg-white/5 shadow-none focus:ring-0 text-right font-medium">
                                         <SelectValue placeholder="Sélectionner..." />
                                     </SelectTrigger>
-                                    <SelectContent>
+                                    <SelectContent className="z-[100]">
                                         {isLoadingClients ? (
-                                            <div className="p-2 text-center text-sm text-slate-500">Chargement...</div>
+                                            <div className="p-2 text-center text-sm bg-white text-slate-500">Chargement...</div>
                                         ) : (
                                             clients.map((client: any) => (
                                                 <SelectItem key={client.id} value={client.id}>

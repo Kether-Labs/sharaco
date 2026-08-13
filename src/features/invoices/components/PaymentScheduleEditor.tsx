@@ -143,7 +143,7 @@ export function PaymentScheduleEditor({
                 <div className="flex items-center justify-between">
                     <div>
                         <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                            💰 Modalités de paiement
+                             Modalités de paiement
                         </h3>
                         <p className="text-sm text-zinc-400 mt-1">
                             Définissez comment votre client vous règlera
@@ -189,7 +189,7 @@ export function PaymentScheduleEditor({
                         <div>
                             <div className="font-bold text-white flex items-center gap-1.5">
                                 Échéancier
-                                <span className="px-1.5 py-0.5 text-[10px] font-bold bg-emerald-500/20 text-emerald-400 rounded">
+                                <span className="px-1.5 py-0.5 text-[7px] font-bold bg-emerald-500/20 text-emerald-400 rounded">
                                     RECOMMANDÉ
                                 </span>
                             </div>

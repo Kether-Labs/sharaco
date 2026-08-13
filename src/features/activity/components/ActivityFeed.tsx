@@ -179,6 +179,7 @@ export function ActivityFeed({ limit = 20, compact = false }: ActivityFeedProps)
                                         const { time } = formatTimestamp(activity.timestamp);
 
                                         const isDocument = activity.type === 'DOCUMENT';
+                                        const isProjet = activity.type === "PROJECT";
                                         const isPaid = activity.action === 'PAID';
                                         const isInvoice = activity.metadata?.document_type === "FACTURE";
                                         const docId = activity.link ? activity.link.split('/').pop() : undefined;
@@ -202,6 +203,8 @@ export function ActivityFeed({ limit = 20, compact = false }: ActivityFeedProps)
                                                 >
                                                     {/* Visual / Thumbnail */}
                                                     <div className="relative flex-shrink-0">
+
+                                                        
                                                         {isDocument && docId && (
                                                             <div className="relative w-16 sm:w-20 aspect-[4/5] rounded-lg sm:rounded-xl overflow-hidden border border-slate-200/50 dark:border-white/10 shadow-sm bg-white dark:bg-slate-900 group-hover:shadow-md group-hover:-translate-y-0.5 transition-all duration-300">
                                                                 <div className="w-full h-full relative pointer-events-none">
@@ -212,10 +215,21 @@ export function ActivityFeed({ limit = 20, compact = false }: ActivityFeedProps)
                                                                 </div>
                                                             </div>
                                                         )}
+                                                        {isProjet && (
+                                                            <div className={cn(
+                                                                "relative w-16 sm:w-20 h-16 sm:h-20 rounded-lg sm:rounded-xl flex items-center justify-center border shadow-sm group-hover:shadow-md group-hover:-translate-y-0.5 transition-all duration-300",
+                                                                colors.icon,
+                                                                "border-slate-200/50 dark:border-white/10",
+                                                                colors.border
+                                                            )}>
+                                                                <Icon className="w-8 h-8 sm:w-10 sm:h-10 opacity-80" strokeWidth={1.5} />
+                                                            </div>
+                                                        )}
                                                     </div>
 
                                                     {/* Content */}
                                                     <div className="flex-1 min-w-0 pt-1 sm:pt-2">
+                                                        
                                                         <div className="flex items-start justify-between gap-4">
                                                             <h4 className={cn(
                                                                 "font-bold text-base sm:text-lg transition-colors line-clamp-2 text-slate-900 dark:text-white group-hover:text-sky-500",
