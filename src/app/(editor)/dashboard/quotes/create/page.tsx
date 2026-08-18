@@ -123,7 +123,7 @@ function QuoteBuilderContent() {
                 notes: ""
             });
 
-            router.push(`/dashboard/quotes/${document.id}`);
+            router.push(`/dashboard/quotes/create/${document.id}`);
         } catch (error: any) {
             console.error("❌ Erreur création:", error);
             toast({

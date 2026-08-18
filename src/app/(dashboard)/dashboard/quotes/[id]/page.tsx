@@ -77,7 +77,7 @@ export default function QuoteDetailPage() {
     const isAccepted = quote.status === "ACCEPTED";
     const hasSchedule = quote.payment_schedule && quote.payment_schedule.length > 0 &&
         !(quote.payment_schedule.length === 1 && quote.payment_schedule[0].percent === 100);
-
+    console.log(quote)
     return (
         <div className="min-h-[100dvh] bg-[#FAFAFA] dark:bg-[#0A0A0A] text-slate-900 dark:text-slate-100 flex flex-col font-sans">
             <header className="sticky top-0 z-30 w-full bg-[#FAFAFA]/90 dark:bg-[#0A0A0A]/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
@@ -91,7 +91,7 @@ export default function QuoteDetailPage() {
                                 Devis {quote.number || "Sans numéro"}
                             </h1>
                             <span className="text-sm text-slate-500">
-                                {quote.client?.name || quote.client_name || "Client inconnu"}
+                                {quote.client?.name || quote.client_name || "Client inconnus"}
                             </span>
                         </div>
                     </div>
