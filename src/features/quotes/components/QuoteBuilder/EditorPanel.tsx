@@ -2,10 +2,8 @@
 
 import { QuoteDraft, QuoteLineItem } from "../../types/QuoteBuilder";
 import { User, Calendar, Paintbrush, ReceiptText, CreditCard } from "lucide-react";
-
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useQuoteTotal } from "../../hooks/useQuoteTotal";
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TabDetails } from "./tabs/TabDetails";
 import { TabClient } from "./tabs/TabClient";
@@ -24,9 +22,58 @@ interface EditorPanelProps {
 export function EditorPanel({ draft, onChange, onItemChange, onAddItem, onRemoveItem }: EditorPanelProps) {
     const { grandTotal } = useQuoteTotal(draft.items, draft.hasVat, draft.vatRate, draft.discountRate, draft.isTaxExempt);
 
+    // ✅ NOUVEAU : Handler qui gère le changement de mode + initialisation des milestones
+    const handlePaymentModeChange = (mode: 'simple' | 'schedule') => {
+        // Toujours mettre à jour le mode
+        onChange('paymentMode', mode);
+        
+        if (mode === 'schedule') {
+            // Vérifier si les milestones actuelles sont valides
+            const currentMilestones = draft.paymentMilestones || [];
+            const totalPercent = currentMilestones.reduce(
+                (sum, m) => sum + (m.percent || 0), 0
+            );
+            const isValid = Math.abs(totalPercent - 100) < 0.01;
+            const hasDefaultMilestone = 
+                currentMilestones.length === 1 && 
+                currentMilestones[0].percent === 100 &&
+                currentMilestones[0].title === 'Paiement intégral';
+            
+            // Si invalide ou juste le "100% par défaut" → initialiser avec 50/50
+            if (!isValid || currentMilestones.length === 0 || hasDefaultMilestone) {
+                onChange('paymentMilestones', [
+                    {
+                        id: crypto.randomUUID(),
+                        title: 'Acompte à la commande',
+                        percent: 50,
+                        description: '',
+                        trigger_date: '',
+                    },
+                    {
+                        id: crypto.randomUUID(),
+                        title: 'Solde à la livraison',
+                        percent: 50,
+                        description: '',
+                        trigger_date: '',
+                    },
+                ]);
+            }
+        } else {
+            // Mode simple → remettre le milestone par défaut
+            onChange('paymentMilestones', [
+                {
+                    id: crypto.randomUUID(),
+                    title: 'Paiement intégral',
+                    percent: 100,
+                    description: '',
+                    trigger_date: '',
+                },
+            ]);
+        }
+    };
+
     return (
         <div className="w-full h-full bg-zinc-950 flex flex-col border-r border-white/5 relative z-20 pt-[72px]">
-            {/* Main Tabs Navigation */}
             <Tabs defaultValue="items" className="flex-1 flex flex-col overflow-hidden">
                 <div className="px-6 py-4 bg-zinc-950">
                     <TabsList className="w-full h-11 bg-zinc-900/50 border border-white/5 p-1 rounded-xl">
@@ -75,7 +122,7 @@ export function EditorPanel({ draft, onChange, onItemChange, onAddItem, onRemove
                                 value={draft.paymentMilestones}
                                 onChange={(milestones) => onChange('paymentMilestones', milestones)}
                                 paymentMode={draft.paymentMode}
-                                onModeChange={(mode) => onChange('paymentMode', mode)}
+                                onModeChange={handlePaymentModeChange}  // ✅ Utiliser le nouveau handler
                                 disabled={false}
                             />
                         </TabsContent>
@@ -85,9 +132,6 @@ export function EditorPanel({ draft, onChange, onItemChange, onAddItem, onRemove
                         </TabsContent>
                     </div>
                 </ScrollArea>
-
-                {/* Bottom Floating Summary & Actions */}
-              
             </Tabs>
         </div>
     );

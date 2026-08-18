@@ -76,7 +76,7 @@ export function PaymentScheduleEditor({
     onModeChange,
     disabled,
 }: PaymentScheduleEditorProps) {
-    const [hoveredTemplate, setHoveredTemplate] = useState<string | null>(null);
+    const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
 
     // Calcul du total et validation
     const totalPercent = useMemo(
@@ -118,7 +118,7 @@ export function PaymentScheduleEditor({
     };
 
     // Mettre à jour une échéance
-    const updateMilestone = (id: string, field: keyof Milestone, newValue: any) => {
+    const updateMilestone = (id: string, field: keyof Milestone, newValue: string | number) => {
         onChange(
             value.map(m => (m.id === id ? { ...m, [field]: newValue } : m))
         );
@@ -126,6 +126,7 @@ export function PaymentScheduleEditor({
 
     // Appliquer un template
     const applyTemplate = (template: typeof TEMPLATES[0]) => {
+        setSelectedTemplate(template.name);
         onChange(
             template.milestones.map(m => ({
                 id: crypto.randomUUID(),
@@ -135,6 +136,13 @@ export function PaymentScheduleEditor({
                 trigger_date: '',
             }))
         );
+    };
+
+    const handleModeChange = (nextMode: 'simple' | 'schedule') => {
+        onModeChange(nextMode);
+        if (nextMode !== 'schedule') {
+            setSelectedTemplate(null);
+        }
     };
 
     return (
@@ -156,7 +164,7 @@ export function PaymentScheduleEditor({
                 {/* Choix du mode */}
                 <RadioGroup
                     value={paymentMode}
-                    onValueChange={(v) => onModeChange(v as 'simple' | 'schedule')}
+                    onValueChange={(v) => handleModeChange(v as 'simple' | 'schedule')}
                     className="grid grid-cols-1 md:grid-cols-2 gap-3"
                     disabled={disabled}
                 >
@@ -172,7 +180,7 @@ export function PaymentScheduleEditor({
                         <div>
                             <div className="font-bold text-white">Paiement simple</div>
                             <div className="text-xs text-zinc-400 mt-0.5">
-                                100% à la livraison (pas d'acompte)
+                                100% à la livraison (pas d&apos;acompte)
                             </div>
                         </div>
                     </label>
@@ -209,10 +217,9 @@ export function PaymentScheduleEditor({
                             exit={{ opacity: 0, height: 0 }}
                             className="space-y-4 overflow-hidden"
                         >
-                            {/* Templates rapides */}
                             <div>
                                 <Label className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2 block">
-                                    ⚡ Templates rapides
+                                    Templates rapides
                                 </Label>
                                 <div className="flex flex-wrap gap-2">
                                     {TEMPLATES.map(template => (
@@ -220,12 +227,12 @@ export function PaymentScheduleEditor({
                                             key={template.name}
                                             type="button"
                                             onClick={() => applyTemplate(template)}
-                                            onMouseEnter={() => setHoveredTemplate(template.name)}
-                                            onMouseLeave={() => setHoveredTemplate(null)}
                                             className={cn(
                                                 "px-3 py-1.5 rounded-lg text-xs font-bold transition-all",
                                                 "border border-zinc-800 text-zinc-300",
-                                                "hover:border-[#2563EB] hover:bg-[#2563EB]/10 hover:text-white"
+                                                selectedTemplate === template.name
+                                                    ? "border-[#2563EB] bg-[#2563EB]/10 text-white"
+                                                    : "hover:border-[#2563EB] hover:bg-[#2563EB]/10 hover:text-white"
                                             )}
                                         >
                                             <Zap className="h-3 w-3 inline mr-1" />
@@ -235,146 +242,148 @@ export function PaymentScheduleEditor({
                                 </div>
                             </div>
 
-                            {/* Liste des échéances */}
-                            <div className="space-y-3">
-                                {value.map((milestone, index) => (
-                                    <motion.div
-                                        key={milestone.id}
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, x: -20 }}
-                                        className="p-4 rounded-xl border border-zinc-800 bg-zinc-900/50 space-y-3"
-                                    >
-                                        <div className="flex items-start justify-between gap-3">
-                                            <div className="flex items-center gap-2">
-                                                <GripVertical className="h-4 w-4 text-zinc-600 cursor-grab" />
-                                                <div className="flex items-center gap-2">
-                                                    <div className="w-6 h-6 rounded-full bg-[#2563EB]/20 text-[#2563EB] text-xs font-black flex items-center justify-center">
-                                                        {index + 1}
+                            {selectedTemplate ? (
+                                <>
+                                    <div className="space-y-3">
+                                        {value.map((milestone, index) => (
+                                            <motion.div
+                                                key={milestone.id}
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, x: -20 }}
+                                                className="p-4 rounded-xl border border-zinc-800 bg-zinc-900/50 space-y-3"
+                                            >
+                                                <div className="flex items-start justify-between gap-3">
+                                                    <div className="flex items-center gap-2">
+                                                        <GripVertical className="h-4 w-4 text-zinc-600 cursor-grab" />
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-6 h-6 rounded-full bg-[#2563EB]/20 text-[#2563EB] text-xs font-black flex items-center justify-center">
+                                                                {index + 1}
+                                                            </div>
+                                                            <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
+                                                                Échéance
+                                                            </span>
+                                                        </div>
                                                     </div>
-                                                    <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
-                                                        Échéance
-                                                    </span>
+                                                    {value.length > 1 && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => removeMilestone(milestone.id)}
+                                                            className="text-zinc-500 hover:text-red-500 transition-colors p-1"
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </button>
+                                                    )}
                                                 </div>
-                                            </div>
-                                            {value.length > 1 && (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => removeMilestone(milestone.id)}
-                                                    className="text-zinc-500 hover:text-red-500 transition-colors p-1"
-                                                >
-                                                    <Trash2 className="h-4 w-4" />
-                                                </button>
-                                            )}
-                                        </div>
 
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                            {/* Titre */}
-                                            <div className="md:col-span-2">
-                                                <Label className="text-xs text-zinc-400 font-bold">
-                                                    Titre
-                                                </Label>
-                                                <Input
-                                                    value={milestone.title}
-                                                    onChange={(e) => updateMilestone(milestone.id, 'title', e.target.value)}
-                                                    placeholder="Ex: Acompte à la signature"
-                                                    className="h-9 bg-zinc-950 border-zinc-800 text-white mt-1"
-                                                />
-                                            </div>
+                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                                    <div className="md:col-span-2">
+                                                        <Label className="text-xs text-zinc-400 font-bold">
+                                                            Titre
+                                                        </Label>
+                                                        <Input
+                                                            value={milestone.title}
+                                                            onChange={(e) => updateMilestone(milestone.id, 'title', e.target.value)}
+                                                            placeholder="Ex: Acompte à la signature"
+                                                            className="h-9 bg-zinc-950 border-zinc-800 text-white mt-1"
+                                                        />
+                                                    </div>
 
-                                            {/* Pourcentage */}
-                                            <div>
-                                                <Label className="text-xs text-zinc-400 font-bold">
-                                                    Pourcentage
-                                                </Label>
-                                                <div className="relative mt-1">
-                                                    <Input
-                                                        type="number"
-                                                        min={0}
-                                                        max={100}
-                                                        step={0.01}
-                                                        value={milestone.percent}
-                                                        onChange={(e) => updateMilestone(milestone.id, 'percent', parseFloat(e.target.value) || 0)}
-                                                        className="h-9 bg-zinc-950 border-zinc-800 text-white pr-8"
-                                                    />
-                                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">
-                                                        %
-                                                    </span>
+                                                    <div>
+                                                        <Label className="text-xs text-zinc-400 font-bold">
+                                                            Pourcentage
+                                                        </Label>
+                                                        <div className="relative mt-1">
+                                                            <Input
+                                                                type="number"
+                                                                min={0}
+                                                                max={100}
+                                                                step={0.01}
+                                                                value={milestone.percent}
+                                                                onChange={(e) => updateMilestone(milestone.id, 'percent', parseFloat(e.target.value) || 0)}
+                                                                className="h-9 bg-zinc-950 border-zinc-800 text-white pr-8"
+                                                            />
+                                                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">
+                                                                %
+                                                            </span>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </div>
 
-                                        {/* Montant calculé + date */}
-                                        <div className="flex items-center justify-between pt-2 border-t border-zinc-800/50">
+                                                <div className="flex items-center justify-between pt-2 border-t border-zinc-800/50">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-xs text-zinc-500">Montant :</span>
+                                                        <span className="font-bold text-white">
+                                                            {formatCurrency(calculateAmount(milestone.percent))}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <Calendar className="h-3.5 w-3.5 text-zinc-500" />
+                                                        <Input
+                                                            type="date"
+                                                            value={milestone.trigger_date}
+                                                            onChange={(e) => updateMilestone(milestone.id, 'trigger_date', e.target.value)}
+                                                            className="h-7 bg-zinc-950 border-zinc-800 text-white text-xs w-36"
+                                                            placeholder="Date prévue"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </motion.div>
+                                        ))}
+                                    </div>
+
+                                    <Button
+                                        type="button"
+                                        onClick={addMilestone}
+                                        variant="outline"
+                                        className="w-full border-dashed border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-600"
+                                    >
+                                        <Plus className="h-4 w-4 mr-2" />
+                                        Ajouter une échéance
+                                    </Button>
+
+                                    <div
+                                        className={cn(
+                                            "p-4 rounded-xl border transition-all",
+                                            isValid
+                                                ? "border-emerald-500/30 bg-emerald-500/5"
+                                                : "border-red-500/30 bg-red-500/5"
+                                        )}
+                                    >
+                                        <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-2">
-                                                <span className="text-xs text-zinc-500">Montant :</span>
-                                                <span className="font-bold text-white">
-                                                    {formatCurrency(calculateAmount(milestone.percent))}
+                                                {isValid ? (
+                                                    <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                                                ) : (
+                                                    <AlertCircle className="h-4 w-4 text-red-400" />
+                                                )}
+                                                <span className="text-sm font-bold text-white">
+                                                    Total de l&apos;échéancier
                                                 </span>
                                             </div>
-                                            <div className="flex items-center gap-2">
-                                                <Calendar className="h-3.5 w-3.5 text-zinc-500" />
-                                                <Input
-                                                    type="date"
-                                                    value={milestone.trigger_date}
-                                                    onChange={(e) => updateMilestone(milestone.id, 'trigger_date', e.target.value)}
-                                                    className="h-7 bg-zinc-950 border-zinc-800 text-white text-xs w-36"
-                                                    placeholder="Date prévue"
-                                                />
+                                            <div className="text-right">
+                                                <div className="text-lg font-black text-white">
+                                                    {totalPercent.toFixed(1)}%
+                                                </div>
+                                                <div className="text-xs text-zinc-400">
+                                                    {formatCurrency(totalAmount)}
+                                                </div>
                                             </div>
                                         </div>
-                                    </motion.div>
-                                ))}
-                            </div>
-
-                            {/* Bouton ajouter */}
-                            <Button
-                                type="button"
-                                onClick={addMilestone}
-                                variant="outline"
-                                className="w-full border-dashed border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-600"
-                            >
-                                <Plus className="h-4 w-4 mr-2" />
-                                Ajouter une échéance
-                            </Button>
-
-                            {/* Total et validation */}
-                            <div
-                                className={cn(
-                                    "p-4 rounded-xl border transition-all",
-                                    isValid
-                                        ? "border-emerald-500/30 bg-emerald-500/5"
-                                        : "border-red-500/30 bg-red-500/5"
-                                )}
-                            >
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                        {isValid ? (
-                                            <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-                                        ) : (
-                                            <AlertCircle className="h-4 w-4 text-red-400" />
+                                        {!isValid && (
+                                            <p className="text-xs text-red-400 mt-2">
+                                                {totalPercent < 100
+                                                    ? `⚠️ Il manque ${(100 - totalPercent).toFixed(1)}% pour atteindre 100%`
+                                                    : `⚠️ Vous dépassez de ${(totalPercent - 100).toFixed(1)}% (max 100%)`}
+                                            </p>
                                         )}
-                                        <span className="text-sm font-bold text-white">
-                                            Total de l'échéancier
-                                        </span>
                                     </div>
-                                    <div className="text-right">
-                                        <div className="text-lg font-black text-white">
-                                            {totalPercent.toFixed(1)}%
-                                        </div>
-                                        <div className="text-xs text-zinc-400">
-                                            {formatCurrency(totalAmount)}
-                                        </div>
-                                    </div>
+                                </>
+                            ) : (
+                                <div className="rounded-xl border border-dashed border-zinc-700 bg-zinc-900/40 p-4 text-sm text-zinc-400">
+                                    Choisissez un template rapide pour afficher les tranches de paiement.
                                 </div>
-                                {!isValid && (
-                                    <p className="text-xs text-red-400 mt-2">
-                                        {totalPercent < 100
-                                            ? `⚠️ Il manque ${(100 - totalPercent).toFixed(1)}% pour atteindre 100%`
-                                            : `⚠️ Vous dépassez de ${(totalPercent - 100).toFixed(1)}% (max 100%)`}
-                                    </p>
-                                )}
-                            </div>
+                            )}
                         </motion.div>
                     )}
                 </AnimatePresence>

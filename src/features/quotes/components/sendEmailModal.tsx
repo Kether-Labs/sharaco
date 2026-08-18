@@ -123,9 +123,7 @@ export function SendEmailModal({
                     <>
                         <DialogHeader className="gap-2">
                             <DialogTitle className="text-2xl font-bold tracking-tight text-slate-900 dark:text-zinc-50 flex items-center gap-3">
-                                <div className="p-2.5 rounded-xl bg-[#2563EB] text-white shadow-lg shadow-sky-500/20">
-                                    <Mail className="h-5 w-5" />
-                                </div>
+                                
                                 Envoyer par email
                             </DialogTitle>
                             <DialogDescription className="text-slate-500 dark:text-zinc-400 text-base">
@@ -146,7 +144,7 @@ export function SendEmailModal({
                                     <Input
                                         id="email"
                                         type="email"
-                                        placeholder="client@exemple.com"
+                                        placeholder="Entrez l'email du client"
                                         value={email}
                                         onChange={(e) => handleEmailChange(e.target.value)}
                                         className="pl-10 h-11 bg-white/50 dark:bg-zinc-900/50 border-slate-200 dark:border-zinc-800 focus-visible:ring-1 focus-visible:ring-sky-500 focus-visible:border-sky-500 transition-all rounded-xl"
@@ -211,7 +209,7 @@ export function SendEmailModal({
                             <Button
                                 onClick={handleSend}
                                 disabled={!email || !!emailError || sendEmailMutation.isPending}
-                                className="rounded-xl bg-[#2563EB] hover:from-sky-400 hover:to-blue-500 text-white shadow-md shadow-sky-500/25 transition-all duration-300"
+                                className="rounded-xl cursor-pointer bg-[#2563EB] hover:from-sky-400 hover:to-blue-500 text-white shadow-md shadow-sky-500/25 transition-all duration-300"
                             >
                                 {sendEmailMutation.isPending ? (
                                     <>
@@ -220,7 +218,7 @@ export function SendEmailModal({
                                     </>
                                 ) : (
                                     <>
-                                        <Send className="mr-2 h-4 w-4" />
+                                        
                                         Envoyer le devis
                                     </>
                                 )}
