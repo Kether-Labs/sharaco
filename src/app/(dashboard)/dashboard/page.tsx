@@ -10,6 +10,7 @@ import { authApi } from '@/features/auth/api/authApi';
 
 import { toast } from 'sonner';
 import { OnboardingTour } from "@/features/dashboard/components/OnboardingTour";
+import { OverdueAlertBanner } from "@/features/dashboard/components/OverdueAlertBanner";
 
 export default function DashboardPage() {
     const router = useRouter();
@@ -86,7 +87,7 @@ export default function DashboardPage() {
                         Vue d'ensemble de votre activité
                     </p>
                 </div>
-
+                
                 <div data-tour="dashboard-stats">
                     <DocumentsStats />
                 </div>
