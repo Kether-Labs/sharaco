@@ -25,6 +25,7 @@ interface SendEmailModalProps {
     clientEmail?: string;
     clientName?: string;
     onSent?: () => void;
+    documentLabel?: "devis" | "facture";
 }
 
 export function SendEmailModal({
@@ -35,6 +36,7 @@ export function SendEmailModal({
     clientEmail,
     clientName,
     onSent,
+    documentLabel = "devis"
 }: SendEmailModalProps) {
     const sendEmailMutation = useSendEmail();
 
@@ -107,10 +109,13 @@ export function SendEmailModal({
                             <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-zinc-50">
                                 Email envoyé avec succès
                             </h2>
+
                             <p className="text-slate-500 dark:text-zinc-400 max-w-[280px] mx-auto text-base">
-                                Le devis a bien été envoyé à <br />
+                                {/* ✅ Texte dynamique */}
+                                Le {documentLabel} a bien été envoyé à <br />
                                 <span className="font-medium text-slate-900 dark:text-zinc-200">{email}</span>
                             </p>
+                            
                         </div>
                         <Button
                             onClick={() => onOpenChange(false)}
@@ -127,7 +132,7 @@ export function SendEmailModal({
                                 Envoyer par email
                             </DialogTitle>
                             <DialogDescription className="text-slate-500 dark:text-zinc-400 text-base">
-                                Envoyer le devis <span className="font-medium text-slate-900 dark:text-zinc-200">{documentNumber || ""}</span> à votre client.
+                                Envoyer {documentLabel =='devis' ? 'le' : 'la'} {documentLabel} <span className="font-medium text-slate-900 dark:text-zinc-200">{documentNumber || ""}</span> à votre client.
                             </DialogDescription>
                         </DialogHeader>
 
@@ -190,8 +195,8 @@ export function SendEmailModal({
                                 <div className="flex gap-3">
 
                                     <p className="text-sm text-sky-800 dark:text-sky-200 leading-relaxed">
-                                        Le client recevra un email avec un lien pour consulter le devis en ligne.
-                                        Le statut du devis sera automatiquement mis à jour en <span className="font-semibold">"Envoyé"</span>.
+                                        Le client recevra un email avec un lien pour consulter  {documentLabel =='devis' ? 'le' : 'la'} {documentLabel} en ligne.
+                                        Le statut  {documentLabel =='devis' ? 'du' : 'de la'} {documentLabel} sera automatiquement mis à jour en <span className="font-semibold">"Envoyé"</span>.
                                     </p>
                                 </div>
                             </div>
@@ -219,7 +224,7 @@ export function SendEmailModal({
                                 ) : (
                                     <>
                                         
-                                        Envoyer le devis
+                                          Envoyer  {documentLabel =='devis' ? 'le' : 'la'} {documentLabel}
                                     </>
                                 )}
                             </Button>
