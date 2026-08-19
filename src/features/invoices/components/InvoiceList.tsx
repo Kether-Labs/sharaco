@@ -183,7 +183,19 @@ export function InvoiceList({ invoices, onDeleteSuccess, projectId, searchQuery 
                                 layout
                                 className={`group flex flex-col ${isBeingDeleted ? 'opacity-50 pointer-events-none' : ''}`}
                             >
-                                <div className="relative w-full aspect-[4/5] rounded-2xl bg-slate-100/50 dark:bg-white/[0.02] border border-slate-200/50 dark:border-white/5 overflow-hidden group-hover:-translate-y-1 p-2 flex items-center justify-center">
+                                <div className={`relative w-full aspect-[4/5] rounded-2xl bg-slate-100/50 dark:bg-white/[0.02] border overflow-hidden group-hover:-translate-y-1 p-2 flex items-center justify-center transition-all ${
+                                    invoice.status === "OVERDUE" 
+                                        ? "border-rose-500/50 shadow-[0_0_20px_-5px_rgba(225,29,72,0.15)] dark:border-rose-500/30" 
+                                        : "border-slate-200/50 dark:border-white/5"
+                                }`}>
+
+                                    {/* Overdue Badge */}
+                                    {invoice.status === "OVERDUE" && (
+                                        <div className="absolute top-3 right-3 z-20 flex items-center gap-1.5 bg-rose-500 text-white border border-rose-600/50 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full shadow-lg shadow-rose-500/20">
+                                            <AlertCircle className="w-3 h-3" />
+                                            En retard
+                                        </div>
+                                    )}
 
                                     {/* Preview Container */}
                                     <div className="w-full h-full rounded-xl overflow-hidden shadow-sm bg-white dark:bg-slate-950/50 relative">
