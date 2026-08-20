@@ -9,6 +9,15 @@ import { useToast } from '@/hooks/use-toast';
 /**
  * Hook pour récupérer la liste des projets
  */
+
+export function useProjectTree(projectId: string | null) {
+    return useQuery({
+        queryKey: ["project-tree", projectId],
+        queryFn: () => projectsApi.getProjectTree(projectId!),
+        enabled: !!projectId,
+        staleTime: 30_000, // 30 secondes
+    });
+}
 export function useProjects(params?: {
     status?: string;
     client_id?: string;

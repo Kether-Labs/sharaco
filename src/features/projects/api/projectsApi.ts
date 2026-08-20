@@ -1,11 +1,15 @@
 // features/projects/api/projectsApi.ts
 import { api } from '@/lib/api';
-import type { Project, ProjectCreate, ProjectUpdate, ProjectAttachmentCreate, ProjectAttachment } from '../types';
+import type { Project, ProjectCreate, ProjectUpdate, ProjectAttachmentCreate, ProjectAttachment, ProjectTreeResponse } from '../types';
 
 export const projectsApi = {
     /**
      * Liste tous les projets de l'utilisateur
      */
+
+     getProjectTree: async (projectId: string): Promise<ProjectTreeResponse> => {
+        return api.get(`/api/v1/projects/${projectId}/tree`);
+    },
     getAll: async (params?: {
         status?: string;
         client_id?: string;
@@ -24,7 +28,7 @@ export const projectsApi = {
         return api.get<Project[]>(`/api/v1/projects${queryString ? `?${queryString}` : ''}`);
     },
 
-
+        
     getDocuments: async (
         projectId: string,
         params?: {
@@ -48,6 +52,8 @@ export const projectsApi = {
     getById: async (id: string): Promise<Project> => {
         return api.get<Project>(`/api/v1/projects/${id}`);
     },
+
+    
 
     /**
      * Crée un nouveau projet

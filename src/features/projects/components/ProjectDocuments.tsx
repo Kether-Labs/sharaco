@@ -1,8 +1,8 @@
 // features/projects/components/ProjectDocuments.tsx
 "use client"
 
-import { useProjectDocuments } from "../hooks/useProjectDocuments"
-import { QuoteList } from "@/features/quotes/components/QuoteList"
+import { useProjectTree } from "../hooks/useProjectTree"
+import { ProjectQuoteGrid } from "./ProjectQuoteGrid"
 import { Loader2, Folder } from "lucide-react"
 
 interface ProjectDocumentsProps {
@@ -10,8 +10,8 @@ interface ProjectDocumentsProps {
 }
 
 export function ProjectDocuments({ projectId }: ProjectDocumentsProps) {
-    const { data: documents = [], isLoading, refetch } = useProjectDocuments(projectId);
-
+    const { data: tree, isLoading, refetch } = useProjectTree(projectId);
+    console.log(tree)
     if (isLoading) {
         return (
             <div className="flex h-full items-center justify-center min-h-[300px]">
@@ -20,7 +20,7 @@ export function ProjectDocuments({ projectId }: ProjectDocumentsProps) {
         );
     }
 
-    if (documents.length === 0) {
+    if (!tree || (tree.quotes.length === 0 && tree.standalone_invoices.length === 0)) {
         return (
             <div className="flex-1 flex flex-col items-center justify-center opacity-60 pointer-events-none select-none h-full min-h-[400px]">
                 <Folder className="w-24 h-24 mb-4 text-slate-300" strokeWidth={1} />
@@ -32,10 +32,10 @@ export function ProjectDocuments({ projectId }: ProjectDocumentsProps) {
     }
 
     return (
-        <QuoteList
-            quotes={documents}
-            onDeleteSuccess={refetch}
+        <ProjectQuoteGrid 
+            tree={tree} 
             projectId={projectId}
+            onRefresh={refetch}
         />
     );
 }
