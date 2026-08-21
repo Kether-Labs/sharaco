@@ -1,3 +1,4 @@
+// features/projects/components/ProjectFolder.tsx
 "use client"
 
 import { useRouter } from "next/navigation"
@@ -6,6 +7,7 @@ import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator,
 import { Project } from "../types"
 import { useState } from "react"
 import { CreateProjectModal } from "./CreateProjectModal"
+import { cn } from "@/lib/utils"
 
 
 interface ProjectFolderProps {
@@ -34,15 +36,14 @@ export function ProjectFolder({ project, onDelete }: ProjectFolderProps) {
         }
     };
 
-    // Icône selon le statut
     const getStatusIcon = () => {
         switch (project.status) {
             case 'ACTIVE':
-                return <TrendingUp className="w-8 h-8 text-emerald-600 dark:text-emerald-400" strokeWidth={1.5} />;
+                return <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8 text-emerald-600 dark:text-emerald-400" strokeWidth={1.5} />;
             case 'COMPLETED':
-                return <FileText className="w-8 h-8 text-sky-600 dark:text-sky-400" strokeWidth={1.5} />;
+                return <FileText className="w-6 h-6 sm:w-8 sm:h-8 text-sky-600 dark:text-sky-400" strokeWidth={1.5} />;
             default:
-                return <CloudUpload className="w-8 h-8 text-slate-800 dark:text-slate-200" strokeWidth={1.5} />;
+                return <CloudUpload className="w-6 h-6 sm:w-8 sm:h-8 text-slate-800 dark:text-slate-200" strokeWidth={1.5} />;
         }
     };
 
@@ -54,29 +55,37 @@ export function ProjectFolder({ project, onDelete }: ProjectFolderProps) {
                         className="group cursor-pointer flex flex-col w-full"
                         onClick={handleOpen}
                     >
-                        <div className="relative pt-3 w-full">
-                            {/* Back Tab */}
-                            <div className="absolute top-0 left-0 w-[45%] h-8 bg-slate-200 dark:bg-slate-800/80 rounded-t-xl transition-colors duration-300 group-hover:bg-slate-300 dark:group-hover:bg-slate-700" />
+                        {/* ═══════════ DOSSIER VISUEL ═══════════ */}
+                        <div className="relative pt-2 sm:pt-3 w-full">
+                            {/* Back Tab (onglet supérieur) */}
+                            <div className="absolute top-0 left-0 w-[40%] sm:w-[45%] h-6 sm:h-8 bg-slate-200 dark:bg-slate-800/80 rounded-t-lg sm:rounded-t-xl transition-colors duration-300 group-hover:bg-slate-300 dark:group-hover:bg-slate-700" />
 
                             {/* Front Body */}
-                            <div className="relative z-10 w-full aspect-[4/3] bg-slate-100 dark:bg-[#1a1a1a] rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1 border border-black/5 dark:border-white/5">
+                            <div className={cn(
+                                "relative z-10 w-full bg-slate-100 dark:bg-[#1a1a1a] rounded-xl sm:rounded-2xl",
+                                "flex items-center justify-center transition-all duration-300",
+                                "group-hover:shadow-lg group-hover:-translate-y-0.5 sm:group-hover:-translate-y-1",
+                                "border border-black/5 dark:border-white/5",
+                                // ✅ Responsive aspect ratio
+                                "aspect-[5/4] sm:aspect-[4/3]"
+                            )}>
                                 {getStatusIcon()}
                             </div>
                         </div>
 
-                        <div className="mt-3 ml-1 space-y-1">
-                            <span className="font-bold text-slate-900 dark:text-white text-sm tracking-wide line-clamp-1 block">
+                        {/* ═══════════ INFOS ═══════════ */}
+                        <div className="mt-2 sm:mt-3 ml-0.5 sm:ml-1 space-y-0.5 sm:space-y-1">
+                            <span className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm tracking-wide line-clamp-1 block">
                                 {project.name}
                             </span>
 
-                            {/* Infos secondaires */}
-                            <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                            <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs text-slate-500 dark:text-slate-400">
                                 {project.client_name && (
-                                    <span className="line-clamp-1">{project.client_name}</span>
+                                    <span className="line-clamp-1 flex-1 min-w-0">{project.client_name}</span>
                                 )}
                                 {project.documents_count !== undefined && project.documents_count > 0 && (
-                                    <span className="flex items-center gap-1">
-                                        <FileText className="w-3 h-3" />
+                                    <span className="flex items-center gap-0.5 sm:gap-1 shrink-0">
+                                        <FileText className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                                         {project.documents_count}
                                     </span>
                                 )}

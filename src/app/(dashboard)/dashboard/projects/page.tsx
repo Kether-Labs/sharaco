@@ -28,7 +28,7 @@ export default function ProjectsPage() {
                 <ContextMenuTrigger asChild>
                     <div className="flex-1 space-y-6 lg:space-y-8 p-4 md:p-8 pt-6 min-h-screen flex flex-col">
                         {/* Header Section */}
-                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+                        <div className="flex max-sm:hidden flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
                             <div>
                                 <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                                     Mes Projets
@@ -38,7 +38,7 @@ export default function ProjectsPage() {
                                 </p>
                             </div>
 
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center  gap-3">
                                 <div className="relative">
                                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                                     <Input
@@ -58,7 +58,53 @@ export default function ProjectsPage() {
                                 </Button>
                             </div>
                         </div>
+                        <div className="max-sm:flex hidden max-sm:flex-col gap-4 md:gap-6 mb-6 md:mb-10">
+                            {/* Titre + Description */}
+                            <div className="flex items-start justify-between gap-3">
+                                <div className="min-w-0">
+                                    <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white truncate">
+                                        Mes Projets
+                                    </h1>
+                                    <p className="text-muted-foreground mt-1 text-xs sm:text-sm md:text-base line-clamp-2">
+                                        Gérez vos dossiers, importations et fichiers liés à vos devis.
+                                    </p>
+                                </div>
 
+                                {/* Bouton Nouveau projet (desktop seulement, visible à côté du titre) */}
+                                <Button
+                                    onClick={() => setIsModalOpen(true)}
+                                    className="hidden md:inline-flex bg-sky-600 hover:bg-sky-700 text-white shrink-0"
+                                >
+                                    <FolderPlus className="mr-2 h-4 w-4" />
+                                    Nouveau projet
+                                </Button>
+                            </div>
+
+                            {/* Barre de recherche + bouton mobile */}
+                            <div className="flex items-center gap-2 sm:gap-3">
+                                {/* Recherche - pleine largeur sur mobile, contrôlée sur desktop */}
+                                <div className="relative flex-1 md:flex-none md:w-72 lg:w-80">
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
+                                    <Input
+                                        placeholder="Rechercher un projet..."
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        className="pl-10 h-10 md:h-11 w-full bg-slate-50 dark:bg-slate-900/50 border-transparent focus:bg-white dark:focus:bg-slate-900 rounded-xl text-sm"
+                                    />
+                                </div>
+
+                                {/* Bouton "Nouveau projet" : icône seule sur mobile, avec texte sur sm+ */}
+                                <Button
+                                    onClick={() => setIsModalOpen(true)}
+                                    className="bg-sky-600 hover:bg-sky-700 text-white shrink-0 h-10 md:h-11 px-3 sm:px-4"
+                                    size="icon"
+                                    aria-label="Nouveau projet"
+                                >
+                                    <FolderPlus className="h-4 w-4 sm:mr-2" />
+                                    <span className="hidden sm:inline">Nouveau projet</span>
+                                </Button>
+                            </div>
+                        </div>
                         {isLoading && (
                             <div className="flex items-center justify-center py-20">
                                 <Loader2 className="h-8 w-8 text-sky-500 animate-spin" />

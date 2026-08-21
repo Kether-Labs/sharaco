@@ -1,22 +1,18 @@
+// app/dashboard/layout.tsx
 "use client"
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import Header from "@/features/navigation/components/Header"
 import Sidebar from "@/features/navigation/components/Sidebar"
 import { Toaster } from "@/components/ui/toaster"
-import { Sheet, SheetContent } from "@/components/ui/sheet"
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-    const [isSidebarOpen, setIsSidebarOpen] = React.useState(true)
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
+    const [isSidebarOpen, setIsSidebarOpen] = React.useState(false)
 
-    // Fermer le sidebar sur mobile quand l'écran devient plus petit
+    // Fermer le sidebar sur mobile au démarrage et au resize
     React.useEffect(() => {
         const handleResize = () => {
             if (window.innerWidth < 768) {
                 setIsSidebarOpen(false)
-            } else {
-                setIsSidebarOpen(true)
             }
         }
 
@@ -28,28 +24,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
     return (
         <div className="flex bg-background mesh-gradient min-h-[100dvh] overflow-x-hidden">
-            {/* Desktop Sidebar */}
-            <div className="hidden md:block">
-                <Sidebar setIsSidebarOpen={setIsSidebarOpen} isSidebarOpen={isSidebarOpen} />
-            </div>
+            {/* Sidebar (fixed position, n'affecte pas le flow) */}
+            <Sidebar setIsSidebarOpen={setIsSidebarOpen} isSidebarOpen={isSidebarOpen} />
 
-            {/* Mobile Menu */}
-            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-                <SheetContent side="left" className="bg-transparent border-transparent p-0 w-72">
-                    <Sidebar setIsSidebarOpen={setIsMobileMenuOpen} isSidebarOpen={true} />
-                </SheetContent>
-            </Sheet>
-
-            {/* Main Content */}
-            <div className={cn(
-                "flex-1 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
-                isSidebarOpen ? "md:ml-[88px]" : "ml-0"
-            )}>
-                {/* Header */}
-
-
-                {/* Page Content */}
-                <main className="relative flex-1 p-4 md:p-8 lg:p-10  w-full">
+            {/* ═══════════════════════════════════════════════════════════
+                MAIN CONTENT
+                ✅ Marges FIXES selon le breakpoint, pas selon isSidebarOpen
+                ✅ Pas de transition (le sidebar est fixed, ne doit rien animer)
+            ═══════════════════════════════════════════════════════════ */}
+            <div className="flex-1 ml-0 md:ml-[88px]">
+                <main className="relative flex-1 p-4 md:p-8 lg:p-10 w-full pb-20 md:pb-0">
                     {children}
                     <Toaster />
                 </main>
@@ -57,4 +41,3 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
     )
 }
-

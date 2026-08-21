@@ -205,110 +205,117 @@ export default function QuoteDetailPage() {
                 </div>
 
                 {/* Right Column: Details & Actions */}
-                <div className="w-full xl:w-[460px] 2xl:w-[690px] flex flex-col shrink-0 xl:pt-2">
+                <div className="w-full xl:w-[400px] 2xl:w-[580px] flex flex-col shrink-0 xl:pt-2 gap-6">
                     
-                    <div className="mb-12">
+                    {/* Montants Card */}
+                    <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-950/60 p-5 shadow-[0_1px_0_rgba(15,23,42,0.03),0_8px_20px_rgba(15,23,42,0.04)] backdrop-blur-sm">
                         <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-xs font-semibold text-slate-400 tracking-widest uppercase mb-6">
-                            Montants
-                        </h3>
-
-                             {isAccepted && nextMilestone && (
-                    <div className=" z-20 hidden xl:block">
-                        <Button
-                            onClick={handleGenerateNext}
-                            disabled={isGenerating}
-                            className="h-10 px-4 cursor-pointer rounded-xl bg-[#2563EB] text-white font-medium shadow-[0_10px_20px_-10px_rgba(14,165,233,0.7)] transition-all"
-                        >
-                            {isGenerating ? (
-                                <>
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    Génération...
-                                </>
-                            ) : (
-                                <>
-                                    
-                                    Générer la facture suivante
-                                </>
-                            )}
-                        </Button>
-                    </div>
-                )}
-
+                            <h3 className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 tracking-[0.14em] uppercase">
+                                Récapitulatif
+                            </h3>
                         </div>
                         
-                        
-                        <div className="space-y-0 text-sm">
-                            <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 py-3">
-                                <span className="text-slate-500">Sous-total</span>
+                        <div className="space-y-1 text-sm">
+                            <div className="flex justify-between items-center py-2">
+                                <span className="text-slate-500 dark:text-slate-400">Sous-total</span>
                                 <span className="font-medium text-slate-900 dark:text-slate-100">
                                     {formatCurrency(quote.subtotal_cents || 0)}
                                 </span>
                             </div>
-                            <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 py-3">
-                                <span className="text-slate-500">TVA</span>
+                            <div className="flex justify-between items-center py-2">
+                                <span className="text-slate-500 dark:text-slate-400">TVA</span>
                                 <span className="font-medium text-slate-900 dark:text-slate-100">
                                     {formatCurrency(quote.tax_total_cents || 0)}
                                 </span>
                             </div>
-                            <div className="flex justify-between items-center pt-4">
-                                <span className="font-semibold text-slate-900 dark:text-slate-100">Total</span>
-                                <span className="text-lg font-semibold tracking-tight text-slate-900 dark:text-slate-100">
+                            
+                            <div className="h-px w-full bg-slate-100 dark:bg-slate-800 my-2" />
+                            
+                            <div className="flex justify-between items-center pt-2 pb-1">
+                                <span className="font-semibold text-slate-900 dark:text-slate-100">Total TTC</span>
+                                <span className="text-xl font-bold tracking-tight text-[#2563EB] dark:text-blue-400">
                                     {formatCurrency(quote.total_cents || quote.grand_total_cents || 0)}
                                 </span>
                             </div>
                         </div>
+
+                        {isAccepted && nextMilestone && (
+                            <div className="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800">
+                                <Button
+                                    onClick={handleGenerateNext}
+                                    disabled={isGenerating}
+                                    className="w-full h-12 rounded-xl bg-[#2563EB] hover:bg-blue-700 text-white font-medium shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] transition-all flex items-center justify-center gap-2"
+                                >
+                                    {isGenerating ? (
+                                        <>
+                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                            <span>Génération...</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <FileText className="h-4 w-4" />
+                                            <span>Générer la facture suivante</span>
+                                        </>
+                                    )}
+                                </Button>
+                            </div>
+                        )}
                     </div>
 
-                    <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-950/60 p-3.5 shadow-[0_1px_0_rgba(15,23,42,0.03),0_8px_20px_rgba(15,23,42,0.04)] backdrop-blur-sm">
-                        <div className="flex items-center justify-between mb-3">
+                    {/* Actions Card */}
+                    <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-950/60 p-5 shadow-[0_1px_0_rgba(15,23,42,0.03),0_8px_20px_rgba(15,23,42,0.04)] backdrop-blur-sm">
+                        <div className="flex items-center justify-between mb-4">
                             <h3 className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 tracking-[0.14em] uppercase">
-                                Actions
+                                Actions rapides
                             </h3>
-                            <span className="inline-flex items-center rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-2 py-0.5 text-[9px] font-medium text-slate-600 dark:text-slate-300">
-                                rapide
-                            </span>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-2.5">
+                        <div className="grid grid-cols-2 gap-3">
                             <Button
                                 onClick={handleSendEmail}
-                                className="group h-11 justify-between rounded-xl bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white transition-all duration-200 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950"
+                                className="group h-14 cursor-pointer flex flex-col justify-center items-center gap-1 rounded-md bg-[#2563EB] text-white hover:bg-[#2563EB]/80   transition-all duration-200 shadow-sm"
                             >
-                                <span className="font-medium text-xs">Email</span>
-                                <Mail className="h-4 w-4 transition-transform duration-200 group-hover:-translate-y-0.5" />
+                                
+                                Envoyer au client
                             </Button>
 
                             <Button
                                 onClick={handleDownload}
                                 variant="outline"
-                                className="h-11 justify-between rounded-xl border-slate-200 bg-slate-50 text-slate-900 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800 focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950"
+                                className="group h-14 flex flex-col justify-center items-center gap-1 rounded-md border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 shadow-sm transition-all duration-200"
                             >
-                                <span className="font-medium text-xs">PDF</span>
-                                <Download className="h-4 w-4" />
+                                
+                                Télécharger en PDF
                             </Button>
 
-                            <Button
+                           
+                           
+                        </div>
+
+                         <div className="flex items-center justify-center gap-5 w-full mt-6">
+                                     <Button
+                                     onClick={() => {router.push(`/dashboard/quotes/create/${quoteId}`)}}
                                 asChild
-                                variant="ghost"
-                                className="h-11 justify-between rounded-xl border border-transparent bg-transparent text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-900 dark:hover:text-slate-100 focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950 col-span-2"
+                                variant="outline"
+                                className="py-6 gap-2 w-[50%] rounded-md border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 shadow-sm transition-all duration-200"
                             >
-                                <Link href={`/dashboard/quotes/create/${quoteId}`} className="inline-flex w-full items-center justify-between">
-                                    <span className="font-medium text-xs">Modifier le devis</span>
-                                    <Edit className="h-4 w-4" />
-                                </Link>
+                                
+                                    
+                                    Modifier le devis
+                                
                             </Button>
 
                             <Button
                                 onClick={handleDelete}
                                 disabled={isDeleting}
                                 variant="ghost"
-                                className="h-11 justify-between rounded-xl text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-950/40 dark:hover:text-red-300 focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950 disabled:opacity-60 col-span-2"
+                                className="py-6 w-[50%] justify-center gap-2 rounded-md text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-950/40 dark:hover:text-red-300 disabled:opacity-60 col-span-2 transition-all duration-200"
                             >
-                                <span className="font-medium text-xs">Supprimer le devis</span>
                                 {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                                <span className="font-medium text-xs">Supprimer le devis</span>
                             </Button>
-                        </div>
+                            </div>
+                        
                     </div>
 
                     <SendEmailModal
@@ -323,7 +330,7 @@ export default function QuoteDetailPage() {
 
                     {/* Échéancier (si devis accepté + échéancier présent) */}
                     {isAccepted && hasSchedule && (
-                        <div className="mt-12">
+                        <div className="mt-2">
                             <PaymentTimeline
                                 quoteId={quoteId}
                                 quoteNumber={quote.number}

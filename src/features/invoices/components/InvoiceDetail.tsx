@@ -168,11 +168,7 @@ export function InvoiceDetail({ invoiceId }: { invoiceId: string }) {
                                 {statusConfig.label}
                             </div>
                             
-                            {isOverdue && (
-                                <span className="px-2 py-0.5 text-[10px] font-bold bg-rose-500/10 text-rose-500 rounded-full border border-rose-500/20">
-                                    ⚠️ En retard
-                                </span>
-                            )}
+                            
                         </div>
                     </div>
                 </header>
@@ -190,7 +186,36 @@ export function InvoiceDetail({ invoiceId }: { invoiceId: string }) {
                     </div>
 
                     {/* Right Column: Details & Actions */}
-                    <div className="w-full lg:w-[320px] flex flex-col shrink-0 lg:pt-8">
+                    <div className="w-full lg:w-[320px] flex flex-col shrink-0 lg:pt-2">
+
+                        <div className="flex items-center gap-5 mb-8 justify-center">
+                                        <Button 
+                                    onClick={handleOpenEmailModal} 
+                                    disabled={isPaid}
+                                    variant="default"
+                                    className={cn(
+                                        "w-full  rounded-md font-medium justify-between px-4 transition-colors duration-200",
+                                        isPaid 
+                                            ? "bg-[#2563EB] text-slate-500 cursor-not-allowed dark:bg-slate-800 "
+                                            : "bg-[#2563EB] cursor-pointer  text-white "
+                                    )}
+                                >
+                                    <span>{isSent ? "Renvoyer par email" : "Envoyer une relance"}</span>
+                                    
+                                </Button>
+
+                                 {!isPaid && (
+                                    <Button 
+                                        onClick={handleMarkAsPaid}
+                                        disabled={isMarkingPaid}
+                                        variant="outline"
+                                        className="w-full h-10 cursor-pointer rounded-md border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-900 dark:text-slate-100 font-medium justify-between px-4 transition-colors duration-200"
+                                    >
+                                        <span>Marquer comme payée</span>
+                                        
+                                    </Button>
+                                )}
+                        </div>
                         
                         {/* Montants */}
                         <div className="mb-12">
@@ -245,33 +270,10 @@ export function InvoiceDetail({ invoiceId }: { invoiceId: string }) {
 
                             <div className="flex flex-col gap-2">
                                 {/* ✅ Bouton Envoyer : ouvre maintenant le modal */}
-                                <Button 
-                                    onClick={handleOpenEmailModal} 
-                                    disabled={isPaid}
-                                    variant="default"
-                                    className={cn(
-                                        "w-full h-10 rounded-md font-medium justify-between px-4 transition-colors duration-200",
-                                        isPaid 
-                                            ? "bg-slate-200 text-slate-500 cursor-not-allowed dark:bg-slate-800 dark:text-slate-500"
-                                            : "bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
-                                    )}
-                                >
-                                    <span>{isSent ? "Renvoyer par email" : "Envoyer par email"}</span>
-                                    <Send className="h-4 w-4" />
-                                </Button>
+                                
 
                                 {/* Marquer comme payée */}
-                                {!isPaid && (
-                                    <Button 
-                                        onClick={handleMarkAsPaid}
-                                        disabled={isMarkingPaid}
-                                        variant="outline"
-                                        className="w-full h-10 rounded-md border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-900 dark:text-slate-100 font-medium justify-between px-4 transition-colors duration-200"
-                                    >
-                                        <span>Marquer comme payée</span>
-                                        {isMarkingPaid ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-                                    </Button>
-                                )}
+                               
 
                                 {/* Télécharger PDF */}
                                 <Button 
@@ -299,18 +301,7 @@ export function InvoiceDetail({ invoiceId }: { invoiceId: string }) {
                                 )}
 
                                 {/* Relance */}
-                                <Button 
-                                    onClick={handleRemind}
-                                    disabled={isPaid || isReminding}
-                                    variant="ghost"
-                                    className={cn(
-                                        "w-full h-10 rounded-md hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-600 dark:text-slate-400 font-medium justify-between px-4 transition-colors duration-200",
-                                        isPaid && 'opacity-50 cursor-not-allowed'
-                                    )}
-                                >
-                                    <span>Envoyer une relance</span>
-                                    {isReminding ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bell className="h-4 w-4" />}
-                                </Button>
+                                
                             </div>
                         </div>
 

@@ -78,7 +78,7 @@ export default function DashboardPage() {
             {/* ✅ Tour automatique au premier lancement */}
             <OnboardingTour />
 
-            <div className="flex-1 space-y-8 p-4 md:p-8 pt-6 min-h-screen">
+            <div className="flex-1  space-y-8 p-4 md:p-8 pt-6 min-h-screen">
                 <div data-tour="dashboard-title">
                     <h1 className="text-3xl font-black tracking-tight text-white">
                         Tableau de bord
