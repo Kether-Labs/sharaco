@@ -1,3 +1,4 @@
+// app/dashboard/quotes/page.tsx
 "use client"
 
 import { QuoteHeader } from "@/features/quotes/components/QuoteHeader"
@@ -14,45 +15,52 @@ export default function QuotesPage() {
     const queryClient = useQueryClient()
     const { data: quotes, isLoading, error, refetch } = useQuotes()
     const handleDeleteSuccess = () => {
-        // Rafraîchir la liste après suppression
         queryClient.invalidateQueries({ queryKey: ['documents'] })
     }
 
     const [searchQuery, setSearchQuery] = useState("");
     const [statusFilter, setStatusFilter] = useState<string>("ALL");
 
-
     const hasQuotes = quotes && quotes.length > 0;
 
     return (
-        <div className="flex-1 space-y-6 lg:space-y-12 p-4 md:p-8 pt-6 min-h-screen">
+        <div className="flex-1 space-y-4 sm:space-y-6 lg:space-y-8 xl:space-y-12 p-3 sm:p-4 md:p-8 pt-4 sm:pt-6 min-h-screen">
             {isLoading ? (
-                <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {[...Array(8)].map((_, i) => (
-                        <Skeleton key={i} className="h-64 rounded-[2rem]" />
+                /* ═══════════ SKELETON LOADING ═══════════ */
+                <div className="mt-4 sm:mt-8 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4 md:gap-6">
+                    {[...Array(12)].map((_, i) => (
+                        <div key={i} className="space-y-2 sm:space-y-3">
+                            <Skeleton className="w-full aspect-[4/5] rounded-xl sm:rounded-2xl" />
+                            <Skeleton className="h-3 sm:h-4 w-3/4 rounded-md mx-1" />
+                            <Skeleton className="h-2.5 sm:h-3 w-1/2 rounded-md mx-1" />
+                        </div>
                     ))}
                 </div>
             ) : error ? (
-                <div className="flex flex-col items-center justify-center p-20 text-center bg-white/40 dark:bg-slate-950/40 rounded-3xl border border-rose-500/20 backdrop-blur-xl mt-8">
-                    <p className="text-rose-500 font-medium mb-4">Impossible de charger les devis.</p>
-                    <Button onClick={() => refetch()} variant="outline" className="rounded-xl">
+                /* ═══════════ ERROR STATE ═══════════ */
+                <div className="flex flex-col items-center justify-center p-6 sm:p-12 md:p-20 text-center bg-white/40 dark:bg-slate-950/40 rounded-2xl sm:rounded-3xl border border-rose-500/20 backdrop-blur-xl mt-4 sm:mt-8">
+                    <p className="text-rose-500 font-medium mb-3 sm:mb-4 text-sm sm:text-base px-4">
+                        Impossible de charger les devis.
+                    </p>
+                    <Button onClick={() => refetch()} variant="outline" className="rounded-xl h-10 sm:h-11 px-4">
                         <RefreshCcw className="mr-2 h-4 w-4" /> Réessayer
                     </Button>
                 </div>
             ) : !hasQuotes ? (
-                <div className="flex flex-col items-center justify-center py-32 text-center ">
-                    <div className="h-24 w-24 bg-[#2563EB]/10 rounded-[2rem] flex items-center justify-center mb-6 border border-sky-500/20 shadow-xl shadow-sky-500/10 group hover:scale-110 transition-transform duration-500">
-                        <FileText className="h-10 w-10 text-[#2563EB]" />
+                /* ═══════════ EMPTY STATE ═══════════ */
+                <div className="flex flex-col items-center justify-center py-16 sm:py-24 md:py-32 text-center px-4">
+                    <div className="h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 bg-[#2563EB]/10 rounded-2xl sm:rounded-[1.5rem] md:rounded-[2rem] flex items-center justify-center mb-4 sm:mb-6 border border-sky-500/20 shadow-xl shadow-sky-500/10 group hover:scale-110 transition-transform duration-500">
+                        <FileText className="h-7 w-7 sm:h-8 sm:h-8 md:h-10 md:w-10 text-[#2563EB]" />
                     </div>
-                    <h2 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight mb-4">
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight mb-3 sm:mb-4">
                         Aucun devis pour le moment
                     </h2>
-                    <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto mb-10 text-lg">
+                    <p className="text-sm sm:text-base md:text-lg text-slate-500 dark:text-slate-400 max-w-md mx-auto mb-6 sm:mb-8 md:mb-10 leading-relaxed">
                         Commencez par créer votre premier devis. Il sera ajouté à cette liste et vous pourrez le partager directement avec vos clients.
                     </p>
                     <Link href="/dashboard/quotes/create">
-                        <Button className="h-14 px-8 bg-[#2563EB] hover:bg-[#2563EB]/80 text-white rounded-2xl font-bold  text-lg">
-                            <Plus className="h-6 w-6 mr-2" />
+                        <Button className="h-12 sm:h-14 px-5 sm:px-6 md:px-8 bg-[#2563EB] hover:bg-[#2563EB]/80 text-white rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base md:text-lg">
+                            <Plus className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 mr-1.5 sm:mr-2" />
                             Créer mon premier devis
                         </Button>
                     </Link>
@@ -66,7 +74,7 @@ export default function QuotesPage() {
                         onStatusChange={setStatusFilter}
                     />
 
-                    <div className="mt-8">
+                    <div className="mt-4 sm:mt-6 md:mt-8">
                         <QuoteList
                             quotes={quotes}
                             onDeleteSuccess={handleDeleteSuccess}

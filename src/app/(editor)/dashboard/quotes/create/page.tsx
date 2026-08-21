@@ -30,7 +30,6 @@ function QuoteBuilderContent() {
     const [isClientModalOpen, setIsClientModalOpen] = useState(false);
     const [selectedLayoutStyle, setSelectedLayoutStyle] = useState<string>("");
 
-    // Client management state
     const { data: clientsData } = useClients();
     const clients = clientsData?.items || clientsData || [];
     const [clientMode, setClientMode] = useState<"select" | "create">("create");
@@ -39,7 +38,6 @@ function QuoteBuilderContent() {
     const [newClient, setNewClient] = useState({ name: "", email: "", phone: "", address: "" });
     const createClient = useCreateClient();
 
-    // Charger les projets
     const { data: projects = [] } = useQuery({
         queryKey: ['projects'],
         queryFn: () => projectsApi.getAll(),
@@ -51,11 +49,11 @@ function QuoteBuilderContent() {
                 <TemplateSelector onSelect={handleSelectTemplate} />
                 {renderClientModal()}
                 {isCreating && !isClientModalOpen && (
-                    <div className="fixed inset-0 z-50 flex h-[100dvh] w-screen items-center justify-center bg-zinc-950/80 backdrop-blur-sm">
-                        <div className="flex flex-col items-center gap-4 text-center">
-                            <Loader2 className="h-12 w-12 text-[#2563EB] animate-spin" />
-                            <p className="text-zinc-300 font-bold text-lg mt-4">Veuillez patienter...</p>
-                            <p className="text-zinc-500 font-medium">Nous vous redirigeons vers l'éditeur de devis</p>
+                    <div className="fixed inset-0 z-50 flex h-[100dvh] w-screen items-center justify-center bg-zinc-950/80 backdrop-blur-sm p-4">
+                        <div className="flex flex-col items-center gap-3 sm:gap-4 text-center max-w-xs">
+                            <Loader2 className="h-10 w-10 sm:h-12 sm:w-12 text-[#2563EB] animate-spin" />
+                            <p className="text-zinc-300 font-bold text-base sm:text-lg mt-2 sm:mt-4">Veuillez patienter...</p>
+                            <p className="text-zinc-500 font-medium text-sm">Nous vous redirigeons vers l'éditeur de devis</p>
                         </div>
                     </div>
                 )}
@@ -104,7 +102,6 @@ function QuoteBuilderContent() {
             return;
         }
 
-        // We keep the modal open so the loader shows inside it
         setIsCreating(true);
 
         try {
@@ -138,38 +135,44 @@ function QuoteBuilderContent() {
     function renderClientModal() {
         return (
             <Dialog open={isClientModalOpen} onOpenChange={(open) => !isCreating && setIsClientModalOpen(open)}>
-                <DialogContent className="sm:max-w-[425px] bg-white dark:bg-zinc-950 border-white/10 shadow-2xl rounded-[2rem] p-0 overflow-hidden !z-[9999]">
-                    <div className="h-2 bg-gradient-to-r from-[#2563EB] to-indigo-500 w-full" />
+                <DialogContent className="max-w-[92vw] sm:max-w-[425px] bg-white dark:bg-zinc-950 border-white/10 shadow-2xl rounded-[1.5rem] sm:rounded-[2rem] p-0 overflow-hidden !z-[9999] max-h-[90dvh] overflow-y-auto">
+                    <div className="h-1.5 sm:h-2 bg-gradient-to-r from-[#2563EB] to-indigo-500 w-full" />
 
                     {isCreating ? (
-                        <div className="p-12 flex flex-col items-center justify-center text-center space-y-4">
+                        <div className="p-8 sm:p-12 flex flex-col items-center justify-center text-center space-y-3 sm:space-y-4">
                             <div className="relative mb-2">
                                 <div className="absolute inset-0 bg-[#2563EB]/20 blur-xl rounded-full" />
-                                <Loader2 className="h-12 w-12 text-[#2563EB] animate-spin relative z-10" />
+                                <Loader2 className="h-10 w-10 sm:h-12 sm:w-12 text-[#2563EB] animate-spin relative z-10" />
                             </div>
-                            <DialogTitle className="text-2xl font-black text-slate-900 dark:text-white mt-4">
+                            <DialogTitle className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white mt-2 sm:mt-4">
                                 Création en cours...
                             </DialogTitle>
-                            <DialogDescription className="text-sm text-slate-500 dark:text-slate-400 font-medium">
+                            <DialogDescription className="text-sm text-slate-500 dark:text-slate-400 font-medium px-4">
                                 Veuillez patienter pendant que nous générons votre devis et vous redirigeons vers l'éditeur.
                             </DialogDescription>
                         </div>
                     ) : (
-                        <div className="p-6">
-                            <DialogHeader className="mb-6 text-left">
-                                <DialogTitle className="text-2xl font-black text-slate-900 dark:text-white">Pour qui créez-vous ce devis ?</DialogTitle>
-                                <DialogDescription className="text-slate-500 dark:text-slate-400">
-                                    {clientMode === "select" ? "Sélectionnez un client existant pour votre devis." : "Ajoutez les informations du client pour pouvoir finaliser la création du devis."}
+                        <div className="p-4 sm:p-6">
+                            <DialogHeader className="mb-4 sm:mb-6 text-left">
+                                <DialogTitle className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                                    Pour qui créez-vous ce devis ?
+                                </DialogTitle>
+                                <DialogDescription className="text-sm text-slate-500 dark:text-slate-400">
+                                    {clientMode === "select"
+                                        ? "Sélectionnez un client existant pour votre devis."
+                                        : "Ajoutez les informations du client pour pouvoir finaliser la création du devis."}
                                 </DialogDescription>
                             </DialogHeader>
 
-                            <div className="space-y-4">
+                            <div className="space-y-3 sm:space-y-4">
                                 {clientMode === "select" ? (
-                                    <div className="space-y-4">
+                                    <div className="space-y-3 sm:space-y-4">
                                         <div className="space-y-2">
-                                            <Label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Client *</Label>
+                                            <Label className="text-[11px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+                                                Client *
+                                            </Label>
                                             <Select value={selectedClientIdModal} onValueChange={setSelectedClientIdModal}>
-                                                <SelectTrigger className="h-12 bg-slate-50 dark:bg-zinc-900/50 border-slate-200 dark:border-white/5 rounded-xl">
+                                                <SelectTrigger className="h-11 sm:h-12 bg-slate-50 dark:bg-zinc-900/50 border-slate-200 dark:border-white/5 rounded-xl text-sm">
                                                     <SelectValue placeholder="Sélectionnez un client" />
                                                 </SelectTrigger>
                                                 <SelectContent className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-800 z-[10000]">
@@ -194,11 +197,13 @@ function QuoteBuilderContent() {
                                 ) : (
                                     <>
                                         <div className="space-y-2">
-                                            <Label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Nom complet / Entreprise *</Label>
+                                            <Label className="text-[11px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+                                                Nom complet / Entreprise *
+                                            </Label>
                                             <div className="relative">
                                                 <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                                                 <Input
-                                                    className="pl-10 h-12 bg-slate-50 dark:bg-zinc-900/50 border-slate-200 dark:border-white/5 rounded-xl focus:border-[#2563EB] focus:ring-[#2563EB]"
+                                                    className="pl-10 h-11 sm:h-12 bg-slate-50 dark:bg-zinc-900/50 border-slate-200 dark:border-white/5 rounded-xl focus:border-[#2563EB] focus:ring-[#2563EB] text-sm"
                                                     placeholder="Nom Client ou Nom de l'entreprise"
                                                     value={newClient.name}
                                                     onChange={(e) => setNewClient({ ...newClient, name: e.target.value })}
@@ -207,12 +212,14 @@ function QuoteBuilderContent() {
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Email</Label>
+                                            <Label className="text-[11px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+                                                Email
+                                            </Label>
                                             <div className="relative">
                                                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                                                 <Input
                                                     type="email"
-                                                    className="pl-10 h-12 bg-slate-50 dark:bg-zinc-900/50 border-slate-200 dark:border-white/5 rounded-xl focus:border-[#2563EB] focus:ring-[#2563EB]"
+                                                    className="pl-10 h-11 sm:h-12 bg-slate-50 dark:bg-zinc-900/50 border-slate-200 dark:border-white/5 rounded-xl focus:border-[#2563EB] focus:ring-[#2563EB] text-sm"
                                                     placeholder="contact@client.com"
                                                     value={newClient.email}
                                                     onChange={(e) => setNewClient({ ...newClient, email: e.target.value })}
@@ -220,13 +227,16 @@ function QuoteBuilderContent() {
                                             </div>
                                         </div>
 
-                                        <div className="grid grid-cols-2 gap-4">
+                                        {/* ✅ Grille responsive : stack mobile, 2 cols desktop */}
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                             <div className="space-y-2">
-                                                <Label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Téléphone</Label>
+                                                <Label className="text-[11px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+                                                    Téléphone
+                                                </Label>
                                                 <div className="relative">
                                                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                                                     <Input
-                                                        className="pl-10 h-12 bg-slate-50 dark:bg-zinc-900/50 border-slate-200 dark:border-white/5 rounded-xl focus:border-[#2563EB] focus:ring-[#2563EB]"
+                                                        className="pl-10 h-11 sm:h-12 bg-slate-50 dark:bg-zinc-900/50 border-slate-200 dark:border-white/5 rounded-xl focus:border-[#2563EB] focus:ring-[#2563EB] text-sm"
                                                         placeholder="+33 6..."
                                                         value={newClient.phone}
                                                         onChange={(e) => setNewClient({ ...newClient, phone: e.target.value })}
@@ -235,11 +245,13 @@ function QuoteBuilderContent() {
                                             </div>
 
                                             <div className="space-y-2">
-                                                <Label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Adresse</Label>
+                                                <Label className="text-[11px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+                                                    Adresse
+                                                </Label>
                                                 <div className="relative">
                                                     <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                                                     <Input
-                                                        className="pl-10 h-12 bg-slate-50 dark:bg-zinc-900/50 border-slate-200 dark:border-white/5 rounded-xl focus:border-[#2563EB] focus:ring-[#2563EB]"
+                                                        className="pl-10 h-11 sm:h-12 bg-slate-50 dark:bg-zinc-900/50 border-slate-200 dark:border-white/5 rounded-xl focus:border-[#2563EB] focus:ring-[#2563EB] text-sm"
                                                         placeholder="123 rue..."
                                                         value={newClient.address}
                                                         onChange={(e) => setNewClient({ ...newClient, address: e.target.value })}
@@ -263,18 +275,18 @@ function QuoteBuilderContent() {
                                 )}
                             </div>
 
-                            <DialogFooter className="mt-8 flex gap-3 sm:justify-start">
+                            <DialogFooter className="mt-6 sm:mt-8 flex gap-2 sm:gap-3 sm:justify-start flex-col-reverse sm:flex-row">
                                 <Button
                                     variant="outline"
                                     onClick={() => setIsClientModalOpen(false)}
-                                    className="flex-1 h-12 rounded-xl border-slate-200 dark:border-white/5 font-bold"
+                                    className="flex-1 h-11 sm:h-12 rounded-xl border-slate-200 dark:border-white/5 font-bold text-sm w-full"
                                 >
                                     Annuler
                                 </Button>
                                 <Button
                                     onClick={handleCreateClientAndQuote}
                                     disabled={createClient.isPending || (clientMode === "create" && !newClient.name) || (clientMode === "select" && !selectedClientIdModal)}
-                                    className="flex-1 h-12 bg-[#2563EB] hover:bg-[#2563EB]/80 text-white font-bold rounded-xl"
+                                    className="flex-1 h-11 sm:h-12 bg-[#2563EB] hover:bg-[#2563EB]/80 text-white font-bold rounded-xl text-sm w-full"
                                 >
                                     {createClient.isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : "Créer et Continuer"}
                                 </Button>
@@ -287,28 +299,28 @@ function QuoteBuilderContent() {
     }
 
     return (
-        <div className="min-h-screen bg-zinc-950 p-8 relative">
+        <div className="min-h-screen bg-zinc-950 p-4 sm:p-6 md:p-8 relative">
             {isCreating && !isClientModalOpen && (
                 <div className="fixed inset-0 z-50 flex h-[100dvh] w-screen items-center justify-center bg-zinc-950/80 backdrop-blur-sm">
-                    <div className="flex flex-col items-center gap-4 text-center">
-                        <Loader2 className="h-12 w-12 text-[#2563EB] animate-spin" />
-                        <p className="text-zinc-300 font-bold text-lg mt-4">Veuillez patienter...</p>
-                        <p className="text-zinc-500 font-medium">Nous vous redirigeons vers l'éditeur de devis</p>
+                    <div className="flex flex-col items-center gap-4 text-center px-4">
+                        <Loader2 className="h-10 w-10 sm:h-12 sm:w-12 text-[#2563EB] animate-spin" />
+                        <p className="text-zinc-300 font-bold text-base sm:text-lg mt-4">Veuillez patienter...</p>
+                        <p className="text-zinc-500 font-medium text-sm">Nous vous redirigeons vers l'éditeur de devis</p>
                     </div>
                 </div>
             )}
 
-            <div className="max-w-4xl mx-auto space-y-8">
+            <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
                 {/* Sélecteur de projet */}
                 {projects.length > 0 && (
                     <Card className="bg-zinc-900 border-zinc-800">
-                        <CardHeader>
-                            <CardTitle className="text-white">Projet associé (optionnel)</CardTitle>
+                        <CardHeader className="pb-3">
+                            <CardTitle className="text-white text-base sm:text-lg">Projet associé (optionnel)</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <Label className="text-zinc-400 mb-2 block">Sélectionner un projet</Label>
+                            <Label className="text-zinc-400 mb-2 block text-xs sm:text-sm">Sélectionner un projet</Label>
                             <Select value={selectedProjectId} onValueChange={setSelectedProjectId}>
-                                <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
+                                <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white h-11">
                                     <SelectValue placeholder="Aucun projet" />
                                 </SelectTrigger>
                                 <SelectContent className="bg-zinc-800 border-zinc-700">
@@ -320,7 +332,7 @@ function QuoteBuilderContent() {
                                     ))}
                                 </SelectContent>
                             </Select>
-                            <p className="text-xs text-zinc-500 mt-2">
+                            <p className="text-[11px] sm:text-xs text-zinc-500 mt-2">
                                 Si vous sélectionnez un projet, le client sera automatiquement récupéré.
                             </p>
                         </CardContent>
@@ -329,12 +341,11 @@ function QuoteBuilderContent() {
 
                 {/* Sélecteur de template */}
                 <Card className="bg-zinc-900 border-zinc-800">
-                    <CardHeader>
-                        <CardTitle className="text-white">Choisir un modèle</CardTitle>
+                    <CardHeader className="pb-3">
+                        <CardTitle className="text-white text-base sm:text-lg">Choisir un modèle</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <TemplateSelector onSelect={handleSelectTemplate} />
-
                     </CardContent>
                 </Card>
             </div>
