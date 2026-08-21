@@ -1,4 +1,3 @@
-// features/projects/components/ProjectQuoteGrid.tsx
 "use client"
 
 import { useState } from "react"
@@ -18,55 +17,63 @@ interface ProjectQuoteGridProps {
 
 const containerVariants = {
     hidden: { opacity: 0 },
-    show: { opacity: 1, transition: { staggerChildren: 0.05 } }
+    show: { opacity: 1, transition: { staggerChildren: 0.08 } }
 }
 
 const cardVariants = {
-    hidden: { opacity: 0, scale: 0.95 },
-    show: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 300, damping: 25 } }
+    hidden: { opacity: 0, y: 15, scale: 0.98 },
+    show: { 
+        opacity: 1, 
+        y: 0, 
+        scale: 1, 
+        transition: { type: "spring", stiffness: 120, damping: 20 } 
+    }
 }
 
 export function ProjectQuoteGrid({ tree, projectId, onRefresh }: ProjectQuoteGridProps) {
     const [expandedQuoteId, setExpandedQuoteId] = useState<string | null>(null);
 
-    // Vue factures (quand un dossier est ouvert)
     const expandedQuote = tree.quotes.find(q => q.id === expandedQuoteId);
 
     if (expandedQuote) {
         return (
-            <InvoiceGrid
-                quote={expandedQuote}
-                onBack={() => setExpandedQuoteId(null)}
-                onRefresh={onRefresh}
-            />
+            <motion.div
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ type: "spring", stiffness: 150, damping: 25 }}
+            >
+                <InvoiceGrid
+                    quote={expandedQuote}
+                    onBack={() => setExpandedQuoteId(null)}
+                    onRefresh={onRefresh}
+                />
+            </motion.div>
         );
     }
-    console.log(tree)
+
     return (
-        <div className="space-y-6">
+        <div className="space-y-12">
             <motion.div
                 variants={containerVariants}
                 initial="hidden"
                 animate="show"
-                className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-6 gap-4 md:gap-6"
+                className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-x-5 gap-y-8"
             >
                 {/* ═══════════ Nouveau Devis Card ═══════════ */}
                 <motion.div variants={cardVariants} className="h-full">
                     <Link
                         href={`/dashboard/quotes/create?project_id=${projectId}`}
-                        className="group flex flex-col h-full w-full"
+                        className="group flex flex-col h-full w-full outline-none"
                     >
-                        <div className="w-full aspect-[4/5] rounded-2xl bg-slate-100/50 dark:bg-white/[0.02] border border-slate-200/50 dark:border-white/5 flex flex-col items-center justify-center group-hover:bg-slate-100 dark:group-hover:bg-white/[0.05] group-hover:border-violet-500/30 group-hover:shadow-xl group-hover:shadow-violet-500/10 group-hover:-translate-y-1 transition-all duration-300">
-                            <div className="w-12 h-12 rounded-full bg-[#2563EB] flex items-center justify-center text-white mb-3 shadow-[0_4px_15px_rgba(37,99,235,0.3)] group-hover:scale-110 transition-transform">
-                                <Plus className="w-6 h-6" />
+                        <div className="w-full aspect-[4/5] rounded-2xl bg-white/40 dark:bg-transparent border border-dashed border-slate-300 dark:border-white/20 flex flex-col items-center justify-center transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:bg-white dark:group-hover:bg-white/5 group-hover:border-solid group-hover:border-slate-400 dark:group-hover:border-white/30 group-hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] group-hover:-translate-y-1">
+                            <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-500 dark:text-slate-300 mb-3 transition-transform duration-500 group-hover:scale-110 group-hover:bg-slate-900 group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-slate-900">
+                                <Plus  className="w-4 h-4" />
                             </div>
-                            <span className="text-sm font-bold text-slate-700 dark:text-slate-300">
-                                Nouveau devis
-                            </span>
                         </div>
-                        <div className="mt-3 opacity-0">
-                            <h4 className="text-sm font-bold">X</h4>
-                            <div className="text-[11px]">X</div>
+                        {/* Invisible alignment text to match other cards structure */}
+                        <div className="mt-4 px-1 opacity-0 pointer-events-none select-none">
+                            <h4 className="text-[13px] font-semibold">X</h4>
+                            <div className="text-[11px] mt-1">X</div>
                         </div>
                     </Link>
                 </motion.div>
@@ -81,14 +88,12 @@ export function ProjectQuoteGrid({ tree, projectId, onRefresh }: ProjectQuoteGri
 
                         return (
                             <div key={quote.id} className="contents">
-                                {/* Carte devis (preview PNG) */}
                                 <QuoteCardWithInvoices
                                     quote={quote}
                                     variants={cardVariants}
                                     onExpand={() => setExpandedQuoteId(quote.id)}
                                 />
 
-                                {/* 📁 Dossier factures (si le devis a des factures) */}
                                 {quote.invoices.length > 0 && (
                                     <FolderCard
                                         title={`Factures ${quote.number || ""}`}
@@ -108,22 +113,23 @@ export function ProjectQuoteGrid({ tree, projectId, onRefresh }: ProjectQuoteGri
 
             {/* ═══════════ Factures standalone ═══════════ */}
             {tree.standalone_invoices.length > 0 && (
-                <div className="mt-12">
-                    <div className="text-[10px] font-semibold text-slate-400 tracking-widest uppercase mb-4">
-                        Factures hors devis ({tree.standalone_invoices.length})
+                <div className="pt-8 border-t border-slate-200/60 dark:border-white/10">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="h-px bg-slate-200 dark:bg-white/10 flex-1" />
+                        <div className="text-[10px] font-bold text-slate-400 tracking-[0.2em] uppercase">
+                            Hors devis ({tree.standalone_invoices.length})
+                        </div>
+                        <div className="h-px bg-slate-200 dark:bg-white/10 flex-1" />
                     </div>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-4">
-                        {/* 📁 Dossier unique pour les factures standalone */}
+                    
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-x-5 gap-y-8">
                         <FolderCard
-                            title="Factures hors devis"
+                            title="Factures isolées"
                             subtitle="Sans devis parent"
                             invoiceCount={tree.standalone_invoices.length}
                             paidCount={tree.standalone_invoices.filter(i => i.status === "PAID").length}
                             overdueCount={tree.standalone_invoices.filter(i => i.status === "OVERDUE" || (i.days_late && i.days_late > 0)).length}
-                            onClick={() => {
-                                // Optionnel : ouvrir une vue spéciale standalone
-                                // Pour l'instant, on peut juste linker vers /dashboard/invoices
-                            }}
+                            onClick={() => {}}
                             variants={cardVariants}
                         />
                     </div>
