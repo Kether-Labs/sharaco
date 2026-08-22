@@ -1,3 +1,4 @@
+// features/quotes/components/LivePreview.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -5,7 +6,7 @@ import { useDebouncedValue } from "../../hooks/useDebouncedValue";
 import { templatesApi } from "@/features/templates/api/templatesApi";
 import type { QuoteDraft } from "../../types/QuoteBuilder";
 import { DocumentPreviewRequest } from "@/features/templates/types";
-import { Loader2 } from "lucide-react";
+import { Loader2, AlertCircle, FileText } from "lucide-react";
 import { cn } from "@/lib/utils"
 
 interface LivePreviewProps {
@@ -14,19 +15,14 @@ interface LivePreviewProps {
     templateId?: string | null;
 }
 
-/**
- * Convertit le draft frontend → format attendu par POST /documents/preview
- */
 function draftToPreviewRequest(
     draft: QuoteDraft,
     layoutStyle: string,
     templateId?: string | null
 ): DocumentPreviewRequest {
-    // ✅ Helper : détecte si l'échéancier est valide
-    const hasValidSchedule = 
-        draft.paymentMilestones && 
+    const hasValidSchedule =
+        draft.paymentMilestones &&
         draft.paymentMilestones.length > 0 &&
-        // Ignorer le cas "100% par défaut" qui équivaut à un paiement simple
         !(draft.paymentMilestones.length === 1 && draft.paymentMilestones[0].percent === 100);
 
     return {
@@ -55,8 +51,6 @@ function draftToPreviewRequest(
         show_tax_id: true,
         notes: draft.notes || null,
         reference: draft.reference || null,
-        
-        // ✅ NOUVELLE LOGIQUE : basé sur les milestones, pas sur le mode
         payment_schedule: hasValidSchedule
             ? draft.paymentMilestones!.map((ms, idx) => ({
                 sequence: idx + 1,
@@ -67,8 +61,6 @@ function draftToPreviewRequest(
             }))
             : null,
     };
-
-   
 }
 
 export function LivePreview({ draft, layoutStyle = "classic", templateId }: LivePreviewProps) {
@@ -76,8 +68,6 @@ export function LivePreview({ draft, layoutStyle = "classic", templateId }: Live
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    console.log(draft.paymentMode, draft.paymentMilestones, "LivePreview - draft payment info");
-    // 🔑 Debounce : attend 500ms après la dernière modif
     const debouncedDraft = useDebouncedValue(draft, 500);
 
     useEffect(() => {
@@ -94,7 +84,6 @@ export function LivePreview({ draft, layoutStyle = "classic", templateId }: Live
                     templateId
                 );
 
-                console.log('🔄 FETCH PREVIEW - Request Data:', requestData);
                 const html = await templatesApi.previewDocument(requestData);
 
                 if (!cancelled) {
@@ -113,55 +102,78 @@ export function LivePreview({ draft, layoutStyle = "classic", templateId }: Live
 
         fetchPreview();
 
-        // Cleanup : si le draft change avant la réponse, on annule
         return () => {
             cancelled = true;
         };
     }, [debouncedDraft, layoutStyle, templateId]);
 
     return (
-        <div className="relative w-full h-full">
-            {/* Loading indicator — petit bandeau discret */}
+        <div className="relative w-full min-h-[80vh] lg:min-h-[120vh]">
+            {/* ═══════════ LOADING BADGE (discret) ═══════════ */}
             {isLoading && (
-                <div className="absolute top-2 right-2 z-10 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/20">
-                    <span className="text-[10px] font-bold text-sky-500 uppercase tracking-widest animate-pulse">
-                        Mise à jour...
+                <div className="absolute top-2 right-2 z-10 px-2.5 sm:px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/20 backdrop-blur-sm">
+                    <span className="text-[9px] sm:text-[10px] font-bold text-sky-500 uppercase tracking-widest animate-pulse flex items-center gap-1.5">
+                        <Loader2 className="h-2.5 w-2.5 animate-spin" />
+                        <span className="hidden sm:inline">Mise à jour...</span>
+                        <span className="sm:hidden">...</span>
                     </span>
                 </div>
             )}
 
-            {/* Error state */}
+            {/* ═══════════ ERROR STATE ═══════════ */}
             {error && (
-                <div className="absolute inset-0 flex items-center justify-center bg-red-50 dark:bg-red-950/20">
-                    <div className="text-center p-6">
+                <div className="absolute inset-0 flex items-center justify-center bg-red-50 dark:bg-red-950/20 rounded-xl">
+                    <div className="text-center p-4 sm:p-6 max-w-sm">
+                        <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-3">
+                            <AlertCircle className="h-5 w-5 sm:h-6 sm:w-6 text-red-500" />
+                        </div>
                         <p className="text-sm text-red-600 dark:text-red-400 font-medium">
                             Erreur aperçu
                         </p>
-                        <p className="text-xs text-red-500/70 mt-1">{error}</p>
+                        <p className="text-xs text-red-500/70 mt-1 line-clamp-2">{error}</p>
                     </div>
                 </div>
             )}
 
-            {/* Preview iframe */}
+            {/* ═══════════ PREVIEW IFRAME ═══════════ */}
             {previewHtml ? (
-                <iframe
-                    srcDoc={previewHtml}
-                    className="w-full h-[120vh] border-0 bg-white"
-                    title="Aperçu du document"
-                    sandbox="allow-same-origin"
-                />
+                <div className="relative w-full">
+                    {/* Conteneur avec aspect ratio adaptatif */}
+                    <div className="w-full bg-white shadow-2xl shadow-slate-900/10 dark:shadow-black/40 rounded-sm overflow-hidden mx-auto max-w-full">
+                        <iframe
+                            srcDoc={previewHtml}
+                            className="w-full border-0 bg-white block"
+                            style={{
+                                // Hauteur adaptative : plus petite sur mobile, plus grande sur desktop
+                                height: '140vh',
+                                minHeight: '800px',
+                            }}
+                            title="Aperçu du document"
+                            sandbox="allow-same-origin"
+                        />
+                    </div>
+                </div>
             ) : (
-                /* Loading skeleton avant le premier rendu */
+                /* ═══════════ SKELETON LOADING ═══════════ */
                 <div className={cn(
-                    "flex flex-col h-[120vh] items-center justify-center bg-slate-50 dark:bg-slate-900 overflow-hidden relative"
+                    "flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900 overflow-hidden relative rounded-sm shadow-xl",
+                    "min-h-[60vh] lg:min-h-[800px]"
                 )}>
                     {/* Shimmer effect */}
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
-                    <div className="flex flex-col items-center gap-4 relative z-10">
-                        <div className="h-12 w-12 rounded-2xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center">
-                            <Loader2 className="h-6 w-6 text-sky-500 animate-spin" />
+
+                    <div className="flex flex-col items-center gap-3 sm:gap-4 relative z-10 px-6">
+                        <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl sm:rounded-2xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center">
+                            <FileText className="h-5 w-5 sm:h-6 sm:w-6 text-sky-500" />
                         </div>
-                        <span className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">Engine Rendering...</span>
+                        <div className="text-center">
+                            <span className="text-slate-400 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] block">
+                                Engine Rendering
+                            </span>
+                            <span className="text-slate-500 text-[10px] sm:text-xs mt-1 block">
+                                Génération de l'aperçu...
+                            </span>
+                        </div>
                     </div>
                 </div>
             )}

@@ -17,6 +17,10 @@ import { useAutoSave } from "../../hooks/useAutoSave";
 import { useDocumentUpdate } from "../../hooks/useDocumentUpdate";
 import { useBeforeUnload } from "../../hooks/useBeforeUnload";
 import { DownloadLoader } from "../DownloadLoader";
+import { motion, AnimatePresence } from "framer-motion";
+import { Settings2, X, ChevronUp } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface EditorProps {
     templateId?: string | null;
@@ -32,7 +36,9 @@ export function Editor({ templateId, documentId }: EditorProps) {
     const [loadError, setLoadError] = useState<string | null>(null);
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
-    // ✅ Déterminer le mode
+    // ✅ État du drawer mobile
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
     const isEditMode = !!documentId;
 
     const [draft, setDraft] = useState<QuoteDraft>({
@@ -77,7 +83,6 @@ export function Editor({ templateId, documentId }: EditorProps) {
         layoutStyle: templateId || "classic"
     });
 
-    // ✅ Hook pour la CRÉATION (auto-save une fois)
     const {
         isSaving,
         lastSavedAt,
@@ -87,10 +92,9 @@ export function Editor({ templateId, documentId }: EditorProps) {
         markAsChanged,
     } = useAutoSave({
         draft,
-        enabled: !isEditMode, // Désactivé en mode édition
+        enabled: !isEditMode,
     });
 
-    // ✅ Hook pour la MISE À JOUR (manuel)
     const {
         isUpdating,
         lastUpdatedAt,
@@ -104,11 +108,31 @@ export function Editor({ templateId, documentId }: EditorProps) {
         },
     });
 
-
-    // Alerte de sortie
     useBeforeUnload(hasUnsavedChanges);
 
-    // Charger un document existant
+    // Fermer le drawer avec Escape
+    useEffect(() => {
+        const handleEscape = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && isDrawerOpen) {
+                setIsDrawerOpen(false);
+            }
+        };
+        window.addEventListener('keydown', handleEscape);
+        return () => window.removeEventListener('keydown', handleEscape);
+    }, [isDrawerOpen]);
+
+    // Scroll lock quand le drawer est ouvert
+    useEffect(() => {
+        if (isDrawerOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [isDrawerOpen]);
+
     useEffect(() => {
         if (!documentId) {
             setIsLoading(false);
@@ -172,39 +196,34 @@ export function Editor({ templateId, documentId }: EditorProps) {
                     }],
                     paymentMode: 'simple',
                     paymentMilestones: (doc as any).payment_schedule && (doc as any).payment_schedule.length > 0
-        ? (doc as any).payment_schedule.map((ms: any) => ({
-            id: uuidv4(),  // nouveau ID frontend
-            title: ms.title,
-            percent: ms.percent,
-            description: ms.description || '',
-            trigger_date: ms.trigger_date ? ms.trigger_date.split('T')[0] : '',
-        }))
-        : [
-            {
-                id: uuidv4(),
-                title: 'Paiement intégral',
-                percent: 100,
-                description: '',
-                trigger_date: ''
-            }
-        ],
+                        ? (doc as any).payment_schedule.map((ms: any) => ({
+                            id: uuidv4(),
+                            title: ms.title,
+                            percent: ms.percent,
+                            description: ms.description || '',
+                            trigger_date: ms.trigger_date ? ms.trigger_date.split('T')[0] : '',
+                        }))
+                        : [
+                            {
+                                id: uuidv4(),
+                                title: 'Paiement intégral',
+                                percent: 100,
+                                description: '',
+                                trigger_date: ''
+                            }
+                        ],
                     notes: doc.notes || "",
                     internalNotes: "",
                     logoUrl: null,
-                    // ✅ CORRECTION : Lire la couleur sauvegardée
                     brandColor: (doc as any).primary_color || "#0ea5e9",
                     isSaved: true,
                     templateId: doc.template_id || null,
                     layoutStyle: (doc as any).layout_style || "classic",
                 });
-                console.log("✅ Document chargé:", doc.id, "- Mode édition");
-
             } catch (error: any) {
                 if (error.response?.status === 404) {
-                    console.warn("⚠️ Document non trouvé, mode création");
                     setDraft(prev => ({ ...prev, id: null, isSaved: false }));
                 } else {
-                    console.error("❌ Erreur chargement:", error);
                     setLoadError(error.message);
                 }
             } finally {
@@ -215,7 +234,6 @@ export function Editor({ templateId, documentId }: EditorProps) {
         loadDocument();
     }, [documentId]);
 
-    // Handlers
     const handleDraftChange = (field: keyof QuoteDraft, value: any) => {
         setDraft(prev => ({ ...prev, [field]: value }));
         setHasUnsavedChanges(true);
@@ -255,79 +273,66 @@ export function Editor({ templateId, documentId }: EditorProps) {
         markAsChanged();
     };
 
-    // ✅ Handler de sauvegarde unifié
     const handleSave = useCallback(() => {
         if (isEditMode) {
-            // Mode édition → mise à jour manuelle
             updateDocument();
-        } else {
-            // Mode création → auto-save (déjà géré par le hook)
-            // Rien à faire, le hook s'en occupe
         }
     }, [isEditMode, updateDocument]);
 
     const handleDownload = useCallback(async () => {
-    // ✅ Helper : détecte si l'échéancier est valide (même logique que le preview)
-    const hasValidSchedule = 
-        draft.paymentMilestones && 
-        draft.paymentMilestones.length > 0 &&
-        !(draft.paymentMilestones.length === 1 && draft.paymentMilestones[0].percent === 100);
+        const hasValidSchedule =
+            draft.paymentMilestones &&
+            draft.paymentMilestones.length > 0 &&
+            !(draft.paymentMilestones.length === 1 && draft.paymentMilestones[0].percent === 100);
 
-    const previewRequest = {
-        type: "DEVIS",
-        client_name: draft.clientName || "Client Exemple",
-        client_email: draft.clientEmail || "",
-        client_address: draft.clientAddress || "",
-        client_phone: draft.clientPhone || "",
-        items: draft.items.map(item => ({
-            description: item.description,
-            quantity: item.quantity,
-            unit_price_cents: item.unitPrice,
-            tax_rate: draft.hasVat ? draft.vatRate : 0,
-        })),
-        template_id: draft.templateId || null,
-        layout_style: draft.layoutStyle || "classic",
-        primary_color: draft.brandColor || "#2563EB",
-        secondary_color: "#1E40AF",
-        accent_color: "#DBEAFE",
-        text_color: "#1F2937",
-        background_color: "#FFFFFF",
-        font_family: "Inter",
-        header_text: null,
-        footer_text: null,
-        show_bank_details: true,
-        show_tax_id: true,
-        notes: draft.notes || null,
-        reference: draft.reference || null,
-        
-        // ✅ NOUVELLE LOGIQUE : basé sur les milestones, pas sur le mode
-        payment_schedule: hasValidSchedule
-            ? draft.paymentMilestones!.map((ms, idx) => ({
-                sequence: idx + 1,
-                title: ms.title || `Échéance ${idx + 1}`,
-                percent: ms.percent,
-                description: ms.description || null,
-                trigger_date: ms.trigger_date || null,
-            }))
-            : null,
-    };
+        const previewRequest = {
+            type: "DEVIS",
+            client_name: draft.clientName || "Client Exemple",
+            client_email: draft.clientEmail || "",
+            client_address: draft.clientAddress || "",
+            client_phone: draft.clientPhone || "",
+            items: draft.items.map(item => ({
+                description: item.description,
+                quantity: item.quantity,
+                unit_price_cents: item.unitPrice,
+                tax_rate: draft.hasVat ? draft.vatRate : 0,
+            })),
+            template_id: draft.templateId || null,
+            layout_style: draft.layoutStyle || "classic",
+            primary_color: draft.brandColor || "#2563EB",
+            secondary_color: "#1E40AF",
+            accent_color: "#DBEAFE",
+            text_color: "#1F2937",
+            background_color: "#FFFFFF",
+            font_family: "Inter",
+            header_text: null,
+            footer_text: null,
+            show_bank_details: true,
+            show_tax_id: true,
+            notes: draft.notes || null,
+            reference: draft.reference || null,
+            payment_schedule: hasValidSchedule
+                ? draft.paymentMilestones!.map((ms, idx) => ({
+                    sequence: idx + 1,
+                    title: ms.title || `Échéance ${idx + 1}`,
+                    percent: ms.percent,
+                    description: ms.description || null,
+                    trigger_date: ms.trigger_date || null,
+                }))
+                : null,
+        };
 
-    // ✅ DEBUG : voir ce qui est envoyé avant le téléchargement
-    console.log("📥 Download PDF request:", previewRequest);
-    console.log("📅 payment_schedule:", previewRequest.payment_schedule);
-
-    try {
-        await downloadPdf(previewRequest, draft.isSaved ? draft.id : null, `${draft.reference || 'devis'}.pdf`);
-        toast({ title: "PDF téléchargé", description: "Le fichier a été téléchargé avec succès." });
-    } catch (error) {
-        toast({ title: "Erreur", description: "Impossible de télécharger le PDF.", variant: "destructive" });
-    }
-}, [draft, downloadPdf, toast]);
+        try {
+            await downloadPdf(previewRequest, draft.isSaved ? draft.id : null, `${draft.reference || 'devis'}.pdf`);
+            toast({ title: "PDF téléchargé", description: "Le fichier a été téléchargé avec succès." });
+        } catch (error) {
+            toast({ title: "Erreur", description: "Impossible de télécharger le PDF.", variant: "destructive" });
+        }
+    }, [draft, downloadPdf, toast]);
 
     const [zoom, setZoom] = useState(0.85);
     const [showActions, setShowActions] = useState(false);
 
-    // État de chargement
     if (isLoading) {
         return (
             <div className="flex h-[100dvh] w-screen items-center justify-center bg-zinc-950">
@@ -353,13 +358,13 @@ export function Editor({ templateId, documentId }: EditorProps) {
         );
     }
 
-    // Déterminer les états à passer au header
     const currentIsSaving = isEditMode ? isUpdating : isSaving;
     const currentLastSavedAt = isEditMode ? lastUpdatedAt : lastSavedAt;
     const currentSaveStatus = isEditMode ? updateStatus : saveStatus;
 
     return (
         <div className="flex h-[100dvh] w-screen overflow-hidden bg-zinc-950 font-sans">
+            {/* ═══════════ HEADER (toujours visible) ═══════════ */}
             <EditorHeader
                 draft={draft}
                 documentId={documentId}
@@ -381,9 +386,11 @@ export function Editor({ templateId, documentId }: EditorProps) {
                 isEditMode={isEditMode}
             />
 
+            {/* Grain effect */}
             <div className="fixed inset-0 pointer-events-none z-50 opacity-[0.03] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
 
-            <aside className="w-[450px] xl:w-[500px] h-full shrink-0 relative overflow-hidden">
+            {/* ═══════════ DESKTOP : Sidebar fixe ═══════════ */}
+            <aside className="hidden lg:block w-[450px] xl:w-[500px] h-full shrink-0 relative overflow-hidden">
                 <EditorPanel
                     draft={draft}
                     onChange={handleDraftChange}
@@ -393,10 +400,11 @@ export function Editor({ templateId, documentId }: EditorProps) {
                 />
             </aside>
 
+            {/* ═══════════ MAIN (preview) ═══════════ */}
             <main className="flex-1 relative overflow-hidden bg-[#fafafa] dark:bg-zinc-900/50 pt-[72px]">
-                <div className="absolute inset-0 overflow-auto custom-scrollbar pt-24 pb-32">
+                <div className="absolute inset-0 overflow-auto custom-scrollbar pt-12 lg:pt-24 pb-32">
                     <div className="flex justify-center transition-transform duration-300 origin-top" style={{ transform: `scale(${zoom})` }}>
-                        <div className="w-full max-w-[1000px] px-12">
+                        <div className="w-full max-w-[1000px] px-4 sm:px-8 lg:px-12">
                             <LivePreview
                                 templateId={draft.templateId || null}
                                 layoutStyle={draft.layoutStyle || "classic"}
@@ -407,7 +415,116 @@ export function Editor({ templateId, documentId }: EditorProps) {
                 </div>
             </main>
 
+            {/* ═══════════ MOBILE : FAB + Drawer Bottom Sheet ═══════════ */}
+            <MobileDrawer
+                isOpen={isDrawerOpen}
+                onOpenChange={setIsDrawerOpen}
+                draft={draft}
+                onChange={handleDraftChange}
+                onItemChange={handleItemChange}
+                onAddItem={addItem}
+                onRemoveItem={removeItem}
+            />
+
             <DownloadLoader isVisible={isDownloading} filename={`${draft.reference || 'devis'}.pdf`} />
         </div>
+    );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   COMPOSANT MOBILE DRAWER
+═══════════════════════════════════════════════════════════════ */
+interface MobileDrawerProps {
+    isOpen: boolean;
+    onOpenChange: (open: boolean) => void;
+    draft: QuoteDraft;
+    onChange: <K extends keyof QuoteDraft>(field: K, value: QuoteDraft[K]) => void;
+    onItemChange: <K extends keyof QuoteLineItem>(id: string, field: K, value: QuoteLineItem[K]) => void;
+    onAddItem: () => void;
+    onRemoveItem: (id: string) => void;
+}
+
+function MobileDrawer({ isOpen, onOpenChange, draft, onChange, onItemChange, onAddItem, onRemoveItem }: MobileDrawerProps) {
+    return (
+        <>
+            {/* ═══════════ FAB (Floating Action Button) ═══════════ */}
+            <AnimatePresence>
+                {!isOpen && (
+                    <motion.button
+                        initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.8, y: 20 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                        onClick={() => onOpenChange(true)}
+                        className="lg:hidden fixed bottom-24 right-4 z-40 h-14 w-14 rounded-full bg-[#2563EB] text-white shadow-[0_10px_30px_-5px_rgba(37,99,235,0.6)] hover:scale-110 active:scale-95 transition-transform flex items-center justify-center"
+                        aria-label="Ouvrir les options"
+                    >
+                        <Settings2 className="h-6 w-6" />
+                        {/* Badge indicateur */}
+                        <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-emerald-400 border-2 border-zinc-950" />
+                    </motion.button>
+                )}
+            </AnimatePresence>
+
+            {/* ═══════════ DRAWER ═══════════ */}
+            <AnimatePresence>
+                {isOpen && (
+                    <>
+                        {/* Overlay */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            onClick={() => onOpenChange(false)}
+                            className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[60]"
+                        />
+
+                        {/* Drawer content */}
+                        <motion.div
+                            initial={{ y: "100%" }}
+                            animate={{ y: 0 }}
+                            exit={{ y: "100%" }}
+                            transition={{ type: "spring", damping: 30, stiffness: 300 }}
+                            className="lg:hidden fixed inset-x-0 bottom-0 z-[70] h-[90dvh] bg-zinc-950 rounded-t-3xl border-t border-white/10 flex flex-col shadow-2xl overflow-hidden"
+                            style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+                        >
+                            {/* Header du drawer avec handle */}
+                            <div className="relative flex items-center justify-between px-4 py-3 border-b border-white/5 shrink-0">
+                                {/* Handle drag */}
+                                <div className="absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1 bg-white/20 rounded-full" />
+
+                                <div className="flex items-center gap-2 mt-2">
+                                    <ChevronUp className="h-4 w-4 text-zinc-400" />
+                                    <span className="text-sm font-bold text-white">Options du devis</span>
+                                </div>
+
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => onOpenChange(false)}
+                                    className="mt-2 h-8 w-8 rounded-full hover:bg-white/10"
+                                >
+                                    <X className="h-4 w-4" />
+                                </Button>
+                            </div>
+
+                            {/* Contenu scrollable (EditorPanel réutilisé) */}
+                            <div className="flex-1 overflow-hidden">
+                                <EditorPanel
+                                    draft={draft}
+                                    onChange={onChange}
+                                    onItemChange={onItemChange}
+                                    onAddItem={onAddItem}
+                                    onRemoveItem={onRemoveItem}
+                                    isMobile
+                                    onClose={() => onOpenChange(false)}
+                                />
+                            </div>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
+        </>
     );
 }
