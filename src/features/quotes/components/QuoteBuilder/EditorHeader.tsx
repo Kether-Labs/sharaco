@@ -182,7 +182,7 @@ export function EditorHeader({
                             >
                                 <div className="relative flex items-center justify-center">
                                     <div
-                                        className="w-3.5 h-3.5 rounded-full shadow-sm border border-white/20 transition-all"
+                                        className="w-3.5 h-3.5 max-sm:w-2 max-sm:h-2 rounded-full shadow-sm border border-white/20 transition-all"
                                         style={{ backgroundColor: draft.brandColor }}
                                     />
                                 </div>
@@ -273,16 +273,16 @@ export function EditorHeader({
                             align="end"
                             className="w-60 bg-zinc-900 border-white/10 p-3 rounded-2xl shadow-2xl backdrop-blur-xl z-[120]"
                         >
-                            <DropdownMenuLabel className="text-[10px] font-black text-zinc-500 uppercase tracking-widest px-1 pb-3">
+                            <DropdownMenuLabel className="text-[10px] max-sm:text-xs font-black text-zinc-500   px-1 pb-3">
                                 Couleur de marque
                             </DropdownMenuLabel>
-                            <div className="grid grid-cols-4 gap-2.5">
+                            <div className="grid grid-cols-4 max-sm:grid-cols-6 gap-2.5">
                                 {BRAND_COLORS.map((color) => (
                                     <button
                                         key={color.value}
                                         onClick={() => onColorChange?.(color.value)}
                                         className={cn(
-                                            "w-full aspect-square rounded-xl border-2 transition-all hover:scale-105 active:scale-95",
+                                            "w-full aspect-square max-sm:w-7 max-sm:h-7 rounded-xl border-2 transition-all hover:scale-105 active:scale-95",
                                             draft.brandColor === color.value ? 'border-white' : 'border-transparent'
                                         )}
                                         style={{ backgroundColor: color.value }}
@@ -312,9 +312,9 @@ export function EditorHeader({
                         {isSaving ? (
                             <Loader2 className="w-3.5 h-3.5 animate-spin" />
                         ) : isEditMode ? (
-                            <Edit3 className="w-3.5 h-3.5 sm:mr-1.5 md:mr-2" strokeWidth={3} />
+                            <Edit3 className="w-3.5 h-3.5 sm:mr-1 md:mr-2" strokeWidth={2} />
                         ) : (
-                            <Save className="w-3.5 h-3.5 sm:mr-1.5 md:mr-2" strokeWidth={3} />
+                            <Save className="w-3.5 h-3.5 sm:mr-1 md:mr-2" strokeWidth={3} />
                         )}
                         <span className="hidden sm:inline">
                             {isSaving ? (
@@ -327,7 +327,7 @@ export function EditorHeader({
                         </span>
                         {/* Texte court sur petit écran */}
                         <span className="sm:hidden">
-                            {isSaving ? "..." : isEditMode ? "MAJ" : "Save"}
+                            {isSaving ? "..." : isEditMode ? "Save" : "Save"}
                         </span>
                     </Button>
 

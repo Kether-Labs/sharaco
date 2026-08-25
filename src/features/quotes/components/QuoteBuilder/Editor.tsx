@@ -330,7 +330,9 @@ export function Editor({ templateId, documentId }: EditorProps) {
         }
     }, [draft, downloadPdf, toast]);
 
-    const [zoom, setZoom] = useState(0.85);
+    const [zoom, setZoom] = useState(() =>
+    typeof window !== "undefined" && window.innerWidth < 1024 ? 1 : 0.85
+);
     const [showActions, setShowActions] = useState(false);
 
     if (isLoading) {
@@ -404,7 +406,7 @@ export function Editor({ templateId, documentId }: EditorProps) {
             <main className="flex-1 relative overflow-hidden bg-[#fafafa] dark:bg-zinc-900/50 pt-[72px]">
                 <div className="absolute inset-0 overflow-auto custom-scrollbar pt-12 lg:pt-24 pb-32">
                     <div className="flex justify-center transition-transform duration-300 origin-top" style={{ transform: `scale(${zoom})` }}>
-                        <div className="w-full max-w-[1000px] px-4 sm:px-8 lg:px-12">
+                        <div className="w-full max-w-[1000px] px-2 sm:px-8 lg:px-12">
                             <LivePreview
                                 templateId={draft.templateId || null}
                                 layoutStyle={draft.layoutStyle || "classic"}
