@@ -19,7 +19,7 @@ const statuses = [
 
 export function InvoiceHeader({ searchQuery, onSearchChange, statusFilter, onStatusChange }: InvoiceHeaderProps) {
     return (
-        <div className="relative overflow-hidden p-8 md:p-14 flex flex-col items-center justify-center text-center shadow-sm">
+        <div className="relative overflow-hidden max-sm:p-2 p-8 md:p-14 flex flex-col items-center justify-center text-center shadow-sm">
 
             {/* Background elements */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
@@ -34,7 +34,7 @@ export function InvoiceHeader({ searchQuery, onSearchChange, statusFilter, onSta
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.1 }}
-                    className="text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white mb-10"
+                    className="text-4xl max-sm:text-3xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white mb-10"
                 >
                     Toutes vos Factures
                 </motion.h2>
@@ -54,7 +54,7 @@ export function InvoiceHeader({ searchQuery, onSearchChange, statusFilter, onSta
                             value={searchQuery}
                             onChange={(e) => onSearchChange(e.target.value)}
                             placeholder="Recherchez des factures, des clients ou des dossiers..."
-                            className="w-full h-[60px] pl-14 pr-6 bg-white/90 dark:bg-[#0a0a0a]/90 backdrop-blur-xl border border-slate-200/50 dark:border-white/10 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.2)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all text-slate-900 dark:text-white placeholder:text-slate-500 font-medium text-base"
+                            className="w-full h-[60px] pl-14 max-sm:pl-3 max-sm:pr-2 max-sm:text-sm pr-6 bg-white/90 dark:bg-[#0a0a0a]/90 backdrop-blur-xl border border-slate-200/50 dark:border-white/10 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.2)] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all text-slate-900 dark:text-white placeholder:text-slate-500 font-medium text-base"
                         />
                     </div>
                 </motion.div>
@@ -76,7 +76,7 @@ export function InvoiceHeader({ searchQuery, onSearchChange, statusFilter, onSta
                                     e.preventDefault();
                                     onStatusChange(status.id);
                                 }}
-                                className={`group flex items-center gap-2.5 px-4 py-2.5 rounded-2xl text-sm font-semibold transition-all duration-300 ${
+                                className={`group flex items-center max-sm:text-xs gap-2.5 px-4 py-2.5 rounded-2xl text-sm font-semibold transition-all duration-300 ${
                                     isActive 
                                     ? `bg-white dark:bg-[#0a0a0a] shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] ${status.color} ring-1 ring-black/5 dark:ring-white/10 scale-105` 
                                     : 'text-slate-500 dark:text-slate-400 hover:bg-white/60 dark:hover:bg-white/5 hover:text-slate-800 dark:hover:text-slate-200'

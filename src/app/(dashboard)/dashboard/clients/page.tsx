@@ -15,13 +15,13 @@ export default function ClientsPage() {
         <div className="flex-1 space-y-8 p-4 md:p-8 pt-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
                 <div>
-                    <h1 className="text-3xl font-black tracking-tight text-[#2563EB] dark:text-white flex items-center gap-3">
+                    <h1 className="text-3xl max-sm:text-2xl font-black tracking-tight text-[#2563EB] dark:text-white flex items-center gap-3">
                         <div className="p-2.5 bg-[#2563EB]/20 rounded-xl border border-[#2563EB]/10">
-                            <Users className="w-8 h-8 text-[#2563EB]" />
+                            <Users className="w-8 h-8 max-sm:w-4 max-sm:h-4 text-[#2563EB]" />
                         </div>
-                        Clients
+                        Mes Clients
                     </h1>
-                    <p className="text-slate-500 dark:text-slate-400 mt-2">
+                    <p className="text-slate-500 max-sm:text-sm dark:text-slate-400 mt-2">
                         Gérez votre répertoire client et leurs coordonnées.
                     </p>
                 </div>
@@ -41,7 +41,7 @@ export default function ClientsPage() {
                     placeholder="Rechercher un client..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-12 h-14 bg-white/80 dark:bg-white/[0.02] border-slate-200/50 dark:border-white/5 rounded-2xl shadow-sm focus:ring-2 focus:ring-indigo-500/50 text-base"
+                    className="pl-12 max-sm:text-sm h-14 bg-white/80 dark:bg-white/[0.02] border-slate-200/50 dark:border-white/5 rounded-2xl shadow-sm focus:ring-2 focus:ring-indigo-500/50 text-base"
                 />
             </div>
 

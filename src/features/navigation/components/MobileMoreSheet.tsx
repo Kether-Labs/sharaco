@@ -70,7 +70,7 @@ export function MobileMoreSheet({ open, onOpenChange }: MobileMoreSheetProps) {
                 >
                     {/* ═══════════ HEADER ═══════════ */}
                     <div className="flex items-center justify-between px-4 h-14 shrink-0 border-b border-white/5">
-                        <span className="text-sm font-black text-white uppercase tracking-widest">
+                        <span className="text-sm font-black text-white">
                             Menu
                         </span>
                         <button

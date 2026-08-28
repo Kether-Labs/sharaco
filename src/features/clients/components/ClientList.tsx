@@ -52,7 +52,7 @@ export function ClientList({ searchQuery }: ClientListProps) {
         return (
             <div className="flex flex-col items-center justify-center py-20 text-center bg-slate-50/50 dark:bg-white/[0.02] border border-slate-200/50 dark:border-white/5 rounded-3xl mt-6">
                 <div className="p-4 bg-indigo-500/10 rounded-full mb-4">
-                    <Users className="h-10 w-10 text-indigo-500" />
+                    <Users className="h-10 w-10 max-sm:h-3 max-sm:w-3 text-indigo-500" />
                 </div>
                 <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">Aucun client trouvé</h3>
                 <p className="text-slate-500 dark:text-slate-400">
@@ -84,7 +84,7 @@ export function ClientList({ searchQuery }: ClientListProps) {
                         exit={{ opacity: 0, scale: 0.95 }}
                         transition={{ duration: 0.4, type: "spring", bounce: 0.3 }}
                         className={cn(
-                            "group relative bg-white dark:bg-[#111] rounded-3xl p-6 border border-slate-200/50 dark:border-white/5",
+                            "group relative bg-white dark:bg-[#111] rounded-3xl p-6  border border-slate-200/50 dark:border-white/5",
                             "hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_8px_30px_rgba(0,0,0,0.4)] hover:-translate-y-1 transition-all duration-500",
                             deletingId === client.id && "opacity-50 pointer-events-none scale-95"
                         )}
@@ -94,8 +94,8 @@ export function ClientList({ searchQuery }: ClientListProps) {
 
                         <div className="relative z-10 flex flex-col h-full">
                             <div className="flex justify-between items-start mb-6">
-                                <div className="h-14 w-14 rounded-2xl bg-[#2563EB]/10 flex items-center justify-center border border-indigo-500/20 group-hover:scale-110 transition-transform duration-500 shadow-sm">
-                                    <User className="h-7 w-7 text-[#2563EB]" />
+                                <div className="h-14 w-14 max-sm:h-10 max-sm:w-10 rounded-2xl bg-[#2563EB]/10 flex items-center justify-center border border-indigo-500/20 group-hover:scale-110 transition-transform duration-500 shadow-sm">
+                                    <User className="h-7 w-7 max-sm:h-5 max-sm:w-5 text-[#2563EB]" />
                                 </div>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
