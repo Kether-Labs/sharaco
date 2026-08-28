@@ -2,7 +2,7 @@
 "use client"
 
 import { motion, type Variants } from "framer-motion"
-import { FileText, AlertTriangle, CheckCircle2 } from "lucide-react"
+import { FileText, CheckCircle2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface FolderCardProps {
@@ -93,7 +93,7 @@ export function FolderCard({
                     <div className="flex items-center gap-2">
                         {hasOverdue && (
                             <span className="flex items-center gap-1 text-[10px] font-bold text-rose-400">
-                                <AlertTriangle className="h-3 w-3" />
+                                
                                 {overdueCount} retard{overdueCount > 1 ? 's' : ''}
                             </span>
                         )}

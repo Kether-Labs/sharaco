@@ -1,7 +1,7 @@
 // features/projects/components/ProjectStatsCards.tsx
 "use client";
 
-import { Wallet, TrendingUp, AlertTriangle, FileText } from "lucide-react";
+import { Wallet, TrendingUp, FileText } from "lucide-react";
 import { formatCurrency } from "@/features/quotes/lib/formatCurrency";
 
 import { cn } from "@/lib/utils";
@@ -41,7 +41,7 @@ export function ProjectStatsCards({ summary }: ProjectStatsCardsProps) {
             label: "En retard",
             value: formatCurrency(summary.total_overdue),
             sublabel: `${summary.overdue_invoice_count} facture(s) en retard`,
-            icon: AlertTriangle,
+            icon: null,
             color: "text-rose-500",
             bgColor: "bg-rose-500/10",
             highlight: summary.overdue_invoice_count > 0,
@@ -66,9 +66,7 @@ export function ProjectStatsCards({ summary }: ProjectStatsCardsProps) {
                             <span className="text-xs font-semibold text-slate-400 tracking-widest uppercase">
                                 {card.label}
                             </span>
-                            <div className={cn("p-2 rounded-lg", card.bgColor)}>
-                                <Icon className={cn("h-4 w-4", card.color)} />
-                            </div>
+                          
                         </div>
                         <div className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
                             {card.value}

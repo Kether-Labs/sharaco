@@ -75,13 +75,13 @@ export function InvoiceGrid({ quote, onBack, onRefresh }: InvoiceGridProps) {
 
                 <div className="ml-auto flex items-center gap-2 text-xs">
                     <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                        <CheckCircle2 className="h-3 w-3" />
+                        
                         <span className="font-bold">{paidCount}</span>
                         <span>payées</span>
                     </div>
                     {overdueCount > 0 && (
                         <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-rose-500/10 text-rose-600 dark:text-rose-400">
-                            <AlertTriangle className="h-3 w-3" />
+                            
                             <span className="font-bold">{overdueCount}</span>
                             <span>en retard</span>
                         </div>
@@ -135,7 +135,7 @@ function InvoiceMiniCard({ invoice }: { invoice: ProjectTreeInvoice }) {
         <Link
             href={`/dashboard/invoices/${invoice.id}`}
             className={cn(
-                "group block rounded-xl border overflow-hidden transition-all hover:-translate-y-0.5",
+                "group block rounded-xl border overflow-hidden",
                 isOverdue
                     ? "border-rose-500/30 bg-rose-500/5 hover:border-rose-500/60"
                     : "border-slate-200 dark:border-slate-800 bg-white dark:bg-[#111111] hover:border-slate-400"
@@ -144,9 +144,7 @@ function InvoiceMiniCard({ invoice }: { invoice: ProjectTreeInvoice }) {
             <div className="p-4">
                 {/* Header : statut */}
                 <div className="flex items-start justify-between mb-3">
-                    <div className={cn("p-1.5 rounded-lg", config.bg)}>
-                        <Icon className={cn("h-3.5 w-3.5", config.color)} />
-                    </div>
+                    
                     {invoice.invoice_type && (
                         <span className="px-1.5 py-0.5 text-[9px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500 rounded uppercase">
                             {invoice.invoice_type}
