@@ -1,3 +1,5 @@
+import { useAuthStore } from "@/store/auth-store";
+
 /**
  * Formate un montant en centimes vers une chaîne de devise lisible.
  * 
@@ -19,10 +21,12 @@ export function formatCurrency(
     locale: string = 'fr-FR'
 ): string {
     // Gestion des valeurs nulles/undefined
+
+    const cur = currency || useAuthStore.getState().currency || "XOF";
     if (cents == null || isNaN(cents)) {
         return new Intl.NumberFormat(locale, {
             style: 'currency',
-            currency,
+            currency:cur,
             minimumFractionDigits: 0,
             maximumFractionDigits: 0,
         }).format(0);

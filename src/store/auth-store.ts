@@ -7,6 +7,8 @@ interface AuthState {
     isAuthenticated: boolean;
     setToken: (token: string) => void;
     setUser: (user: User) => void;
+    currency: string;
+    setCurrency: (currency: string) => void;
     logout: () => void;
 }
 
@@ -30,7 +32,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     token: getInitialToken(),
     user: null,
     isAuthenticated: !!getInitialToken(),
-
+    currency: "XOF",
+    setCurrency: (currency) => set({ currency }),
     setToken: (token: string) => {
         localStorage.setItem('sharaco_token', token);
         setCookie('sharaco_token', token);

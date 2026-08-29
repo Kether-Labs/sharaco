@@ -146,7 +146,7 @@ export function TemplateSelector({ onSelect, onClose }: TemplateSelectorProps) {
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ duration: 0.8, ease: [0.34, 1.56, 0.64, 1] }}
-                            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black tracking-tighter text-slate-900 dark:text-white leading-none max-w-4xl"
+                            className="text-3xl sm:text-4xl md:text-3xl lg:text-4xl xl:text-6xl font-black tracking-tighter text-slate-900 dark:text-white leading-none max-w-4xl"
                         >
                             Choisissez votre <span className="text-sky-500">modèle.</span>
                         </motion.h2>
@@ -155,7 +155,7 @@ export function TemplateSelector({ onSelect, onClose }: TemplateSelectorProps) {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ delay: 0.4 }}
-                            className="text-slate-500 dark:text-slate-400 text-sm sm:text-base md:text-lg lg:text-xl font-medium tracking-tight max-w-2xl"
+                            className="text-slate-500 dark:text-slate-400 text-sm sm:text-base md:text-lg lg:text-md font-medium tracking-tight max-w-2xl"
                         >
                             Survolez un document pour le prévisualiser ou le sélectionner. Tous nos modèles sont optimisés pour l'impression.
                         </motion.p>

@@ -64,7 +64,7 @@ export function DocumentsStats({ onFilterByStatus, currentFilter }: DocumentsSta
                     {[...Array(4)].map((_, i) => (
                         <div
                             key={i}
-                            className="w-[78vw] sm:w-[320px] md:w-auto shrink-0 snap-center bg-white/50 dark:bg-[#0a0a0a]/50 backdrop-blur-xl border border-slate-200/50 dark:border-white/5 rounded-3xl p-6 md:p-8 animate-pulse flex flex-col justify-between h-44"
+                            className="w-[78vw] sm:w-[320px] md:w-auto shrink-0 snap-center bg-white/50 dark:bg-[#0a0a0a]/50 backdrop-blur-xl border border-slate-200/50 dark:border-white/5 rounded-3xl p-6 md:p-8 flex flex-col justify-between h-44"
                         >
                             <div className="flex justify-between items-center">
                                 <div className="h-3 w-24 bg-slate-200 dark:bg-white/10 rounded-full" />
@@ -184,11 +184,9 @@ export function DocumentsStats({ onFilterByStatus, currentFilter }: DocumentsSta
                         const isClickable = !!onFilterByStatus;
 
                         return (
-                            <motion.button
+                            <button
                                 key={card.key}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: index * 0.1 }}
+                                
                                 onClick={() => {
                                     if (isClickable) onFilterByStatus(isActive ? null : card.key);
                                 }}
@@ -279,7 +277,7 @@ export function DocumentsStats({ onFilterByStatus, currentFilter }: DocumentsSta
                                         </div>
                                     )}
                                 </div>
-                            </motion.button>
+                            </button>
                         );
                     })}
                 </div>
@@ -293,7 +291,7 @@ export function DocumentsStats({ onFilterByStatus, currentFilter }: DocumentsSta
                         onClick={() => scrollToIndex(i)}
                         aria-label={`Aller à ${card.label}`}
                         className={cn(
-                            "h-1.5 rounded-full transition-all duration-300",
+                            "h-1.5 rounded-full  duration-300",
                             i === activeIndex
                                 ? "w-6 bg-slate-900 dark:bg-white"
                                 : "w-1.5 bg-slate-300 dark:bg-white/20"
