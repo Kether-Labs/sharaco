@@ -30,22 +30,8 @@ const TemplateCard = React.memo(({
     const router = useRouter()
 
     return (
-        <motion.div
-            variants={{
-                hidden: { opacity: 0, y: 30, scale: 0.95 },
-                show: {
-                    opacity: 1,
-                    y: 0,
-                    scale: 1,
-                    transition: {
-                        type: "spring",
-                        stiffness: 100,
-                        damping: 20,
-                        delay: index * 0.1
-                    }
-                }
-            }}
-            whileHover={{ y: -8 }}
+        <div
+            
             className="group relative flex flex-col gap-3 sm:gap-4 md:gap-6"
         >
             {/* Visual Label (Above the card for Bento 2.0 style) */}
@@ -66,23 +52,23 @@ const TemplateCard = React.memo(({
             {/* Premium Container Area */}
             <div className="relative w-full aspect-[3/4] rounded-[1.5rem] sm:rounded-[2rem] md:rounded-[2.5rem] overflow-hidden border border-slate-200/50 dark:border-white/5 bg-white dark:bg-slate-950 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] dark:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] group-hover:shadow-2xl transition-all duration-500">
                 {/* Perpetual Motion Background Glow */}
-                <motion.div
-                    animate={{
-                        opacity: [0.1, 0.2, 0.1],
-                        scale: [1, 1.1, 1]
-                    }}
-                    transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
+                <div
+                    
                     className="absolute inset-0 bg-gradient-to-br from-sky-500/10 via-transparent to-indigo-500/10 pointer-events-none"
                 />
 
                 <div className="absolute inset-2 sm:inset-3 md:inset-4 overflow-hidden border border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-black/20">
-                    <img
-                        src={`http://localhost:8000/api/v1/templates/${layout.id}/preview.png`}
-                        alt={`Template ${layout.id}`}
-                        className="w-full h-full object-cover"
-                        sizes="(max-width: 640px) 90vw, (max-width: 768px) 45vw, (max-width: 1200px) 30vw, 22vw"
-                    />
-                </div>
+    <img
+        src={`http://localhost:8000/api/v1/templates/${layout.id}/preview.png`}
+        alt={`Template ${layout.name}`}
+        className="w-full h-full object-cover"
+        sizes="(max-width: 640px) 90vw, (max-width: 768px) 45vw, (max-width: 1200px) 30vw, 22vw"
+        // ✅ AJOUTS CLÉS
+        loading={index < 2 ? "eager" : "lazy"}  // 2 premières prioritaires
+        decoding="async"                         // ne bloque pas le main thread
+        fetchPriority={index < 2 ? "high" : "low"}
+    />
+</div>
 
                 {/* ✅ Hover Reveal Interface - responsive + touch-friendly */}
                 <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-md opacity-0 group-hover:opacity-100 md:group-hover:opacity-100 transition-all duration-500 flex flex-col items-center justify-center p-3 sm:p-6 md:p-8 gap-2 sm:gap-3 md:gap-4 translate-y-4 group-hover:translate-y-0">
@@ -113,7 +99,7 @@ const TemplateCard = React.memo(({
                     </div>
                 </div>
             </div>
-        </motion.div>
+        </div>
     )
 })
 
@@ -142,23 +128,19 @@ export function TemplateSelector({ onSelect, onClose }: TemplateSelectorProps) {
                 <div className="mx-auto max-w-7xl flex flex-col gap-10 sm:gap-12 md:gap-16">
                     {/* Title Section - Responsive Typography */}
                     <div className="flex flex-col items-center text-center space-y-3 sm:space-y-4 px-2">
-                        <motion.h2
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.8, ease: [0.34, 1.56, 0.64, 1] }}
+                        <h2
+                           
                             className="text-3xl sm:text-4xl md:text-3xl lg:text-4xl xl:text-6xl font-black tracking-tighter text-slate-900 dark:text-white leading-none max-w-4xl"
                         >
                             Choisissez votre <span className="text-sky-500">modèle.</span>
-                        </motion.h2>
+                        </h2>
 
-                        <motion.p
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.4 }}
+                        <p
+                            
                             className="text-slate-500 dark:text-slate-400 text-sm sm:text-base md:text-lg lg:text-md font-medium tracking-tight max-w-2xl"
                         >
                             Survolez un document pour le prévisualiser ou le sélectionner. Tous nos modèles sont optimisés pour l'impression.
-                        </motion.p>
+                        </p>
                     </div>
 
                     {/* ✅ Grid - Responsive breakpoints */}
@@ -174,9 +156,8 @@ export function TemplateSelector({ onSelect, onClose }: TemplateSelectorProps) {
                                 </div>
                             ))
                         ) : error ? (
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
+                            <div
+                               
                                 className="col-span-full flex flex-col items-center justify-center py-12 sm:py-24 text-center gap-4 sm:gap-6 glass-dark rounded-2xl sm:rounded-[2rem] md:rounded-[3rem] p-6 sm:p-8 md:p-12"
                             >
                                 <div className="h-12 w-12 sm:h-16 sm:w-16 rounded-2xl sm:rounded-3xl bg-rose-500/10 flex items-center justify-center">
@@ -192,9 +173,9 @@ export function TemplateSelector({ onSelect, onClose }: TemplateSelectorProps) {
                                 >
                                     Réessayer
                                 </Button>
-                            </motion.div>
+                            </div>
                         ) : (
-                            <motion.div
+                            <div
                                 initial="hidden"
                                 animate="show"
                                 variants={{
@@ -214,12 +195,12 @@ export function TemplateSelector({ onSelect, onClose }: TemplateSelectorProps) {
                                         index={index}
                                     />
                                 ))}
-                            </motion.div>
+                            </div>
                         )}
                     </div>
 
                     {/* Footer Tip */}
-                    <motion.div
+                    <div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 1 }}
@@ -230,7 +211,7 @@ export function TemplateSelector({ onSelect, onClose }: TemplateSelectorProps) {
                             Design Engine v2.0
                         </p>
                         <div className="h-px w-8 sm:w-12 bg-slate-200 dark:bg-white/10" />
-                    </motion.div>
+                    </div>
                 </div>
             </div>
         </div>

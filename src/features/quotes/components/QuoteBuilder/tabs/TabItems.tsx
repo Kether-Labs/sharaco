@@ -8,6 +8,7 @@ import { useQuoteTotal } from "../../../hooks/useQuoteTotal";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { formatCurrency } from "@/features/quotes/lib/formatCurrency";
 
 interface TabItemsProps {
     draft: QuoteDraft;
@@ -26,8 +27,7 @@ export function TabItems({ draft, onItemChange, onAddItem, onRemoveItem, onDraft
         draft.isTaxExempt
     );
 
-    const formatCurrency = (amount: number) =>
-        new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XAF' }).format(amount);
+    
 
     return (
         <div className="space-y-10 pb-32">
