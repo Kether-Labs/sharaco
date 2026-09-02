@@ -191,8 +191,8 @@ export default function Hero() {
 
               <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-5">
                 <Link href="/register">
-                  <button className="bg-[#2563EB] text-white  px-8 py-4 rounded-full text-lg font-bold transition-all hover:scale-105 active:scale-95 shadow-xl shadow-black/10 dark:shadow-white/10 flex items-center justify-center">
-                    Rejoindre la waitlist
+                  <button className="bg-[#2563EB] text-white  px-8 py-4 rounded-full text-lg font-bold cursor-pointer shadow-xl shadow-black/10 dark:shadow-white/10 flex items-center justify-center">
+                    Créer mon compte gratuitement
                   </button>
                 </Link>
                 <Link href="/templates">
