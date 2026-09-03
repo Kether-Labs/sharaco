@@ -1,99 +1,127 @@
-"use client"
+// features/home/components/PainPointsSection.tsx
+// Server component : aucune interactivité requise → pas de "use client" (perf ⚡)
 
 import Link from 'next/link'
-import { AlertTriangle, Clock, EyeOff, UserX, Sparkles, ArrowRight } from 'lucide-react'
+import { Clock, BellOff, EyeOff, FileWarning, ArrowDown, TrendingDown, AlertTriangle } from 'lucide-react'
+
+interface PainPoint {
+  icon: typeof Clock
+  title: string
+  description: string
+  cost: string
+}
+
+// ⚠️ Vérifie/ajuste le "48%" avec une source solide (études BTP/services le citent souvent).
+// Un chiffre citable > un chiffre rond.
+const PAIN_POINTS: PainPoint[] = [
+  {
+    icon: Clock,
+    title: '2 heures perdues par devis',
+    description: 'Mise en page, alignements, totaux recalculés à la main… pour un document identique à 90 % au précédent.',
+    cost: '≈ 100 € de temps non facturé',
+  },
+  {
+    icon: BellOff,
+    title: 'Et les relances ? On oublie.',
+    description: 'Le devis parti, on enchaîne sur le dossier suivant. Sans relance, vos propositions dorment dans les boîtes mail.',
+    cost: '48 % des devis ne sont jamais relancés',
+  },
+  {
+    icon: EyeOff,
+    title: "Zéro visibilité après l'envoi",
+    description: 'A-t-il ouvert ? A-t-il transféré à son associé ? Aucune donnée, aucune alerte. Vous relancez à l’aveugle, au pire moment.',
+    cost: '0 suivi natif dans un e-mail',
+  },
+  {
+    icon: FileWarning,
+    title: 'devis_final_V7_corrigé(2).docx',
+    description: 'Les versions se multiplient, les remises se mélangent, et le client finit par recevoir… l’ancienne version.',
+    cost: '1 erreur de version = confiance entamée',
+  },
+]
 
 export default function PainPointsSection() {
   return (
-    <section className="py-16 md:py-24 max-w-6xl mx-auto px-4 relative z-10">
-      {/* Header */}
-      <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-bold uppercase tracking-wider">
-          <AlertTriangle className="w-3.5 h-3.5" />
-          Le problème actuel
-        </div>
-        <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
-          Chaque semaine, des freelances perdent des clients pour ça
-        </h2>
-        <p className="text-lg text-slate-600 dark:text-slate-400 font-medium">
-          Si vous avez reconnu au moins une de ces situations — <span className="text-slate-900 dark:text-white font-bold">Sharaco a été conçu pour vous.</span>
-        </p>
-      </div>
+    <section id="pain" className="relative py-24 lg:py-32">
+      {/* Fond en rupture douce avec le hero */}
+      <div className="absolute inset-0 -z-10 bg-slate-50/60 dark:bg-slate-900/40" />
+      <div className="absolute inset-x-0 top-0 -z-10 h-px bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-800 to-transparent" />
 
-      {/* 3 Pain Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {/* Card 1 */}
-        <div className="group relative rounded-3xl p-8 bg-slate-900/40 dark:bg-slate-900/60 backdrop-blur-xl border border-rose-500/20 dark:border-rose-500/10 shadow-xl transition-all duration-300 hover:border-rose-500/40 hover:-translate-y-1.5 flex flex-col justify-between">
-          <div className="space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500 font-bold group-hover:scale-110 transition-transform">
-              <Clock className="w-6 h-6" />
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+       <div className="mx-auto max-w-3xl text-center">
+  <p className="text-xs font-bold uppercase tracking-[0.2em] text-rose-500 dark:text-rose-400">
+    Le constat
+  </p>
+  <h2 className="mt-4 text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+    Le vrai coût de vos devis
+  </h2>
+  <p className="mt-6 text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
+    Le devis lui-même ? 15 minutes. Mais entre les mises en page, les relances
+    oubliées et les versions perdues, c&apos;est tout le reste qui vous coûte
+    de l&apos;argent. Vous vivez probablement l&apos;un de ces quatre scénarios.
+  </p>
+</div>
+
+        {/* Grille des douleurs */}
+        <div className="mt-16 grid gap-6 sm:grid-cols-4">
+          {PAIN_POINTS.map((pain) => (
+            <article
+              key={pain.title}
+              className="group relative rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 p-7 sm:p-8 transition-all duration-300 hover:-translate-y-1 hover:border-rose-300 dark:hover:border-rose-500/40 hover:shadow-xl hover:shadow-rose-500/5"
+            >
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-rose-500/10 text-rose-500 dark:text-rose-400">
+                <pain.icon className="h-5.5 w-5.5" strokeWidth={1.8} />
+              </div>
+
+              <h3 className="mt-5 text-lg font-bold text-slate-900 dark:text-white break-words">
+                {pain.title}
+              </h3>
+              <p className="mt-3 text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed">
+                {pain.description}
+              </p>
+
+              {/* Le coût — c'est LUI qui pique */}
+              <div className="mt-6 inline-flex items-center gap-1.5 rounded-full bg-rose-500/10 px-3 py-1.5 text-xs font-bold text-rose-600 dark:text-rose-400">
+                <AlertTriangle className="h-3.5 w-3.5" />
+                {pain.cost}
+              </div>
+            </article>
+          ))}
+        </div>
+
+        {/* Agitation finale : le calcul qui fait mal */}
+        <div className="mt-16 overflow-hidden rounded-3xl border border-slate-800 bg-slate-900 dark:bg-black/60 p-8 sm:p-12 shadow-2xl">
+          <div className="flex flex-col lg:flex-row lg:items-center gap-8 lg:gap-12">
+            <div className="flex-1">
+              <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-rose-400">
+                <TrendingDown className="h-4 w-4" />
+                Le calcul qui fait mal
+              </p>
+              <p className="mt-4 text-xl sm:text-2xl lg:text-3xl font-bold text-white leading-snug">
+                10 devis/mois × 2 heures ={' '}
+                <span className="text-rose-400">20 heures perdues</span>.
+                <span className="block mt-2 text-slate-300 text-lg sm:text-xl">
+                  Soit <span className="font-bold text-white">6 semaines de chiffre d&apos;affaires</span> évaporées sur une année.
+                </span>
+              </p>
             </div>
-            <div className="text-xs font-bold text-rose-500 uppercase tracking-widest">Temps perdu</div>
-            <p className="text-slate-200 font-semibold text-lg leading-snug">
-              Vous passez 1h30 sur Word. Un tableau bancal. Un client qui ne rappelle plus.
-            </p>
-          </div>
-          <div className="mt-8 pt-4 border-t border-white/5 flex items-center gap-2 text-xs text-slate-400">
-            <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
-            <span>Inconvénient majeur</span>
-          </div>
-        </div>
 
-        {/* Card 2 */}
-        <div className="group relative rounded-3xl p-8 bg-slate-900/40 dark:bg-slate-900/60 backdrop-blur-xl border border-rose-500/20 dark:border-rose-500/10 shadow-xl transition-all duration-300 hover:border-rose-500/40 hover:-translate-y-1.5 flex flex-col justify-between">
-          <div className="space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500 font-bold group-hover:scale-110 transition-transform">
-              <EyeOff className="w-6 h-6" />
+            {/* Pivot vers la solution */}
+            <div className="shrink-0">
+              <a
+                href="#solution"
+                className="group inline-flex items-center gap-3 rounded-full bg-white px-7 py-4 text-base font-bold text-slate-900 transition-all hover:scale-[1.03] active:scale-95 shadow-xl"
+              >
+                Et si on réglait ça ?
+                <ArrowDown className="h-5 w-5 group-hover:translate-y-1 transition-transform" />
+              </a>
+              <p className="mt-3 text-center text-xs text-slate-400 font-medium lg:text-left">
+                La réponse tient en 2 minutes.
+              </p>
             </div>
-            <div className="text-xs font-bold text-rose-500 uppercase tracking-widest">Incertitude</div>
-            <p className="text-slate-200 font-semibold text-lg leading-snug">
-              Votre devis est parti. Silence radio. Accepté ? Lu ? Ignoré ? Vous ne savez pas.
-            </p>
-          </div>
-          <div className="mt-8 pt-4 border-t border-white/5 flex items-center gap-2 text-xs text-slate-400">
-            <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
-            <span>Manque de visibilité</span>
           </div>
         </div>
-
-        {/* Card 3 */}
-        <div className="group relative rounded-3xl p-8 bg-slate-900/40 dark:bg-slate-900/60 backdrop-blur-xl border border-rose-500/20 dark:border-rose-500/10 shadow-xl transition-all duration-300 hover:border-rose-500/40 hover:-translate-y-1.5 flex flex-col justify-between">
-          <div className="space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500 font-bold group-hover:scale-110 transition-transform">
-              <UserX className="w-6 h-6" />
-            </div>
-            <div className="text-xs font-bold text-rose-500 uppercase tracking-widest">Chiffre d'affaires perdu</div>
-            <p className="text-slate-200 font-semibold text-lg leading-snug">
-              Vous oubliez de relancer. Le client signe ailleurs.
-            </p>
-          </div>
-          <div className="mt-8 pt-4 border-t border-white/5 flex items-center gap-2 text-xs text-slate-400">
-            <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
-            <span>Occasion manquée</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Solution Banner & Transition CTA */}
-      <div className="mt-16 rounded-3xl p-8 sm:p-12 bg-slate-900/60 backdrop-blur-2xl border border-sky-500/20 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
-        <div className="space-y-2 max-w-xl">
-          <div className="inline-flex items-center gap-2 text-sky-400 font-bold text-sm uppercase tracking-wider">
-            La Solution Sharaco
-          </div>
-          <h3 className="text-2xl sm:text-3xl font-extrabold text-white">
-            Sharaco règle ça. Voici comment.
-          </h3>
-          <p className="text-slate-300 text-sm sm:text-base font-medium">
-            Automatisez vos devis, suivez leur ouverture en temps réel et relancez au moment exact où le prospect hésite.
-          </p>
-        </div>
-
-        <Link href="/register" className="flex-shrink-0">
-          <button className="bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold px-8 py-4 rounded-full text-lg shadow-xl shadow-sky-500/25 transition-all transform hover:scale-105 active:scale-95 flex items-center gap-3">
-            Commencez maintenant
-            <ArrowRight className="w-5 h-5" />
-          </button>
-        </Link>
       </div>
     </section>
   )

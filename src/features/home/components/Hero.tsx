@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { SwitchTheme } from '@/components/ui/switch-theme'
 import Image from 'next/image'
 import Logo from '@/components/ui/logo'
+import { BackgroundRippleEffect } from "@/components/ui/background-ripple-effect";
 
 // Types
 interface NavItem {
@@ -149,6 +150,7 @@ export default function Hero() {
 
       {/* Main Content */}
       <main className=" overflow-hidden">
+        
         {/* Hero section */}
         <section className="relative pt-40  lg:pt-56 ">
           {/* Background decoration */}
@@ -188,6 +190,7 @@ export default function Hero() {
               <p className="mt-8 text-lg sm:text-xl text-slate-600 dark:text-slate-400 max-w-3xl font-medium leading-relaxed">
                 Créez, envoyez et suivez vos devis depuis une seule plateforme. Fini Word, Excel et les devis perdus dans les mails.
               </p>
+          <BackgroundRippleEffect />
 
               <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-5">
                 <Link href="/register">
