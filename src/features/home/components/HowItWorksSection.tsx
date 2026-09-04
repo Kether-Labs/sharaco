@@ -1,143 +1,155 @@
 "use client"
 
-import { Users, Layers, Send, CheckCircle2, Sparkles, ArrowRight, FileText, Zap, ShieldCheck } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { useRef } from 'react'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
 
 export default function HowItWorksSection() {
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollRef.current) {
+      const scrollAmount = scrollRef.current.firstElementChild?.clientWidth || 300
+      scrollRef.current.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' })
+    }
+  }
+
   const steps = [
     {
-      number: "01",
-      badge: "Étape 1",
-      badgeColor: "bg-sky-500/10 border-sky-500/20 text-sky-400",
-      gradient: "from-sky-400 via-blue-500 to-indigo-600",
-      title: "Ajoutez vos clients & prestations",
-      description: "Importez ou créez votre base de clients et vos éléments en quelques clics. Fini la réécriture répétitive et les erreurs de saisie.",
-      icon: <Users className="w-6 h-6 text-sky-400" />,
-      preview: (
-        <div className="space-y-3 p-4 bg-slate-900/80 rounded-2xl border border-white/10 text-left">
-          <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/5 border border-white/5">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold text-xs">AC</div>
-              <div>
-                <div className="text-xs font-bold text-white">Acme Corp</div>
-                <div className="text-[10px] text-slate-400">client@acme.com</div>
-              </div>
-            </div>
-            <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">Actif</span>
-          </div>
-          <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/5 border border-white/5">
-            <div className="flex items-center gap-2">
-              <FileText className="w-4 h-4 text-sky-400" />
-              <span className="text-xs text-slate-200 font-medium">Design UI/UX App</span>
-            </div>
-            <span className="text-xs font-mono font-bold text-white">1 200 €</span>
-          </div>
-        </div>
-      )
+      number: "1",
+      title: "Créez un projet et son client",
+      description: "Un dossier dédié par chantier : regroupez devis, factures et documents d'un même client. Tout est centralisé.",
+      screenshotNote: "Page /dashboard/projects avec quelques cartes projets"
     },
     {
-      number: "02",
-      badge: "Étape 2",
-      badgeColor: "bg-indigo-500/10 border-indigo-500/20 text-indigo-400",
-      gradient: "from-indigo-400 via-purple-500 to-violet-600",
-      title: "Composez avec un modèle pro",
-      description: "Choisissez parmi des templates élégants, adaptés à votre identité visuelle. Générez des devis clairs et ultra-professionnels.",
-      icon: <Layers className="w-6 h-6 text-indigo-400" />,
-      preview: (
-        <div className="p-4 bg-slate-900/80 rounded-2xl border border-white/10 text-left space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-indigo-400 uppercase tracking-wider">Template Premium</span>
-            <div className="flex gap-1.5">
-              <div className="w-2.5 h-2.5 rounded-full bg-sky-500"></div>
-              <div className="w-2.5 h-2.5 rounded-full bg-indigo-500"></div>
-              <div className="w-2.5 h-2.5 rounded-full bg-violet-500"></div>
-            </div>
-          </div>
-          <div className="h-16 rounded-xl bg-gradient-to-r from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 flex items-center justify-center gap-2">
-            <Sparkles className="w-4 h-4 text-indigo-400 animate-pulse" />
-            <span className="text-xs font-bold text-white">Mise en page automatique</span>
-          </div>
-        </div>
-      )
+      number: "2",
+      title: "Rédigez votre devis en temps réel",
+      description: "Éditeur avec aperçu live : totaux et TVA se calculent seuls pendant que vous saisissez. Cinq modèles pros prêts à imprimer.",
+      screenshotNote: "L'éditeur de devis avec preview à droite"
     },
     {
-      number: "03",
-      badge: "Étape 3",
-      badgeColor: "bg-emerald-500/10 border-emerald-500/20 text-emerald-400",
-      gradient: "from-emerald-400 via-teal-500 to-cyan-600",
-      title: "Envoyez et encaissez",
-      description: "Suivez l'ouverture en temps réel, faites signer électroniquement en un clic et convertissez automatiquement vos devis en factures.",
-      icon: <Send className="w-6 h-6 text-emerald-400" />,
-      preview: (
-        <div className="p-4 bg-slate-900/80 rounded-2xl border border-white/10 text-left space-y-3">
-          <div className="flex items-center justify-between p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-              <span className="text-xs font-bold text-emerald-300">Devis Signé en ligne</span>
-            </div>
-            <span className="text-[10px] font-bold text-emerald-400 bg-emerald-400/20 px-2 py-0.5 rounded-full">Validé</span>
-          </div>
-          <div className="flex items-center justify-between text-xs text-slate-400 px-1">
-            <span>Relance automatique</span>
-            <span className="text-emerald-400 font-mono font-bold">Payé le 04/08</span>
-          </div>
-        </div>
-      )
+      number: "3",
+      title: "Envoyez et suivez en direct",
+      description: "Le client reçoit un lien privé par email : suivez en direct l'ouverture, la consultation et l'acceptation de votre devis.",
+      screenshotNote: "Page détail devis avec statuts \"Consulté\", \"Accepté\""
+    },
+    {
+      number: "4",
+      title: "La facture naît automatiquement",
+      description: "Dès l'acceptation du devis, la facture est générée seule avec la même numérotation et les mêmes infos. Zéro double saisie.",
+      screenshotNote: "Page détail facture avec le lien vers le devis parent"
+    },
+    {
+      number: "5",
+      title: "Échelonnez le paiement",
+      description: "Acompte 30 %, mi-parcours 40 %, solde 30 % : chaque facture est générée à la date prévue, sans que vous ayez à y penser.",
+      screenshotNote: "Timeline échéancier avec les 3 tranches"
+    },
+    {
+      number: "6",
+      title: "Encaissez sans relancer",
+      description: "Retards détectés seuls, alertes avant échéance et vue des encaissements : Sharaco suit tout, jusqu'au dernier centime.",
+      screenshotNote: ""
     }
   ]
 
   return (
-    <section className="py-20 md:py-32 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-      {/* Background Subtle Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-sky-500/5 blur-[140px] rounded-full pointer-events-none -z-10" />
+    <section className="relative bg-white dark:bg-slate-950 pt-40 pb-32 overflow-hidden">
+      {/* Seamless Gradient Transition from FeaturesGrid */}
+      <div className="absolute top-0 left-0 right-0 h-96 bg-gradient-to-b from-[#92C7FE] to-white dark:from-[#0B172E] dark:to-slate-950 pointer-events-none" />
 
-      {/* Header */}
-      <div className="text-center max-w-3xl mx-auto mb-20 space-y-4">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-xs font-bold uppercase tracking-wider">
-          <Zap className="w-3.5 h-3.5" />
-          How It Works — Zéro friction
-        </div>
-        <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
-          Votre premier devis en <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-indigo-500">3 étapes</span>
-        </h2>
-        <p className="text-lg text-slate-600 dark:text-slate-400 font-medium">
-          Une expérience fluide et intuitive, conçue pour vous faire gagner un temps précieux à chaque opportunité.
-        </p>
+      {/* Background Decorative Mesh (Subtle) */}
+      <div className="absolute inset-0 hidden dark:block -z-10 opacity-30">
+        <div className="absolute top-[40%] right-[10%] w-[30%] h-[30%] bg-indigo-500/10 blur-[120px] rounded-full" />
       </div>
 
-      {/* Steps Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
-        {steps.map((step, idx) => (
-          <div
-            key={idx}
-            className="group relative rounded-3xl p-8 bg-slate-950/60 dark:bg-slate-900/60 backdrop-blur-xl border border-white/10 shadow-2xl transition-all duration-500 hover:border-white/20 hover:-translate-y-2 flex flex-col justify-between"
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        
+        {/* Header */}
+        <div className="max-w-3xl mb-16 md:mb-24">
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-6"
           >
-            {/* Top Row: Number & Icon */}
-            <div>
-              <div className="flex items-center justify-between mb-8">
-                <span className={`text-6xl sm:text-7xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br ${step.gradient}`}>
+            Comment ça marche
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="text-lg md:text-xl text-slate-600 dark:text-slate-400"
+          >
+            Du projet à l'encaissement, <span className="text-blue-600 dark:text-blue-500 font-semibold">en 6 étapes </span>
+             Un workflow complet qui s'adapte à votre façon de travailler.
+          </motion.p>
+        </div>
+
+        {/* Carousel Container */}
+        <div className="relative">
+          {/* Scrollable area */}
+          <div 
+            ref={scrollRef}
+            className="flex overflow-x-auto snap-x snap-mandatory hide-scrollbar gap-0 pb-8"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {steps.map((step, idx) => (
+              <div 
+                key={idx} 
+                className="snap-start shrink-0 w-[85vw] md:w-[50vw] lg:w-[25%] flex flex-col pr-8 md:pr-16 relative group"
+              >
+                {/* Vertical Separator */}
+                {idx !== steps.length - 1 && (
+                  <div className="hidden md:block absolute right-4 md:right-8 top-6 bottom-4 w-px bg-slate-200 dark:bg-slate-800 transition-colors" />
+                )}
+
+                {/* Big Number */}
+                <div className="text-[3rem] md:text-[5rem] leading-none font-medium text-[#c6d2f5]/70 mb-6 font-sans tracking-tighter">
                   {step.number}
-                </span>
-                <div className={`p-3 rounded-2xl border ${step.badgeColor} group-hover:scale-110 transition-transform`}>
-                  {step.icon}
                 </div>
+                
+                {/* Title */}
+                <h3 className="text-xl md:text-xl font-bold text-[#0B172E] dark:text-white mb-4">
+                  {step.title}
+                </h3>
+                
+                {/* Description */}
+                <p className="text-slate-600 dark:text-slate-400 text-base md:text-md leading-relaxed flex-grow">
+                  {step.description}
+                </p>
               </div>
-
-              {/* Title & Description */}
-              <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-sky-300 transition-colors">
-                {step.title}
-              </h3>
-              <p className="text-slate-400 text-sm leading-relaxed mb-8 font-medium">
-                {step.description}
-              </p>
-            </div>
-
-            {/* Interactive Preview Widget */}
-            <div className="mt-auto pt-6 border-t border-white/5">
-              {step.preview}
-            </div>
+            ))}
           </div>
-        ))}
+
+          {/* Carousel Controls */}
+          <div className="flex items-center justify-end gap-3 mt-8">
+            <button 
+              onClick={() => scroll('left')}
+              className="p-3 rounded-full border border-slate-200 dark:border-slate-700 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-200 dark:hover:border-blue-800 transition-all"
+              aria-label="Précédent"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <button 
+              onClick={() => scroll('right')}
+              className="p-3 rounded-full border border-slate-200 dark:border-slate-700 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-200 dark:hover:border-blue-800 transition-all"
+              aria-label="Suivant"
+            >
+              <ArrowRight className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+
       </div>
+
+      {/* Global styles for hiding scrollbar */}
+      <style dangerouslySetInnerHTML={{__html: `
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+      `}} />
     </section>
   )
 }

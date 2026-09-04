@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
-
+import { BackgroundRippleEffect } from "@/components/ui/background-ripple-effect";
 const features = [
   {
     title: "Devis en quelques minutes",
@@ -93,6 +93,7 @@ export default function FeaturesGrid() {
               </div>
             </motion.div>
           ))}
+          
         </div>
       </div>
     </section>
