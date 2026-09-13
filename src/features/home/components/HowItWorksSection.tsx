@@ -17,7 +17,7 @@ export default function HowItWorksSection() {
   const steps = [
     {
       number: "1",
-      title: "Créez un projet et son client",
+      title: "Créez le projet de votre client",
       description: "Un dossier dédié par chantier : regroupez devis, factures et documents d'un même client. Tout est centralisé.",
       screenshotNote: "Page /dashboard/projects avec quelques cartes projets"
     },
